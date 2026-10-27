@@ -91,6 +91,12 @@ struct MatchView: View {
 
     private var panel: some View {
         VStack(alignment: .leading, spacing: 10) {
+            if model.state.phase == .finished {
+                Text(model.state.winner == .us ? "Match gagné \(model.state.setsWon)" : "Match perdu \(model.state.setsWon)")
+                    .font(.barlowCondensed(28))
+            } else if model.canStartNextSet {
+                big("Set \(model.state.setIndex + 1) : même composition", bg: TmColor.yellow, fg: TmColor.navy) { model.startNextSet() }
+            }
             Text(model.selectedPlayerId.map { "#\(model.label($0).number) \(model.label($0).name) : choisir l'action" } ?? "Touchez une joueuse, puis l'action")
                 .font(.barlow(18, .bold))
             HStack(spacing: 8) {

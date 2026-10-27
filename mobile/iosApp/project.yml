@@ -25,14 +25,14 @@ targets:
         UILaunchScreen: {}
         UIRequiresFullScreen: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight, UIInterfaceOrientationPortrait]
-        UIAppFonts:
-          - Fonts/barlow_regular.ttf
-          - Fonts/barlow_medium.ttf
-          - Fonts/barlow_semibold.ttf
-          - Fonts/barlow_bold.ttf
-          - Fonts/barlow_condensed_semibold.ttf
-          - Fonts/barlow_condensed_bold.ttf
+        UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight, UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown]
+        UIAppFonts:   # noms seuls : XcodeGen copie les polices à plat dans le bundle
+          - barlow_regular.ttf
+          - barlow_medium.ttf
+          - barlow_semibold.ttf
+          - barlow_bold.ttf
+          - barlow_condensed_semibold.ttf
+          - barlow_condensed_bold.ttf
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: fr.hasteria.tempsmort

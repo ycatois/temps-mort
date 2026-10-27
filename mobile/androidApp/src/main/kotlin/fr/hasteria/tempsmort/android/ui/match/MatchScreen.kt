@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -49,7 +51,7 @@ fun MatchScreen(vm: MatchViewModel = viewModel()) {
     val s = vm.state
     Column(Modifier.fillMaxSize().background(TmColor.GroundApp).safeDrawingPadding()) {
         ScoreBar(vm)
-        BoxWithConstraints(Modifier.fillMaxSize().padding(16.dp)) {
+        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(16.dp)) {
             val wide = maxWidth >= 840.dp
             if (wide) {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -57,13 +59,12 @@ fun MatchScreen(vm: MatchViewModel = viewModel()) {
                     ActionPanel(vm, Modifier.weight(1f))
                 }
             } else {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Court(vm, Modifier.fillMaxWidth())
                     ActionPanel(vm, Modifier.fillMaxWidth())
                 }
             }
         }
-        if (s.phase == Phase.FINISHED) Text("Match terminé", Modifier.padding(16.dp))
     }
 }
 
@@ -157,6 +158,13 @@ private fun PlayerToken(number: Int, name: String, serving: Boolean, libero: Boo
 private fun ActionPanel(vm: MatchViewModel, modifier: Modifier) {
     val selected = vm.selectedPlayerId?.let { vm.playerLabel(it) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        when {
+            vm.state.phase == Phase.FINISHED -> Text(
+                if (vm.state.winner == Side.US) "Match gagné ${vm.state.setsWon}" else "Match perdu ${vm.state.setsWon}",
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            vm.canStartNextSet -> BigButton("Set ${vm.state.setIndex + 1} : même composition", TmColor.Yellow, TmColor.Navy, Modifier.fillMaxWidth(), vm::startNextSet)
+        }
         Text(
             selected?.let { "#${it.first} ${it.second} : choisir l'action" } ?: "Touchez une joueuse, puis l'action",
             style = MaterialTheme.typography.titleMedium,

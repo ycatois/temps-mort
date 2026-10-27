@@ -1,9 +1,9 @@
 package fr.hasteria.tempsmort.domain
 
 data class MatchStats(
-    /** % d'échanges gagnés quand l'adversaire sert (null si aucun). */
+    /** Part (0 à 1) des échanges gagnés quand l'adversaire sert (null si aucun). */
     val sideOutRate: Double?,
-    /** % d'échanges gagnés sur notre service (null si aucun). */
+    /** Part (0 à 1) des échanges gagnés sur notre service (null si aucun). */
     val breakRate: Double?,
     /** Points marqués par joueur (ace, attaque, contre). */
     val pointsByPlayer: Map<String, Int>,
@@ -12,8 +12,9 @@ data class MatchStats(
     /** Échanges gagnés / perdus par rotation (R1..Rn). */
     val byRotation: Map<Int, Score>,
 ) {
-    /** La rotation la plus faible (solde le plus négatif), utile pour le résumé « À retenir ». */
-    val weakestRotation: Int? get() = byRotation.minByOrNull { (_, s) -> s.us - s.them }?.key
+    /** Rotation au plus mauvais solde, pour le bloc « À retenir » du résumé ; null si aucune n'est déficitaire. */
+    val weakestRotation: Int?
+        get() = byRotation.filterValues { it.us < it.them }.minByOrNull { (_, s) -> s.us - s.them }?.key
 }
 
 fun computeStats(history: List<RallyRecord>, setIndex: Int? = null): MatchStats {

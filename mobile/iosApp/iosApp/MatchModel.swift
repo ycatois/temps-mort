@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import Shared
 
 /// Relais SwiftUI du MatchSession Kotlin (module shared) : même moteur que sur Android.
@@ -30,6 +31,12 @@ final class MatchModel: ObservableObject {
     }
 
     var canUndo: Bool { session.canUndo }
+    var canStartNextSet: Bool { session.nextSetStart() != nil }
+
+    /// Set suivant avec la composition du set précédent (l'écran E04 permettra de la modifier).
+    func startNextSet() {
+        if let next = session.nextSetStart() { record(next) }
+    }
 
     func select(_ id: String) { selectedPlayerId = selectedPlayerId == id ? nil : id }
 

@@ -34,11 +34,15 @@ class MatchViewModel : ViewModel() {
     var lastRejection: Rejection? by mutableStateOf(null)
         private set
 
+    var canUndo: Boolean by mutableStateOf(false)
+        private set
+    var canStartNextSet: Boolean by mutableStateOf(false)
+        private set
+
+    // Après toutes les propriétés d'état : l'init les utilise.
     init {
         record(MatchEvent.StartSet(Side.US, listOf("manon", "chloe", "emma", "ines", "lucie", "lea"), liberoId = "jade"))
     }
-
-    val canUndo: Boolean get() = session.canUndo
 
     fun select(playerId: String) {
         selectedPlayerId = if (selectedPlayerId == playerId) null else playerId
@@ -55,17 +59,28 @@ class MatchViewModel : ViewModel() {
     fun opponentPoint() = record(MatchEvent.Rally(Side.THEM))
     fun timeout() = record(MatchEvent.Timeout(Side.US))
 
+    /** Set suivant avec la composition du set précédent (l'écran E04 permettra de la modifier). */
+    fun startNextSet() {
+        session.nextSetStart()?.let { record(it) }
+    }
+
     fun undo() {
         session.undo()
-        state = session.state
         lastRejection = null
+        refresh()
     }
 
     fun playerLabel(id: String): Pair<Int, String> = team.player(id)?.let { it.number to it.firstName } ?: (0 to "?")
 
     private fun record(event: MatchEvent) {
         lastRejection = session.record(event)
+        refresh()
+    }
+
+    private fun refresh() {
         state = session.state
+        canUndo = session.canUndo
+        canStartNextSet = session.nextSetStart() != null
     }
 
     private fun demoTeam() = Team(

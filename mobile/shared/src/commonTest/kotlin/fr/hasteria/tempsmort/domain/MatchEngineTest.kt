@@ -130,6 +130,25 @@ class MatchEngineTest {
         assertEquals(Side.THEM, s.state.serving)
     }
 
+    @Test fun firstSetStartCannotBeUndone() {
+        val s = session()
+        s.record(MatchEvent.StartSet(Side.US, start))
+        s.undo()
+        assertEquals(Phase.IN_PLAY, s.state.phase)
+    }
+
+    @Test fun nextSetReusesLineupAndAlternatesFirstServer() {
+        val s = session()
+        assertNull(s.nextSetStart())
+        s.record(MatchEvent.StartSet(Side.US, start, liberoId = "jade"))
+        assertNull(s.nextSetStart()) // set en cours
+        s.win(25)
+        val next = s.nextSetStart()
+        assertEquals(MatchEvent.StartSet(Side.THEM, start, liberoId = "jade"), next)
+        assertNull(s.record(next!!))
+        assertEquals(1, s.state.setIndex)
+    }
+
     @Test fun statsSideOutBreakAndRotation() {
         val s = session()
         s.record(MatchEvent.StartSet(Side.THEM, start))
@@ -142,7 +161,9 @@ class MatchEngineTest {
         assertEquals(mapOf("lucie" to 1, "chloe" to 1), st.pointsByPlayer)
         assertEquals(mapOf("chloe" to 1), st.errorsByPlayer)
         assertEquals(Score(1, 1), st.byRotation[2])
-        assertEquals(2, st.weakestRotation)
+        assertNull(st.weakestRotation) // aucune rotation déficitaire
+        s.record(MatchEvent.Rally(Side.THEM)) // l'adversaire sert et marque, toujours en R2
+        assertEquals(2, s.stats().weakestRotation)
     }
 }
 

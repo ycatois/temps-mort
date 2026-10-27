@@ -32,7 +32,7 @@ AGP 9 : le Kotlin est compilé par AGP lui-même (pas de plugin `kotlin-android`
 
 ## Ce qui existe
 
-- `shared` : équipes, joueuses, catégories (M7 → vétérans, loisir), formats 6x6/4x4/2x2, mixité, règles paramétrables, moteur de match à événements, statistiques (side-out, break, par rotation, par joueuse), 18 tests.
+- `shared` : équipes, joueuses, catégories (M7 → vétérans, loisir), formats 6x6/4x4/2x2, mixité, règles paramétrables, moteur de match à événements, statistiques (side-out, break, par rotation, par joueuse), passage au set suivant, 21 tests.
 - `androidApp` et `iosApp` : premier écran E05 « Match en direct » sur une équipe de démonstration (celle des maquettes), en disposition tablette et smartphone, branché sur le vrai moteur : saisie joueuse puis action, faute adverse, point adverse, temps mort, annulation, libero, rotation automatique.
 
 ## Prochaines étapes (ordre conseillé)

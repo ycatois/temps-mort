@@ -12,7 +12,20 @@ class MatchSession(team: Team, rules: MatchRules = MatchRules.defaultFor(team.fo
         private set
 
     val events: List<MatchEvent> get() = log.toList()
-    val canUndo: Boolean get() = log.isNotEmpty()
+
+    /** On n'annule pas le début du premier set : il vient de l'écran Composition, pas d'une saisie de match. */
+    val canUndo: Boolean get() = log.size > 1
+
+    /**
+     * Début du set suivant proposé par défaut : même composition et même libero que le set précédent,
+     * service à l'équipe qui a reçu en premier au set précédent. Null si aucun set n'est à démarrer.
+     * Le coach peut modifier la composition avant de valider (écran E04).
+     */
+    fun nextSetStart(): MatchEvent.StartSet? {
+        if (state.phase != Phase.AWAITING_SET) return null
+        val previous = log.lastOrNull { it is MatchEvent.StartSet } as? MatchEvent.StartSet ?: return null
+        return previous.copy(firstServer = previous.firstServer.other)
+    }
 
     /** Enregistre l'événement et renvoie null, ou renvoie la raison du refus sans rien changer. */
     fun record(event: MatchEvent): Rejection? {
@@ -23,7 +36,7 @@ class MatchSession(team: Team, rules: MatchRules = MatchRules.defaultFor(team.fo
     }
 
     fun undo() {
-        if (log.isEmpty()) return
+        if (!canUndo) return
         log.removeAt(log.lastIndex)
         state = engine.replay(log)
     }

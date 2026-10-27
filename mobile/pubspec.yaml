@@ -1,0 +1,39 @@
+name: temps_mort
+description: Temps Mort — le banc de touche du coach de volley, sur tablette et smartphone.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Écran toujours allumé pendant le match (V1-TEC-06)
+  wakelock_plus: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  # Polices copiées depuis design/fonts/ttf par `node design/build.mjs`
+  fonts:
+    - family: Barlow
+      fonts:
+        - asset: assets/fonts/barlow_regular.ttf
+          weight: 400
+        - asset: assets/fonts/barlow_medium.ttf
+          weight: 500
+        - asset: assets/fonts/barlow_semibold.ttf
+          weight: 600
+        - asset: assets/fonts/barlow_bold.ttf
+          weight: 700
+    - family: BarlowCondensed
+      fonts:
+        - asset: assets/fonts/barlow_condensed_semibold.ttf
+          weight: 600
+        - asset: assets/fonts/barlow_condensed_bold.ttf
+          weight: 700

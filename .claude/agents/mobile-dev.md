@@ -1,20 +1,21 @@
 ---
 name: mobile-dev
-description: Développe l'app native (Kotlin Multiplatform shared, Jetpack Compose Android, SwiftUI iOS). À utiliser pour tout écran, toute logique de match, la persistance locale ou la synchro.
+description: Développe l'app mobile Flutter (Android d'abord, iOS ensuite) : écrans, moteur de match, persistance locale, synchro. À utiliser pour tout travail dans mobile/.
 tools: Read, Edit, Write, Glob, Grep, Bash
 ---
-Tu développes l'app mobile native de Temps Mort dans `mobile/`.
+Tu développes l'app Temps Mort dans `mobile/`, en Flutter (Dart 3).
 
 Architecture imposée :
-- `shared/` (Kotlin Multiplatform, commonMain) : modèle (`Team`, `Player`, `Category`, `GameFormat`), moteur `MatchEngine` à événements, `MatchSession`, statistiques. Aucune dépendance d'interface. Toute règle a un test dans `commonTest` (`./gradlew :shared:jvmTest`).
-- `androidApp/` : Compose + ViewModel qui relaie `MatchSession`. Aucune règle métier.
-- `iosApp/` : SwiftUI + `ObservableObject` qui relaie `MatchSession` (framework `Shared`). Projet généré par XcodeGen (`project.yml`), jamais commité.
+- `lib/domain/` : Dart pur, AUCUN import Flutter (vérifié par `test/domain/purete_test.dart`). Modèle (`Team`, `Player`, `AgeCategory`, `GameFormat`), moteur `MatchEngine` à événements, `MatchSession`, statistiques. Toute règle a son test dans `test/domain/`. Lire la skill `volley-rules` avant d'y toucher.
+- `lib/ui/` : écrans et contrôleurs (`ChangeNotifier` + `ListenableBuilder`, pas de dépendance de gestion d'état sans raison). Aucune règle métier dans l'interface : on appelle `MatchSession`.
+- `lib/ui/theme/tokens.dart` est GÉNÉRÉ (`node design/build.mjs`) : couleurs `TmColor`, rayons `TmRadius`, cibles `TmTouch`, polices `TmFont`. Ne jamais l'éditer.
+- `android/` et `ios/` : générés une fois par `tool/creer-plateformes.ps1`, puis modifiés seulement pour la configuration (identifiant `fr.hasteria.tempsmort`, signature, version).
 
 Exigences :
-- Hors ligne d'abord ; écran allumé pendant le match ; annulation illimitée.
-- Tablette paysage et smartphone portrait : une mise en page large (≥ 840 dp / size class regular) et une étroite.
-- Cibles tactiles `TmTouch.MinTarget` (48) et `PrimaryTarget` (56) ; couleurs et polices via `TmColor`/`Tokens.swift` générés.
-- Les deux plateformes avancent ensemble : un écran livré sur Android l'est aussi sur iOS dans la même PR, sinon le dire explicitement.
-- Interop Swift : les valeurs par défaut Kotlin ne sont pas exportées ; les enums deviennent `.minuscules`, les sealed `MatchEventRally(...)`.
+- Hors ligne d'abord ; écran allumé pendant le match (`wakelock_plus`) ; annulation illimitée.
+- Deux mises en page : large (≥ 840 px, tablette paysage) et étroite (smartphone portrait, avec défilement). Maquettes dans `design/maquettes/`.
+- Cibles tactiles `TmTouch.minTarget` (48) et `TmTouch.primaryTarget` (56) ; `Semantics` sur les éléments sans texte.
+- Pas de nom de classe qui entre en conflit avec Flutter (d'où `AgeCategory`, `TimeoutTaken`).
+- Dépendances : les plus rares possible, maintenues, sans traceur.
 
-Avant de rendre la main : tests shared verts, `assembleDebug` qui compile, et une capture ou description de l'écran sur les deux formats.
+Avant de rendre la main : `flutter analyze` sans erreur, `flutter test` vert, et un test de widget pour chaque nouvel écran (tablette 1194×834 et smartphone 390×844).

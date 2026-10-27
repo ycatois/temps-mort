@@ -44,11 +44,9 @@ for (const target of ['web/public/assets', 'wp-theme/temps-mort/assets']) {
   for (const f of fonts) outputs.set(`${target}/fonts/${f}`, readFileSync(join(root, 'design/fonts', f)));
 }
 
-// Polices TTF pour les apps natives (Android : res/font, iOS : bundle déclaré dans Info.plist)
+// Polices TTF pour l'app Flutter (déclarées dans mobile/pubspec.yaml)
 for (const f of readdirSync(join(root, 'design/fonts/ttf')).filter((f) => f.endsWith('.ttf'))) {
-  const data = readFileSync(join(root, 'design/fonts/ttf', f));
-  outputs.set(`mobile/androidApp/src/main/res/font/${f}`, data);
-  outputs.set(`mobile/iosApp/iosApp/Fonts/${f}`, data);
+  outputs.set(`mobile/assets/fonts/${f}`, readFileSync(join(root, 'design/fonts/ttf', f)));
 }
 
 // ---------- WordPress theme.json ----------
@@ -94,46 +92,27 @@ const themeJson = {
 };
 outputs.set('wp-theme/temps-mort/theme.json', JSON.stringify(themeJson, null, 2) + '\n');
 
-// ---------- Android (Jetpack Compose) ----------
-outputs.set('mobile/androidApp/src/main/kotlin/fr/hasteria/tempsmort/android/ui/theme/Tokens.kt', [
+// ---------- App mobile (Flutter) ----------
+outputs.set('mobile/lib/ui/theme/tokens.dart', [
   `// ${HEADER}`,
-  'package fr.hasteria.tempsmort.android.ui.theme',
+  "import 'package:flutter/painting.dart';",
   '',
-  'import androidx.compose.ui.graphics.Color',
-  'import androidx.compose.ui.unit.dp',
-  '',
-  'object TmColor {',
-  ...colors.map(([k, v, role]) => `    /** ${role} */\n    val ${pascal(k)} = Color(0xFF${v.slice(1)})`),
+  'abstract final class TmColor {',
+  ...colors.map(([k, v, role]) => `  /// ${role}\n  static const ${camel(k)} = Color(0xFF${v.slice(1)});`),
   '}',
   '',
-  'object TmRadius {',
-  ...Object.entries(tokens.radius).filter(([k]) => k !== 'pill').map(([k, v]) => `    val ${pascal(k)} = ${v}.dp`),
+  'abstract final class TmRadius {',
+  ...Object.entries(tokens.radius).filter(([k]) => k !== 'pill').map(([k, v]) => `  static const double ${k} = ${v};`),
   '}',
   '',
-  'object TmTouch {',
-  `    val MinTarget = ${tokens.touch['min-target']}.dp`,
-  `    val PrimaryTarget = ${tokens.touch['primary-target']}.dp`,
+  'abstract final class TmTouch {',
+  `  static const double minTarget = ${tokens.touch['min-target']};`,
+  `  static const double primaryTarget = ${tokens.touch['primary-target']};`,
   '}',
   '',
-].join('\n'));
-
-// ---------- iOS (SwiftUI) ----------
-const rgb = (hex) => [1, 3, 5].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(4));
-outputs.set('mobile/iosApp/iosApp/Theme/Tokens.swift', [
-  `// ${HEADER}`,
-  'import SwiftUI',
-  '',
-  'enum TmColor {',
-  ...colors.map(([k, v, role]) => { const [r, g, b] = rgb(v); return `    /// ${role}\n    static let ${camel(k)} = Color(red: ${r}, green: ${g}, blue: ${b})`; }),
-  '}',
-  '',
-  'enum TmRadius {',
-  ...Object.entries(tokens.radius).filter(([k]) => k !== 'pill').map(([k, v]) => `    static let ${k}: CGFloat = ${v}`),
-  '}',
-  '',
-  'enum TmTouch {',
-  `    static let minTarget: CGFloat = ${tokens.touch['min-target']}`,
-  `    static let primaryTarget: CGFloat = ${tokens.touch['primary-target']}`,
+  'abstract final class TmFont {',
+  `  static const body = '${tokens.font.body.family}';`,
+  `  static const display = '${tokens.font.display.family.replace(/\s+/g, '')}';`,
   '}',
   '',
 ].join('\n'));

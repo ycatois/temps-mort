@@ -24,45 +24,19 @@ jobs:
       - name: Tests PHP
         run: php web/tests/run.php
 
-  shared:
-    name: Moteur de match (Kotlin)
+  mobile:
+    name: App Flutter
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: '21' }
-      - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew :shared:jvmTest
+    defaults:
+      run:
         working-directory: mobile
-
-  android:
-    name: App Android
-    needs: shared
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: '21' }
-      - uses: gradle/actions/setup-gradle@v4
-      - run: ./gradlew :androidApp:assembleDebug
-        working-directory: mobile
-      - uses: actions/upload-artifact@v4
-        with:
-          name: temps-mort-debug.apk
-          path: mobile/androidApp/build/outputs/apk/debug/*.apk
-
-  ios:
-    name: App iOS
-    needs: shared
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with: { distribution: temurin, java-version: '21' }
-      - run: brew install xcodegen
-      - run: xcodegen
-        working-directory: mobile/iosApp
-      - run: >
-          xcodebuild -project TempsMort.xcodeproj -scheme TempsMort
-          -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
-        working-directory: mobile/iosApp
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+      - name: Bundle Android (une fois les dossiers android/ générés)
+        if: hashFiles('mobile/android/app/build.gradle.kts', 'mobile/android/app/build.gradle') != ''
+        run: flutter build appbundle --debug

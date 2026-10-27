@@ -6,31 +6,35 @@ Ce dépôt unique contient les trois livrables et ce qui les relie :
 
 | Dossier | Quoi | Techno | Où ça tourne |
 |---|---|---|---|
-| `mobile/` | App native iOS + Android | Kotlin Multiplatform (`shared/`), Jetpack Compose (`androidApp/`), SwiftUI (`iosApp/`) | Stores |
+| `mobile/` | App Android (puis iOS) | Flutter : moteur de règles en Dart pur (`lib/domain/`), écrans (`lib/ui/`) | Google Play, puis App Store |
 | `web/` | Site vitrine + inscription bêta | PHP 8.3 sans framework, MariaDB, Apache `.htaccess` | o2switch `~/public_html` + `~/tempsmort-app` |
 | `wp-theme/temps-mort/` | Thème du blog, identique au site | Thème WordPress classique + `theme.json` | o2switch `~/public_html/blog` |
-| `design/` | Source unique du design | `tokens.json`, `css/base.css`, polices, maquettes | Génère CSS, Kotlin, Swift, theme.json |
+| `design/` | Source unique du design | `tokens.json`, `css/base.css`, polices, maquettes | Génère CSS, theme.json, tokens Dart |
 
 ## Règles d'or
 
 1. **Le design a une seule source** : `design/tokens.json` et `design/css/base.css`. Ne jamais éditer les fichiers générés (en-tête « GÉNÉRÉ par design/build.mjs »). Après modification : `node design/build.mjs` (le hook le fait automatiquement).
 2. **Site et blog sont identiques** : l'en-tête, le pied de page et le formulaire bêta existent en double (`web/app/templates/partials/*.php` et `wp-theme/temps-mort/{header,footer}.php`, `template-parts/beta.php`). Toute modification se fait des deux côtés ; `node scripts/check-parity.mjs` doit passer.
-3. **Les règles du volley vivent dans `mobile/shared/`** et nulle part ailleurs. Les écrans Android et iOS ne contiennent aucune règle : ils appellent `MatchSession`. Toute règle nouvelle arrive avec son test dans `shared/src/commonTest`. Voir la skill `volley-rules`.
+3. **Les règles du volley vivent dans `mobile/lib/domain/`** (Dart pur, sans Flutter) et nulle part ailleurs. Les écrans ne contiennent aucune règle : ils appellent `MatchSession`. Toute règle nouvelle arrive avec son test dans `mobile/test/domain/`. Voir la skill `volley-rules`.
 4. **Hors ligne d'abord** : un match se joue sans réseau. Le match est une liste d'événements (`MatchEvent`) ; l'état se recalcule en les rejouant ; annuler = retirer le dernier.
 5. **Mineures** : la plupart des joueuses sont mineures. Minimum de données (prénom, numéro, genre si équipe mixte), aucune photo par défaut, hébergement en France, suppression sur demande.
 6. **Accessibilité terrain** : cibles tactiles ≥ 48 dp/pt (56 pour les actions de match), contrastes AA, rien qui ne repose sur la couleur seule.
 7. **o2switch = hébergement mutualisé** : PHP natif, pas de Composer obligatoire, pas de Node en production, pas de démon. Le code applicatif reste hors de `public_html`.
 
+## Première mise en route de l'app
+
+Les dossiers `mobile/android` et `mobile/ios` sont générés une seule fois par `mobile/tool/creer-plateformes.ps1` (PowerShell, Flutter installé sous Windows). Tant qu'ils n'existent pas, seuls `flutter analyze` et `flutter test` fonctionnent.
+
 ## Commandes utiles
 
 ```bash
-node design/build.mjs            # régénère tokens CSS/Kotlin/Swift, theme.json, polices
+node design/build.mjs            # régénère CSS, theme.json, tokens Dart, polices
 npm run check                    # tokens à jour + parité site/blog + tests PHP
 npm run dev:web                  # site sur http://localhost:8080 (sans base : pages statiques)
 docker compose up -d             # site + WordPress /blog + MariaDB, comme sur o2switch
-cd mobile && ./gradlew :shared:jvmTest          # tests du moteur de match
-cd mobile && ./gradlew :androidApp:installDebug # app Android sur l'appareil branché
-cd mobile/iosApp && xcodegen && open TempsMort.xcodeproj   # app iOS (Mac requis)
+cd mobile && flutter test        # tests du moteur de match et des écrans
+cd mobile && flutter run         # app sur la tablette branchée (depuis Windows)
+cd mobile && flutter build appbundle   # fichier à envoyer sur Google Play
 scripts/deploy-web.sh --dry-run  # simulation du déploiement du site
 scripts/deploy-theme.sh          # déploiement du thème du blog
 ```
@@ -45,7 +49,7 @@ scripts/deploy-theme.sh          # déploiement du thème du blog
 ## Conventions
 
 - Langue : interface, commentaires et docs en français ; identifiants de code en anglais.
-- Commits : `type(portée): message` en français, ex. `feat(shared): remplacement libero automatique`. Portées : `shared`, `android`, `ios`, `web`, `blog`, `design`, `infra`.
+- Commits : `type(portée): message` en français, ex. `feat(mobile): remplacement libero automatique`. Portées : `mobile`, `domain`, `web`, `blog`, `design`, `infra`.
 - Git : Claude gère les commits, branches et push. Une branche par fonctionnalité (`feat/E05-annulation`), PR vers `main`, CI verte avant merge.
 - PHP : `declare(strict_types=1)`, échapper toute sortie avec `e()` (site) ou `esc_*()` (WordPress), requêtes préparées uniquement.
 - Pas de dépendance externe chargée depuis un CDN (RGPD) : polices et scripts auto-hébergés.

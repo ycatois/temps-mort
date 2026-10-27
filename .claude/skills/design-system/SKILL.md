@@ -7,7 +7,7 @@ description: Système visuel Temps Mort (couleurs, polices Barlow, composants, r
 ## Source et génération
 - `design/tokens.json` : couleurs (avec leur rôle), polices, rayons, espacements, cibles tactiles.
 - `design/css/base.css` : composants communs site + blog (en-tête, pied, boutons, cartes, `.prose`, bloc bêta).
-- `node design/build.mjs` écrit : `web/public/assets/{css,fonts}`, `wp-theme/temps-mort/assets/{css,fonts}`, `wp-theme/temps-mort/theme.json`, `mobile/androidApp/.../ui/theme/Tokens.kt` + `res/font`, `mobile/iosApp/iosApp/Theme/Tokens.swift` + `Fonts/`.
+- `node design/build.mjs` écrit : `web/public/assets/{css,fonts}`, `wp-theme/temps-mort/assets/{css,fonts}`, `wp-theme/temps-mort/theme.json`, `mobile/lib/ui/theme/tokens.dart` + `mobile/assets/fonts/`.
 
 ## Identité
 - Navy `#14213D` = structure (en-têtes, barre de score, boutons principaux). Deep `#0B1528` = pied de page.

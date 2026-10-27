@@ -1,13 +1,13 @@
 ---
 name: volley-rules
-description: Règles du volley-ball modélisées dans le moteur Temps Mort (rotation, service, libero, remplacements, sets, 6x6/4x4/2x2, mixité, catégories). À lire avant de modifier mobile/shared/domain ou d'écrire un écran de match.
+description: Règles du volley-ball modélisées dans le moteur Temps Mort (rotation, service, libero, remplacements, sets, 6x6/4x4/2x2, mixité, catégories). À lire avant de modifier mobile/lib/domain ou d'écrire un écran de match.
 ---
 # Règles modélisées
 
-Code : `mobile/shared/src/commonMain/kotlin/fr/hasteria/tempsmort/domain/`. Tests : `commonTest/.../MatchEngineTest.kt`.
+Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine_test.dart` (`flutter test`).
 
 ## Modèle
-- Un match = liste de `MatchEvent` : `StartSet`, `Rally`, `Substitution`, `LiberoIn`, `LiberoOut`, `Timeout`.
+- Un match = liste de `MatchEvent` : `StartSet`, `Rally`, `Substitution`, `LiberoIn`, `LiberoOut`, `TimeoutTaken`.
 - `MatchEngine.check()` renvoie un `Rejection` (raison lisible) ou null ; `apply()` produit le nouvel état ; `replay()` rejoue tout (annulation, reprise, synchro).
 - `lineup[0]` = poste 1 (serveur quand l'équipe a le service), puis postes 2, 3, 4, 5, 6.
 
@@ -34,10 +34,10 @@ Code : `mobile/shared/src/commonMain/kotlin/fr/hasteria/tempsmort/domain/`. Test
 - Sort automatiquement quand la rotation l'amènerait au poste 4.
 
 ## Mixité
-- `Team.gender = MIXTE` impose `minWomenOnCourt` (par défaut la moitié des joueurs sur le terrain). Vérifié au `StartSet`, à chaque remplacement et à l'entrée du libero.
+- `Team.gender == TeamGender.mixte` impose `minWomenOnCourt` (par défaut la moitié des joueurs sur le terrain). Vérifié au `StartSet`, à chaque remplacement et à l'entrée du libero.
 
 ## Catégories
-- M7 (baby-volley), M9, M11, M13, M15, M18, M21, Seniors, Vétérans, Loisir. `suggestedFormat` n'est qu'une valeur par défaut à la création d'équipe ; le coach choisit le format et les règles.
+- `AgeCategory` : M7 (baby-volley), M9, M11, M13, M15, M18, M21, Seniors, Vétérans, Loisir. `suggestedFormat` n'est qu'une valeur par défaut à la création d'équipe ; le coach choisit le format et les règles.
 
 ## Statistiques (`computeStats`)
 - Side-out % = échanges gagnés quand l'adversaire sert ; break % = échanges gagnés sur notre service.

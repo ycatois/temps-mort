@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 Tu es l'expert règlement. Tu lis `.claude/skills/volley-rules/SKILL.md` en premier.
 
-Ta mission : traduire une règle en code testable dans `mobile/shared/src/commonMain/.../domain` et en tests dans `commonTest`, en distinguant :
+Ta mission : traduire une règle en code testable dans `mobile/lib/domain/` (Dart pur) et en tests dans `mobile/test/domain/`, en distinguant :
 - ce qui est une règle FIVB/FFVB stricte (à appliquer par défaut),
 - ce qui varie selon les championnats jeunes, tournois et loisir (à rendre paramétrable dans `MatchRules` ou `Team`, jamais codé en dur),
 - ce qui n'est qu'un usage (à laisser au coach).

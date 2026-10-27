@@ -4,7 +4,7 @@ Le banc de touche dans la tablette : application de coaching volley (stats en di
 
 ## Ce que contient ce dépôt
 
-- **`mobile/`** — app native iOS et Android. Règles du volley et moteur de match partagés en Kotlin Multiplatform, interfaces en Jetpack Compose et SwiftUI.
+- **`mobile/`** — app Flutter, Android d'abord puis iOS. Règles du volley et moteur de match en Dart pur, testés.
 - **`web/`** — site vitrine PHP + MariaDB pour o2switch : accueil, tarifs, mentions légales, confidentialité, inscription à la bêta.
 - **`wp-theme/temps-mort/`** — thème WordPress du blog (`/blog`), identique au site.
 - **`design/`** — tokens, CSS commun, polices Barlow auto-hébergées, maquettes. Une commande décline tout vers les trois cibles.
@@ -17,7 +17,7 @@ git clone <dépôt> temps-mort && cd temps-mort
 npm run check                 # vérifie design, parité site/blog et tests PHP
 npm run dev:web               # site sur http://localhost:8080
 docker compose up -d          # ou : site + blog WordPress + MariaDB, comme sur o2switch
-cd mobile && ./gradlew :shared:jvmTest   # tests du moteur de match
+cd mobile && flutter test               # tests du moteur de match et des écrans
 ```
 
 Puis ouvrir le dossier dans Claude Code : `CLAUDE.md` et `.claude/` sont chargés automatiquement. Exemple : `/feature E05 annulation illimitée`.

@@ -7,12 +7,12 @@
                                    │  node design/build.mjs
         ┌──────────────────────────┼───────────────────────────────┐
         ▼                          ▼                               ▼
-  web/public/assets      wp-theme/temps-mort/assets       mobile/…/Tokens.kt, Tokens.swift
+  web/public/assets      wp-theme/temps-mort/assets       mobile/lib/ui/theme/tokens.dart
   (site PHP)             + theme.json (blog WordPress)    + polices TTF (apps natives)
 
   ┌─────────── o2switch (mutualisé) ───────────┐        ┌──────────── Appareils ────────────┐
-  │ ~/public_html        site vitrine (PHP)    │        │ Android (Compose)   iOS (SwiftUI) │
-  │ ~/public_html/blog   WordPress + thème     │        │        └──── shared (KMP) ────┘    │
+  │ ~/public_html        site vitrine (PHP)    │        │ App Flutter : Android, puis iOS   │
+  │ ~/public_html/blog   WordPress + thème     │        │ lib/ui (écrans) → lib/domain      │
   │ ~/tempsmort-app      code PHP hors web     │        │ moteur de match, règles, stats    │
   │ MariaDB              inscriptions bêta…    │        │ stockage local, hors ligne        │
   └────────────────────────────────────────────┘        └───────────────────────────────────┘
@@ -22,17 +22,17 @@
 
 ## Choix techniques et raisons
 
-### App mobile : natif avec Kotlin Multiplatform
-- **Natif demandé** : interface Jetpack Compose sur Android et SwiftUI sur iOS, aucune vue web.
-- **Une seule source pour les règles** : rotation, libero, remplacements, sets, mixité et stats sont dans `mobile/shared` (Kotlin commun), compilé en bibliothèque Android et en framework iOS (`Shared.framework`). Les deux apps ne peuvent pas diverger sur une règle.
-- Alternative écartée : deux apps 100 % séparées (Swift + Kotlin) = règles écrites et testées deux fois. Flutter écarté : rendu non natif.
-- Contrainte : l'app iOS se compile sur un Mac (Xcode). Le module partagé et l'app Android se développent sous Windows/WSL ou Linux.
+### App mobile : Flutter
+- **Une seule base de code** pour Android et iOS : chaque écran s'écrit une fois. Android sort d'abord ; iOS demande ensuite surtout un Mac (ou un service de compilation en ligne) et les comptes Apple.
+- **Une vraie app compilée**, publiée sur les stores, fonctionnant hors ligne ; pas une page web.
+- **Les règles à part** : `lib/domain` est du Dart pur, sans Flutter (un test le vérifie). Il reste réutilisable côté serveur ou pour d'autres sports.
+- Décision d'octobre 2026 : Flutter remplace la première version en Kotlin Multiplatform (Compose + SwiftUI), qui imposait d'écrire chaque écran deux fois. Yann connaît déjà Flutter.
 
 ### Match = journal d'événements
 - `MatchEvent` (StartSet, Rally, Substitution, LiberoIn/Out, Timeout) est la seule chose stockée.
 - L'état (score, rotation, service, compteurs) est recalculé par `MatchEngine.replay()`.
 - Avantages : annulation illimitée (V1-MAT-08), reprise après fermeture (V1-TEC-02), synchronisation simple (on envoie des événements), stats recalculables à volonté.
-- À venir : persistance locale (SQLDelight, commun aux deux plateformes) et synchro vers une API.
+- À venir : persistance locale (SQLite, par exemple avec le paquet `drift`) et synchro vers une API.
 
 ### Site : PHP natif + MariaDB
 - o2switch est un hébergement mutualisé : PHP et MariaDB y sont natifs, sans démon ni Node.
@@ -58,9 +58,10 @@ Recommandation : démarrer en option 1 avec une API versionnée (`/api/v1`) pour
 ├── .claude/                  agents, commandes, skills, hooks, permissions
 ├── design/                   tokens.json, css/base.css, polices, maquettes, build.mjs
 ├── mobile/
-│   ├── shared/               Kotlin Multiplatform : domain/ (Team, MatchEngine, Stats…) + tests
-│   ├── androidApp/           Jetpack Compose
-│   └── iosApp/               SwiftUI + project.yml (XcodeGen)
+│   ├── lib/domain/           Dart pur : Team, MatchEngine, MatchSession, Stats
+│   ├── lib/ui/               écrans Flutter, thème généré
+│   ├── test/                 tests du moteur et des écrans
+│   └── tool/                 création des dossiers android/ et ios/
 ├── web/
 │   ├── public/               racine web → ~/public_html
 │   ├── app/                  code PHP → ~/tempsmort-app

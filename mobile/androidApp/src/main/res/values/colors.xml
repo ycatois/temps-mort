@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- Reprises de design/tokens.json pour les ressources XML (fenêtre de démarrage). -->
-    <color name="navy">#14213D</color>
-    <color name="ground_app">#EDF0F4</color>
-</resources>

@@ -2,7 +2,7 @@
 
 Source : doc « App volley — liste des fonctionnalités V1, V2, V3 » (claude.ai). Ce fichier suit l'avancement dans le dépôt.
 
-Légende : ✅ fait dans le moteur `shared` (testé) · 🟡 partiel · ⬜ à faire.
+Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel · ⬜ à faire.
 
 > **Changement de cap** : V1-TEC-08 (installation PWA) est remplacée par des apps natives iOS et Android publiées sur les stores (décision d'octobre 2026). Le reste de la V1 est inchangé.
 

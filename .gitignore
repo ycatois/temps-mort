@@ -14,11 +14,21 @@ Thumbs.db
 .idea/
 *.iml
 
-# Mobile
-mobile/.gradle/
-mobile/**/build/
-mobile/.kotlin/
-mobile/iosApp/*.xcodeproj/
-mobile/iosApp/iosApp/Info.plist
-mobile/iosApp/DerivedData/
+# Mobile (Flutter)
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/android/.gradle/
+mobile/android/local.properties
+mobile/android/key.properties
+mobile/android/app/release/
+mobile/ios/Pods/
+mobile/ios/Flutter/Generated.xcconfig
+mobile/ios/Flutter/flutter_export_environment.sh
 xcuserdata/
+*.aab
+*.apk
+
+# Échanges avec le poste
+.sync/

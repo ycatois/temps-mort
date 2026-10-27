@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node design/build.mjs*)",
+      "Bash(node scripts/check-parity.mjs)",
+      "Bash(npm run *)",
+      "Bash(php -l *)",
+      "Bash(php web/tests/run.php)",
+      "Bash(php -S *)",
+      "Bash(./gradlew *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(docker compose *)"
+    ],
+    "ask": [
+      "Bash(scripts/deploy-web.sh)",
+      "Bash(scripts/deploy-theme.sh)",
+      "Bash(git push*)"
+    ],
+    "deny": [
+      "Read(./web/app/.env)",
+      "Read(./scripts/deploy.env)",
+      "Read(./**/*.keystore)",
+      "Read(./**/*.jks)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [{ "type": "command", "command": "node scripts/hooks/after-edit.mjs" }]
+      }
+    ]
+  }
+}

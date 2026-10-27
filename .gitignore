@@ -1,0 +1,24 @@
+# Secrets
+web/app/.env
+scripts/deploy.env
+*.keystore
+*.jks
+local.properties
+
+# Générés / locaux
+web/app/var/log/*.log
+web/public/blog/
+node_modules/
+.DS_Store
+Thumbs.db
+.idea/
+*.iml
+
+# Mobile
+mobile/.gradle/
+mobile/**/build/
+mobile/.kotlin/
+mobile/iosApp/*.xcodeproj/
+mobile/iosApp/iosApp/Info.plist
+mobile/iosApp/DerivedData/
+xcuserdata/

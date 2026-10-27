@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Composition 4x4 mixte – smartphone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#1E5BD6}a:hover{color:#14213D}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#EDF0F4;color:#182235;font-family:Barlow,system-ui,sans-serif;display:flex;flex-direction:column">
+
+  <header style="background:#14213D;color:#FFFFFF;padding:16px;display:flex;flex-direction:column;gap:4px">
+    <span style="font-size:12px;color:#B8C4D9;font-weight:600;letter-spacing:.06em">TOURNOI LOISIR · SAMEDI 22 NOV.</span>
+    <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">Composition · set 1</h1>
+  </header>
+
+  <div style="padding:12px 16px 0;display:flex;flex-direction:column;gap:8px">
+    <div role="group" aria-label="Format" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#FFFFFF;border:1px solid #D3DAE3;border-radius:10px;padding:4px">
+      <button type="button" style="border:0;background:transparent;color:#182235;padding:10px 0;border-radius:8px;font-size:15px;font-weight:600">6x6</button>
+      <button type="button" style="border:0;background:#14213D;color:#FFFFFF;padding:10px 0;border-radius:8px;font-size:15px;font-weight:700">4x4</button>
+      <button type="button" style="border:0;background:transparent;color:#182235;padding:10px 0;border-radius:8px;font-size:15px;font-weight:600">2x2</button>
+    </div>
+    <div role="group" aria-label="Type d'équipe" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#FFFFFF;border:1px solid #D3DAE3;border-radius:10px;padding:4px">
+      <button type="button" style="border:0;background:transparent;color:#182235;padding:10px 0;border-radius:8px;font-size:14px;font-weight:600">Féminine</button>
+      <button type="button" style="border:0;background:transparent;color:#182235;padding:10px 0;border-radius:8px;font-size:14px;font-weight:600">Masculine</button>
+      <button type="button" style="border:0;background:#14213D;color:#FFFFFF;padding:10px 0;border-radius:8px;font-size:14px;font-weight:700">Mixte</button>
+    </div>
+  </div>
+
+  <section aria-label="Quatre de départ" style="padding:12px 16px 0">
+    <div style="position:relative;width:358px;height:250px;background:#2E5A95;border-radius:12px">
+      <div style="position:absolute;left:39px;top:8px;width:280px;height:4px;background:#FFFFFF;border-radius:2px"></div>
+      <div style="position:absolute;left:39px;top:12px;width:280px;height:228px;background:#EFA35C;box-sizing:border-box;border:2px solid #FFFFFF;border-top:0"></div>
+      <div style="position:absolute;left:39px;top:96px;width:280px;height:2px;background:#FFFFFF"></div>
+      <div style="position:absolute;left:62px;top:22px;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="width:62px;height:62px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">7</span><span style="font-size:11px;font-weight:600">Lucie</span></span>
+        <span style="font-size:11px;font-weight:700;color:#14213D;background:#FFFFFF;border-radius:4px;padding:0 5px">F · Avant gauche</span></div>
+      <div style="position:absolute;left:200px;top:22px;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="width:62px;height:62px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">10</span><span style="font-size:11px;font-weight:600">Hugo</span></span>
+        <span style="font-size:11px;font-weight:700;color:#14213D;background:#FFFFFF;border-radius:4px;padding:0 5px">H · Avant droit</span></div>
+      <div style="position:absolute;left:62px;top:140px;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="width:62px;height:62px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">4</span><span style="font-size:11px;font-weight:600">Lucas</span></span>
+        <span style="font-size:11px;font-weight:700;color:#14213D;background:#FFFFFF;border-radius:4px;padding:0 5px">H · Arrière gauche</span></div>
+      <div style="position:absolute;left:200px;top:140px;width:96px;display:flex;flex-direction:column;align-items:center;gap:2px">
+        <span style="width:62px;height:62px;border-radius:50%;background:#14213D;color:#FFFFFF;border:3px solid #FFD23F;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">12</span><span style="font-size:11px;font-weight:600">Emma</span></span>
+        <span style="font-size:11px;font-weight:700;color:#14213D;background:#FFFFFF;border-radius:4px;padding:0 5px">F · Arrière droit · sert</span></div>
+    </div>
+  </section>
+
+  <div role="status" style="margin:10px 16px 0;background:#E3EEFF;border:1px solid #9DBAF0;border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;font-size:14px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1E5BD6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m8 12 3 3 5-6"></path></svg>
+    <span><strong>Mixité respectée</strong> : 2 femmes sur le terrain, minimum requis 2.</span>
+  </div>
+
+  <section aria-label="Banc" style="flex-grow:1;margin-top:12px;background:#FFFFFF;border-radius:18px 18px 0 0;padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px">
+    <span style="font-size:15px;font-weight:700">Banc · 3</span>
+    <sc-for list="{{bench}}" as="p" hint-placeholder-count="3">
+      <div style="display:flex;align-items:center;gap:10px;border:1px solid #D3DAE3;border-radius:10px;padding:8px 10px;min-height:48px;box-sizing:border-box">
+        <span style="width:36px;height:36px;border-radius:50%;background:#EDF0F4;color:#14213D;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700">{{p.num}}</span>
+        <span style="flex-grow:1;font-size:15px;font-weight:600">{{p.name}}</span>
+        <span style="font-size:12px;font-weight:700;color:#5B6577;border:1px solid #D3DAE3;border-radius:6px;padding:2px 6px">{{p.g}}</span>
+      </div>
+    </sc-for>
+    <button type="button" style="margin-top:auto;height:56px;border:0;border-radius:12px;background:#FFD23F;color:#14213D;font-size:16px;font-weight:700">Commencer le set 1</button>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      bench: [
+        { num: '3', name: 'Inès', g: 'F' },
+        { num: '8', name: 'Tom', g: 'H' },
+        { num: '5', name: 'Manon', g: 'F' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

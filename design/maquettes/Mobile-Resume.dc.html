@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Résumé du match – smartphone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#1E5BD6}a:hover{color:#14213D}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#EDF0F4;color:#182235;font-family:Barlow,system-ui,sans-serif;display:flex;flex-direction:column;gap:12px;padding:16px">
+
+  <article aria-label="Résumé partageable" style="background:#14213D;color:#FFFFFF;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12px;color:#B8C4D9;letter-spacing:.06em;font-weight:700">SAM. 15 NOV. · M18 F</span>
+      <span style="background:#FFD23F;color:#14213D;font-size:12px;font-weight:700;padding:3px 8px;border-radius:99px">Victoire</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;flex-direction:column">
+        <span style="font-size:16px;font-weight:600">[Votre équipe]</span>
+        <span style="font-size:14px;color:#B8C4D9">AS Adversaire</span>
+      </div>
+      <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:64px;font-weight:700;line-height:1">3 – 1</h1>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700">
+      <span style="background:#24345A;border-radius:8px;padding:6px 0">25–21</span>
+      <span style="background:#24345A;border-radius:8px;padding:6px 0;color:#B8C4D9">22–25</span>
+      <span style="background:#24345A;border-radius:8px;padding:6px 0">25–19</span>
+      <span style="background:#24345A;border-radius:8px;padding:6px 0">25–23</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:14px">
+      <sc-for list="{{tops}}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;justify-content:space-between;gap:8px;border-top:1px solid #33456E;padding-top:6px">
+          <span style="color:#B8C4D9">{{t.cat}}</span>
+          <span style="font-weight:700;text-align:right">{{t.val}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </article>
+
+  <section aria-label="À retenir" style="background:#FFFFFF;border:1px solid #D3DAE3;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:14px">
+    <h2 style="margin:0;font-size:16px;font-weight:700">À retenir</h2>
+    <span><strong>Rotation 5</strong> la plus faible : 14 gagnés pour 19 perdus.</span>
+    <span><strong>11 fautes de service</strong>, dont 6 dans le set 2.</span>
+  </section>
+
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:8px">
+    <button type="button" style="height:56px;border:0;border-radius:12px;background:#14213D;color:#FFFFFF;font-size:16px;font-weight:700">Envoyer l'image</button>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+      <button type="button" style="height:48px;border:2px solid #14213D;border-radius:12px;background:#FFFFFF;color:#14213D;font-size:15px;font-weight:700">PDF</button>
+      <button type="button" style="height:48px;border:2px solid #14213D;border-radius:12px;background:#FFFFFF;color:#14213D;font-size:15px;font-weight:700">CSV</button>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tops: [
+        { cat: 'Meilleure marqueuse', val: '#7 Lucie · 21 pts' },
+        { cat: 'Contre', val: '#12 Emma · 5' },
+        { cat: 'Service', val: '#5 Manon · 4 aces' },
+        { cat: 'Réception', val: '#1 Jade · 2,6' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "temps-mort-studio",
+  "private": true,
+  "description": "Studio Temps Mort : app mobile native, site PHP/MariaDB (o2switch) et thème WordPress du blog",
+  "scripts": {
+    "tokens": "node design/build.mjs",
+    "check": "node design/build.mjs --check && node scripts/check-parity.mjs && php web/tests/run.php",
+    "dev:web": "php -S localhost:8080 -t web/public web/dev-router.php"
+  }
+}

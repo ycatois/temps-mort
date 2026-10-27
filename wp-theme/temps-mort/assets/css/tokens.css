@@ -1,0 +1,42 @@
+/* GÉNÉRÉ par design/build.mjs depuis design/tokens.json — ne pas modifier à la main. */
+:root {
+  --c-navy: #14213D; /* Fond d'en-tête, texte fort, boutons principaux */
+  --c-deep: #0B1528; /* Pied de page, cadre de la tablette */
+  --c-navy-soft: #24345A; /* Fond secondaire sur navy (sélecteur, pastilles) */
+  --c-accent: #1E5BD6; /* Liens, surtitres, actions positives */
+  --c-yellow: #FFD23F; /* Appel à l'action, joueuse au service, bandeau formats */
+  --c-ground: #F6F7F9; /* Fond du site et du blog */
+  --c-ground-app: #EDF0F4; /* Fond des écrans de l'application */
+  --c-surface: #FFFFFF; /* Cartes */
+  --c-surface-alt: #E6EBF2; /* Boutons neutres, emplacements d'image */
+  --c-line: #D3DAE3; /* Bordures */
+  --c-line-soft: #E3E8EF; /* Séparateurs de tableau */
+  --c-text: #182235; /* Texte courant */
+  --c-muted: #5B6577; /* Texte secondaire sur clair */
+  --c-body-muted: #4A5568; /* Paragraphes de carte */
+  --c-on-navy: #D6E2F5; /* Texte courant sur navy */
+  --c-on-navy-muted: #B8C4D9; /* Texte secondaire sur navy */
+  --c-error: #C2541C; /* Faute, action destructive */
+  --c-court: #EFA35C; /* Terrain */
+  --c-court-out: #2E5A95; /* Zone libre autour du terrain */
+  --c-zone-alert: #D9362B; /* Zone dessinée au tableau tactique */
+  --font-display: "Barlow Condensed", Arial Narrow, sans-serif;
+  --font-body: "Barlow", system-ui, sans-serif;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 18px;
+  --r-pill: 999px;
+  --s-xs: 4px;
+  --s-sm: 8px;
+  --s-md: 12px;
+  --s-lg: 16px;
+  --s-xl: 24px;
+  --s-2xl: 40px;
+  --s-3xl: 72px;
+  --container: 1200px;
+  --container-narrow: 880px;
+  --gutter: 24px;
+  --touch-min: 48px;
+  --touch-primary: 56px;
+}

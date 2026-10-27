@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tableau tactique – smartphone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#1E5BD6}a:hover{color:#14213D}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#EDF0F4;color:#182235;font-family:Barlow,system-ui,sans-serif;display:flex;flex-direction:column">
+
+  <header style="background:#14213D;color:#FFFFFF;padding:14px 16px;display:flex;align-items:center;gap:8px">
+    <a href="Mobile-Match.dc.html" aria-label="Retour au match" style="display:flex"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+    <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;flex-grow:1">Tactique · R3</h1>
+    <span style="background:#FFD23F;color:#14213D;border-radius:8px;padding:6px 10px;font-size:14px;font-weight:700">TM 0:24</span>
+  </header>
+
+  <section aria-label="Terrain" style="flex-grow:1;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="position:relative;width:358px;height:470px;background:#2E5A95;border-radius:14px">
+      <div style="position:absolute;left:14px;top:12px;width:330px;height:5px;background:#FFFFFF;border-radius:3px"></div>
+      <div style="position:absolute;left:14px;top:17px;width:330px;height:440px;background:#EFA35C;box-sizing:border-box;border:2px solid #FFFFFF;border-top:0"></div>
+      <div style="position:absolute;left:14px;top:162px;width:330px;height:2px;background:#FFFFFF"></div>
+
+      <svg width="358" height="470" viewBox="0 0 358 470" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M 90 300 C 120 250, 150 200, 175 150" fill="none" stroke="#FFD23F" stroke-width="4" stroke-linecap="round"></path>
+        <path d="M 165 146 L 176 148 L 174 160" fill="none" stroke="#FFD23F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+        <rect x="30" y="360" width="130" height="80" rx="10" fill="#D9362B" fill-opacity=".18" stroke="#D9362B" stroke-width="3" stroke-dasharray="7 6"></rect>
+      </svg>
+
+      <span style="position:absolute;left:34px;top:60px;width:64px;height:64px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">3</span><span style="font-size:11px;font-weight:600">Inès</span></span>
+      <span style="position:absolute;left:147px;top:44px;width:64px;height:64px;border-radius:50%;background:#14213D;color:#FFFFFF;border:3px solid #FFD23F;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">5</span><span style="font-size:11px;font-weight:600">Manon</span></span>
+      <span style="position:absolute;left:260px;top:60px;width:64px;height:64px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">12</span><span style="font-size:11px;font-weight:600">Emma</span></span>
+      <span style="position:absolute;left:56px;top:270px;width:64px;height:64px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">7</span><span style="font-size:11px;font-weight:600">Lucie</span></span>
+      <span style="position:absolute;left:147px;top:300px;width:64px;height:64px;border-radius:50%;background:#FFFFFF;color:#14213D;border:2px solid #14213D;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">1</span><span style="font-size:11px;font-weight:600">Jade · L</span></span>
+      <span style="position:absolute;left:238px;top:270px;width:64px;height:64px;border-radius:50%;background:#14213D;color:#FFFFFF;border:2px solid #FFFFFF;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;line-height:1">9</span><span style="font-size:11px;font-weight:600">Chloé</span></span>
+    </div>
+    <button type="button" style="height:48px;border:2px solid #14213D;border-radius:10px;background:#FFFFFF;color:#14213D;font-size:15px;font-weight:700">Schémas enregistrés · 5</button>
+  </section>
+
+  <nav aria-label="Outils de dessin" style="background:#FFFFFF;border-top:1px solid #D3DAE3;padding:10px 12px 14px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px">
+    <button type="button" aria-label="Déplacer les pions" style="height:52px;border:0;border-radius:10px;background:#E6EBF2;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 2v20M2 12h20"></path></svg></button>
+    <button type="button" aria-label="Crayon" style="height:52px;border:0;border-radius:10px;background:#14213D;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3l4 4L8 20H4v-4z"></path></svg></button>
+    <button type="button" aria-label="Flèche" style="height:52px;border:0;border-radius:10px;background:#E6EBF2;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19 19 5M10 5h9v9"></path></svg></button>
+    <button type="button" aria-label="Couleur" style="height:52px;border:0;border-radius:10px;background:#E6EBF2;display:flex;align-items:center;justify-content:center">
+      <span style="width:24px;height:24px;border-radius:50%;background:#FFD23F;border:2px solid #14213D"></span></button>
+    <button type="button" aria-label="Annuler le dernier trait" style="height:52px;border:0;border-radius:10px;background:#E6EBF2;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#14213D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg></button>
+    <button type="button" aria-label="Tout effacer" style="height:52px;border:2px solid #C2541C;border-radius:10px;background:#FFFFFF;display:flex;align-items:center;justify-content:center">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9A3F12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M6 7l1 13h10l1-13M9 7V4h6v3"></path></svg></button>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

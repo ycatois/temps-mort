@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Site – tarifs</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#1E5BD6}a:hover{color:#14213D}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:100%;box-sizing:border-box;background:#F6F7F9;color:#182235;font-family:Barlow,system-ui,sans-serif">
+
+  <header style="background:#14213D;color:#FFFFFF">
+    <nav aria-label="Navigation principale" style="max-width:1200px;margin:0 auto;padding:18px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px">
+      <a href="Site-Accueil.dc.html" style="display:flex;align-items:center;gap:10px;color:#FFFFFF;text-decoration:none;margin-right:auto">
+        <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="19" r="13" fill="none" stroke="#FFD23F" stroke-width="3"></circle><path d="M17 19V11" stroke="#FFD23F" stroke-width="3" stroke-linecap="round"></path><path d="M13 3h8" stroke="#FFD23F" stroke-width="3" stroke-linecap="round"></path></svg>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700">{{brand}}</span>
+      </a>
+      <a href="Site-Accueil.dc.html" style="color:#D6E2F5;text-decoration:none;font-size:16px;font-weight:600">Accueil</a>
+      <a href="Site-Tarifs.dc.html" aria-current="page" style="color:#FFFFFF;text-decoration:underline;text-underline-offset:6px;font-size:16px;font-weight:700">Tarifs</a>
+      <a href="Site-Accueil.dc.html" style="background:#FFD23F;color:#14213D;text-decoration:none;border-radius:10px;padding:12px 18px;font-size:16px;font-weight:700">Rejoindre la bêta</a>
+    </nav>
+    <div style="max-width:1200px;margin:0 auto;padding:40px 24px 56px;display:flex;flex-direction:column;gap:14px;align-items:center;text-align:center">
+      <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:clamp(40px,5vw,64px);font-weight:700;line-height:1">Un tarif par coach, ou un pour tout le club.</h1>
+      <p style="margin:0;font-size:19px;color:#D6E2F5;max-width:52ch">Le match en direct reste gratuit pour une équipe. Payez seulement pour l'historique, les stats complètes et plusieurs équipes.</p>
+      <div role="group" aria-label="Période de facturation" style="display:flex;background:#24345A;border-radius:10px;padding:4px;margin-top:8px">
+        <button type="button" style="border:0;background:transparent;color:#D6E2F5;padding:10px 18px;border-radius:8px;font-size:15px;font-weight:600">Mensuel</button>
+        <button type="button" style="border:0;background:#FFFFFF;color:#14213D;padding:10px 18px;border-radius:8px;font-size:15px;font-weight:700">À la saison · −20 %</button>
+      </div>
+    </div>
+  </header>
+
+  <section aria-label="Offres" style="max-width:1200px;margin:-28px auto 0;padding:0 24px;display:flex;flex-wrap:wrap;gap:20px;align-items:stretch">
+    <article style="flex:1 1 300px;min-width:0;background:#FFFFFF;border:1px solid #D3DAE3;border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 style="margin:0;font-size:22px;font-weight:700">Coach</h2>
+        <span style="color:#5B6577;font-size:15px">Pour découvrir avec une équipe</span>
+      </div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:1">0 €</span>
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:16px">
+        <li>Une équipe, tous formats</li>
+        <li>Match en direct et rotation automatique</li>
+        <li>Stats en mode simple</li>
+        <li>Tableau tactique</li>
+        <li>Résumé partageable du dernier match</li>
+      </ul>
+      <a href="Site-Accueil.dc.html" style="margin-top:auto;height:54px;border:2px solid #14213D;border-radius:12px;color:#14213D;text-decoration:none;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center">Commencer gratuitement</a>
+    </article>
+
+    <article style="flex:1 1 300px;min-width:0;background:#14213D;color:#FFFFFF;border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <h2 style="margin:0;font-size:22px;font-weight:700">Coach Pro</h2>
+          <span style="color:#B8C4D9;font-size:15px">Pour suivre une saison entière</span>
+        </div>
+        <span style="background:#FFD23F;color:#14213D;font-size:13px;font-weight:700;padding:4px 10px;border-radius:99px">Le plus choisi</span>
+      </div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:1;color:#FFD23F">[PRIX] €<span style="font-size:22px;color:#B8C4D9"> / mois</span></span>
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:16px">
+        <li>Jusqu'à 3 équipes</li>
+        <li>Stats complètes et par rotation</li>
+        <li>Historique et progression de chaque joueuse</li>
+        <li>Exports PDF et CSV</li>
+        <li>Coach adjoint et saisie par un parent</li>
+      </ul>
+      <a href="Site-Accueil.dc.html" style="margin-top:auto;height:54px;border-radius:12px;background:#FFD23F;color:#14213D;text-decoration:none;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center">Essayer 30 jours</a>
+    </article>
+
+    <article style="flex:1 1 300px;min-width:0;background:#FFFFFF;border:1px solid #D3DAE3;border-radius:18px;padding:28px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <h2 style="margin:0;font-size:22px;font-weight:700">Club</h2>
+        <span style="color:#5B6577;font-size:15px">Pour toutes les équipes du club</span>
+      </div>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:700;line-height:1">[PRIX] €<span style="font-size:22px;color:#5B6577"> / saison</span></span>
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:16px">
+        <li>Équipes et coachs illimités</li>
+        <li>Tout Coach Pro pour chaque coach</li>
+        <li>Tableau de bord du responsable technique</li>
+        <li>Bibliothèque de schémas partagée</li>
+        <li>Facture au nom de l'association</li>
+      </ul>
+      <a href="Site-Accueil.dc.html" style="margin-top:auto;height:54px;border:2px solid #14213D;border-radius:12px;color:#14213D;text-decoration:none;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center">Parler à un humain</a>
+    </article>
+  </section>
+
+  <section aria-label="Comparatif détaillé" style="max-width:1200px;margin:0 auto;padding:64px 24px;display:flex;flex-direction:column;gap:20px">
+    <h2 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,3.5vw,44px);font-weight:700">Comparatif détaillé</h2>
+    <div style="overflow-x:auto;background:#FFFFFF;border:1px solid #D3DAE3;border-radius:14px">
+      <table style="width:100%;min-width:640px;border-collapse:collapse;font-size:16px">
+        <thead>
+          <tr style="text-align:left">
+            <th scope="col" style="padding:14px 18px;border-bottom:2px solid #D3DAE3">Fonctionnalité</th>
+            <th scope="col" style="padding:14px 18px;border-bottom:2px solid #D3DAE3;text-align:center">Coach</th>
+            <th scope="col" style="padding:14px 18px;border-bottom:2px solid #D3DAE3;text-align:center">Coach Pro</th>
+            <th scope="col" style="padding:14px 18px;border-bottom:2px solid #D3DAE3;text-align:center">Club</th>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+            <tr>
+              <td style="padding:12px 18px;border-bottom:1px solid #E3E8EF">{{r.f}}</td>
+              <td style="padding:12px 18px;border-bottom:1px solid #E3E8EF;text-align:center;font-weight:600">{{r.a}}</td>
+              <td style="padding:12px 18px;border-bottom:1px solid #E3E8EF;text-align:center;font-weight:600">{{r.b}}</td>
+              <td style="padding:12px 18px;border-bottom:1px solid #E3E8EF;text-align:center;font-weight:600">{{r.c}}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin:0;font-size:15px;color:#5B6577">Prix TTC. Sans engagement en mensuel. Les associations non assujetties à la TVA paient le prix affiché.</p>
+  </section>
+
+  <footer style="background:#0B1528;color:#B8C4D9">
+    <div style="max-width:1200px;margin:0 auto;padding:32px 24px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;font-size:15px">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#FFFFFF;margin-right:auto">{{brand}}</span>
+      <a href="#" style="color:#B8C4D9">Mentions légales</a>
+      <a href="#" style="color:#B8C4D9">Confidentialité</a>
+      <span>Édité par Hasteria SASU · hébergé en France</span>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"brand":{"editor":"text","default":"Temps Mort"},"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      brand: this.props.brand ?? 'Temps Mort',
+      rows: [
+        { f: 'Équipes', a: '1', b: 'Jusqu’à 3', c: 'Illimité' },
+        { f: 'Formats 6x6, 4x4, 2x2 et mixte', a: 'Oui', b: 'Oui', c: 'Oui' },
+        { f: 'Match en direct hors ligne', a: 'Oui', b: 'Oui', c: 'Oui' },
+        { f: 'Stats', a: 'Mode simple', b: 'Complètes', c: 'Complètes' },
+        { f: 'Historique des matchs', a: 'Dernier match', b: 'Saison entière', c: 'Toutes les saisons' },
+        { f: 'Tableau tactique', a: 'Oui', b: 'Schémas illimités', c: 'Bibliothèque du club' },
+        { f: 'Exports PDF et CSV', a: '—', b: 'Oui', c: 'Oui' },
+        { f: 'Coach adjoint, saisie par un parent', a: '—', b: 'Oui', c: 'Oui' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

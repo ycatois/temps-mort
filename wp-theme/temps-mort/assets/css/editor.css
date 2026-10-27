@@ -1,0 +1,5 @@
+/* Éditeur de blocs : l'article ressemble à sa version publiée (typographie .prose). */
+.editor-styles-wrapper { font-family: var(--font-body); font-size: 18px; line-height: 1.65; color: var(--c-text); background: var(--c-ground); }
+.editor-styles-wrapper h1, .editor-styles-wrapper h2, .editor-styles-wrapper h3,
+.editor-styles-wrapper .editor-post-title__input { font-family: var(--font-display); font-weight: 700; color: var(--c-navy); line-height: 1.08; }
+.editor-styles-wrapper blockquote { border-left: 4px solid var(--c-yellow); padding-left: 20px; font-family: var(--font-display); font-size: 26px; font-weight: 600; }

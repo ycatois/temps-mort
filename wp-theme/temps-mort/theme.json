@@ -1,0 +1,258 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/theme.json",
+  "version": 3,
+  "title": "GÉNÉRÉ par design/build.mjs depuis design/tokens.json — ne pas modifier à la main.",
+  "settings": {
+    "appearanceTools": false,
+    "color": {
+      "custom": false,
+      "customGradient": false,
+      "defaultPalette": false,
+      "defaultGradients": false,
+      "palette": [
+        {
+          "slug": "navy",
+          "color": "#14213D",
+          "name": "navy"
+        },
+        {
+          "slug": "deep",
+          "color": "#0B1528",
+          "name": "deep"
+        },
+        {
+          "slug": "navy-soft",
+          "color": "#24345A",
+          "name": "navy-soft"
+        },
+        {
+          "slug": "accent",
+          "color": "#1E5BD6",
+          "name": "accent"
+        },
+        {
+          "slug": "yellow",
+          "color": "#FFD23F",
+          "name": "yellow"
+        },
+        {
+          "slug": "ground",
+          "color": "#F6F7F9",
+          "name": "ground"
+        },
+        {
+          "slug": "ground-app",
+          "color": "#EDF0F4",
+          "name": "ground-app"
+        },
+        {
+          "slug": "surface",
+          "color": "#FFFFFF",
+          "name": "surface"
+        },
+        {
+          "slug": "surface-alt",
+          "color": "#E6EBF2",
+          "name": "surface-alt"
+        },
+        {
+          "slug": "line",
+          "color": "#D3DAE3",
+          "name": "line"
+        },
+        {
+          "slug": "line-soft",
+          "color": "#E3E8EF",
+          "name": "line-soft"
+        },
+        {
+          "slug": "text",
+          "color": "#182235",
+          "name": "text"
+        },
+        {
+          "slug": "muted",
+          "color": "#5B6577",
+          "name": "muted"
+        },
+        {
+          "slug": "body-muted",
+          "color": "#4A5568",
+          "name": "body-muted"
+        },
+        {
+          "slug": "on-navy",
+          "color": "#D6E2F5",
+          "name": "on-navy"
+        },
+        {
+          "slug": "on-navy-muted",
+          "color": "#B8C4D9",
+          "name": "on-navy-muted"
+        },
+        {
+          "slug": "error",
+          "color": "#C2541C",
+          "name": "error"
+        },
+        {
+          "slug": "court",
+          "color": "#EFA35C",
+          "name": "court"
+        },
+        {
+          "slug": "court-out",
+          "color": "#2E5A95",
+          "name": "court-out"
+        },
+        {
+          "slug": "zone-alert",
+          "color": "#D9362B",
+          "name": "zone-alert"
+        }
+      ]
+    },
+    "typography": {
+      "customFontSize": false,
+      "defaultFontSizes": false,
+      "fontFamilies": [
+        {
+          "slug": "display",
+          "name": "Barlow Condensed",
+          "fontFamily": "\"Barlow Condensed\", Arial Narrow, sans-serif",
+          "fontFace": [
+            {
+              "fontFamily": "Barlow Condensed",
+              "fontStyle": "normal",
+              "fontWeight": "600",
+              "src": [
+                "file:./assets/fonts/barlow-condensed-latin-600-normal.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Barlow Condensed",
+              "fontStyle": "normal",
+              "fontWeight": "700",
+              "src": [
+                "file:./assets/fonts/barlow-condensed-latin-700-normal.woff2"
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "body",
+          "name": "Barlow",
+          "fontFamily": "\"Barlow\", system-ui, sans-serif",
+          "fontFace": [
+            {
+              "fontFamily": "Barlow",
+              "fontStyle": "normal",
+              "fontWeight": "400",
+              "src": [
+                "file:./assets/fonts/barlow-latin-400-normal.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Barlow",
+              "fontStyle": "normal",
+              "fontWeight": "500",
+              "src": [
+                "file:./assets/fonts/barlow-latin-500-normal.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Barlow",
+              "fontStyle": "normal",
+              "fontWeight": "600",
+              "src": [
+                "file:./assets/fonts/barlow-latin-600-normal.woff2"
+              ]
+            },
+            {
+              "fontFamily": "Barlow",
+              "fontStyle": "normal",
+              "fontWeight": "700",
+              "src": [
+                "file:./assets/fonts/barlow-latin-700-normal.woff2"
+              ]
+            }
+          ]
+        }
+      ],
+      "fontSizes": [
+        {
+          "slug": "small",
+          "name": "Petit",
+          "size": "15px"
+        },
+        {
+          "slug": "medium",
+          "name": "Normal",
+          "size": "18px"
+        },
+        {
+          "slug": "large",
+          "name": "Grand",
+          "size": "24px"
+        },
+        {
+          "slug": "x-large",
+          "name": "Titre",
+          "size": "clamp(30px, 3.5vw, 44px)"
+        }
+      ]
+    },
+    "layout": {
+      "contentSize": "720px",
+      "wideSize": "1200px"
+    },
+    "spacing": {
+      "units": [
+        "px",
+        "em",
+        "rem",
+        "%"
+      ]
+    }
+  },
+  "styles": {
+    "color": {
+      "background": "var(--wp--preset--color--ground)",
+      "text": "var(--wp--preset--color--text)"
+    },
+    "typography": {
+      "fontFamily": "var(--wp--preset--font-family--body)",
+      "fontSize": "18px",
+      "lineHeight": "1.65"
+    },
+    "elements": {
+      "link": {
+        "color": {
+          "text": "var(--wp--preset--color--accent)"
+        }
+      },
+      "heading": {
+        "typography": {
+          "fontFamily": "var(--wp--preset--font-family--display)",
+          "fontWeight": "700",
+          "lineHeight": "1.05"
+        },
+        "color": {
+          "text": "var(--wp--preset--color--navy)"
+        }
+      },
+      "button": {
+        "color": {
+          "background": "var(--wp--preset--color--yellow)",
+          "text": "var(--wp--preset--color--navy)"
+        },
+        "border": {
+          "radius": "12px"
+        },
+        "typography": {
+          "fontWeight": "700"
+        }
+      }
+    }
+  }
+}

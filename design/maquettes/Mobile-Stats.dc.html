@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Stats en direct – smartphone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#1E5BD6}a:hover{color:#14213D}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:844px;box-sizing:border-box;background:#EDF0F4;color:#182235;font-family:Barlow,system-ui,sans-serif;display:flex;flex-direction:column">
+
+  <header style="background:#14213D;color:#FFFFFF;padding:14px 16px;display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:8px">
+      <a href="Mobile-Match.dc.html" aria-label="Retour au match" style="display:flex"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg></a>
+      <h1 style="margin:0;font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;flex-grow:1">Stats · 25–21 · 18–15</h1>
+    </div>
+    <div role="tablist" aria-label="Vue" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));background:#24345A;border-radius:10px;padding:4px">
+      <button type="button" role="tab" aria-selected="true" style="border:0;background:#FFFFFF;color:#14213D;padding:9px 0;border-radius:8px;font-size:14px;font-weight:700">Joueuses</button>
+      <button type="button" role="tab" aria-selected="false" style="border:0;background:transparent;color:#D6E2F5;padding:9px 0;border-radius:8px;font-size:14px;font-weight:600">Rotations</button>
+      <button type="button" role="tab" aria-selected="false" style="border:0;background:transparent;color:#D6E2F5;padding:9px 0;border-radius:8px;font-size:14px;font-weight:600">Équipe</button>
+    </div>
+  </header>
+
+  <div style="padding:12px 16px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+    <div style="background:#FFFFFF;border:1px solid #D3DAE3;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#5B6577">SIDE-OUT</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1.1">61 %</span>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D3DAE3;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#5B6577">BREAK</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1.1">47 %</span>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D3DAE3;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column">
+      <span style="font-size:11px;font-weight:700;letter-spacing:.06em;color:#5B6577">RÉCEPTION</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;line-height:1.1">2,0</span>
+    </div>
+  </div>
+
+  <div role="group" aria-label="Période" style="margin:10px 16px 0;display:flex;gap:6px">
+    <button type="button" style="height:36px;padding:0 12px;border:1px solid #D3DAE3;border-radius:99px;background:#FFFFFF;color:#182235;font-size:13px;font-weight:600">Set 1</button>
+    <button type="button" style="height:36px;padding:0 12px;border:1px solid #D3DAE3;border-radius:99px;background:#FFFFFF;color:#182235;font-size:13px;font-weight:600">Set 2</button>
+    <button type="button" style="height:36px;padding:0 12px;border:0;border-radius:99px;background:#14213D;color:#FFFFFF;font-size:13px;font-weight:700">Match</button>
+  </div>
+
+  <section aria-label="Par joueuse" style="padding:10px 16px 16px;display:flex;flex-direction:column;gap:8px">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+      <div style="background:#FFFFFF;border:1px solid #D3DAE3;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:12px">
+        <span style="width:38px;height:38px;border-radius:50%;background:#14213D;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700">{{r.num}}</span>
+        <div style="flex-grow:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+          <span style="font-size:15px;font-weight:700">{{r.name}}</span>
+          <span style="font-size:13px;color:#5B6577;font-variant-numeric:tabular-nums">{{r.line}}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:700;line-height:1">{{r.pts}}</span>
+          <span style="font-size:11px;color:#5B6577;font-weight:600">pts</span>
+        </div>
+      </div>
+    </sc-for>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      rows: [
+        { num: '7', name: 'Lucie', pts: 9, line: 'Att. 22 % · 1 ace · réc. 2,0 · 3 fautes' },
+        { num: '3', name: 'Inès', pts: 7, line: 'Att. 14 % · 1 ace · 1 contre · 3 fautes' },
+        { num: '12', name: 'Emma', pts: 6, line: 'Att. 33 % · 2 contres · 1 faute' },
+        { num: '9', name: 'Chloé', pts: 3, line: 'Att. 0 % · réc. 1,6 · 3 fautes' },
+        { num: '5', name: 'Manon', pts: 3, line: '2 aces · att. 50 % · 1 faute' },
+        { num: '1', name: 'Jade (L)', pts: 0, line: 'Réception 2,4 sur 22' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

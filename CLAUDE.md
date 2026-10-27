@@ -39,6 +39,7 @@ scripts/deploy-theme.sh          # déploiement du thème du blog
 
 - Backlog V1/V2/V3 (83 fonctionnalités, 9 modules) : doc « Fonctionnalités V1 / V2 / V3 » sur claude.ai — résumé dans `docs/roadmap.md`.
 - Maquettes : `design/maquettes/*.dc.html` (écrans E04, E05, E07, E08, E10 tablette et smartphone ; site Accueil et Tarifs).
+- Tarifs et acquisition : docs « Temps Mort : grille tarifaire » et « Temps Mort : acquisition par le blog et Facebook » sur claude.ai ; sujets du blog dans `marketing/sujets.md`.
 - Architecture et choix techniques : `docs/architecture.md`. Déploiement : `docs/deploiement-o2switch.md`. Mobile et stores : `docs/mobile.md`.
 
 ## Conventions
@@ -51,6 +52,10 @@ scripts/deploy-theme.sh          # déploiement du thème du blog
 
 ## Agents et commandes du studio
 
-Agents (`.claude/agents/`) : `mobile-dev`, `web-dev`, `wp-theme-dev`, `volley-rules-expert`, `design-guardian`, `reviewer`.
-Commandes (`.claude/commands/`) : `/feature`, `/check`, `/tokens`, `/deploy-web`, `/deploy-blog`, `/release-mobile`.
-Skills (`.claude/skills/`) : `volley-rules`, `design-system`, `o2switch-deploy`.
+Agents (`.claude/agents/`) : `mobile-dev`, `web-dev`, `wp-theme-dev`, `volley-rules-expert`, `design-guardian`, `reviewer`, `redacteur-blog`, `community-manager`.
+Commandes (`.claude/commands/`) : `/feature`, `/check`, `/tokens`, `/deploy-web`, `/deploy-blog`, `/release-mobile`, `/article`, `/posts-facebook`, `/bilan-marketing`.
+Skills (`.claude/skills/`) : `volley-rules`, `design-system`, `o2switch-deploy`, `ligne-editoriale`.
+
+## Marketing
+
+L'acquisition passe par le blog et la page Facebook : voir `marketing/README.md`. Le marketing compte autant que le code : un sujet du blog sans brouillon est une tâche au même titre qu'un écran.

@@ -368,9 +368,9 @@ class MatchEngine {
 
     return switch (event) {
       Rally() => null,
-      TimeoutTaken t => state.timeoutsLeft(t.side) <= 0 ? const NoTimeoutLeft() : null,
-      Substitution s => _checkSubstitution(state, s),
-      LiberoIn l => _checkLiberoIn(state, l),
+      final TimeoutTaken t => state.timeoutsLeft(t.side) <= 0 ? const NoTimeoutLeft() : null,
+      final Substitution s => _checkSubstitution(state, s),
+      final LiberoIn l => _checkLiberoIn(state, l),
       LiberoOut() => state.liberoReplacing == null ? const LiberoNotIn() : null,
       StartSet() => throw StateError('traité plus haut'),
     };
@@ -380,7 +380,7 @@ class MatchEngine {
     final rejection = check(state, event);
     if (rejection != null) throw IllegalMatchEvent(rejection);
     return switch (event) {
-      StartSet s => state.copyWith(
+      final StartSet s => state.copyWith(
           phase: Phase.inPlay,
           serving: s.firstServer,
           lineup: s.lineup,
@@ -390,13 +390,13 @@ class MatchEngine {
           substitutionsUsed: 0,
           timeoutsUsed: const Score(),
         ),
-      Rally r => _applyRally(state, r),
-      TimeoutTaken t => state.copyWith(timeoutsUsed: state.timeoutsUsed.plus(t.side)),
-      Substitution s => state.copyWith(
+      final Rally r => _applyRally(state, r),
+      final TimeoutTaken t => state.copyWith(timeoutsUsed: state.timeoutsUsed.plus(t.side)),
+      final Substitution s => state.copyWith(
           lineup: List.unmodifiable(state.lineup.map((id) => id == s.outId ? s.inId : id)),
           substitutionsUsed: state.substitutionsUsed + 1,
         ),
-      LiberoIn l => state.copyWith(
+      final LiberoIn l => state.copyWith(
           lineup: List.unmodifiable(state.lineup.map((id) => id == l.replacedId ? state.liberoId! : id)),
           liberoReplacing: l.replacedId,
         ),

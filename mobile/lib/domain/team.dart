@@ -53,6 +53,7 @@ class Player {
     required this.number,
     required this.gender,
     this.role = Role.polyvalent,
+    this.archived = false,
   });
 
   final String id;
@@ -60,6 +61,18 @@ class Player {
   final int number;
   final PlayerGender gender;
   final Role role;
+
+  /// Joueuse partie en cours de saison : absente des compositions, gardée pour l'historique des matchs.
+  final bool archived;
+
+  Player copyWith({String? firstName, int? number, PlayerGender? gender, Role? role, bool? archived}) => Player(
+        id: id,
+        firstName: firstName ?? this.firstName,
+        number: number ?? this.number,
+        gender: gender ?? this.gender,
+        role: role ?? this.role,
+        archived: archived ?? this.archived,
+      );
 }
 
 class Team {
@@ -85,6 +98,9 @@ class Team {
   /// Pour une équipe mixte : nombre minimum de femmes sur le terrain (par défaut la moitié).
   final int minWomenOnCourt;
 
+  /// Joueuses que l'on peut convoquer et composer (les archivées restent pour l'historique).
+  List<Player> get activePlayers => players.where((p) => !p.archived).toList();
+
   Player? player(String id) {
     for (final p in players) {
       if (p.id == id) return p;
@@ -92,13 +108,28 @@ class Team {
     return null;
   }
 
-  Team copyWith({GameFormat? format, int? minWomenOnCourt}) => Team(
+  Team copyWith({
+    String? name,
+    GameFormat? format,
+    TeamGender? gender,
+    AgeCategory? category,
+    List<Player>? players,
+    int? minWomenOnCourt,
+  }) =>
+      Team(
         id: id,
-        name: name,
+        name: name ?? this.name,
         format: format ?? this.format,
-        gender: gender,
-        category: category,
-        players: players,
+        gender: gender ?? this.gender,
+        category: category ?? this.category,
+        players: players ?? this.players,
         minWomenOnCourt: minWomenOnCourt ?? this.minWomenOnCourt,
       );
+
+  /// L'équipe jouée dans un autre format pour un match précis (V1-FOR-08), par exemple une équipe
+  /// 6x6 en tournoi 4x4. Même format : équipe inchangée. Autre format : le minimum de femmes reprend
+  /// la valeur par défaut du nouveau format, car celui de l'équipe ne vaut que pour son format.
+  Team withFormat(GameFormat format) => format == this.format
+      ? this
+      : Team(id: id, name: name, format: format, gender: gender, category: category, players: players);
 }

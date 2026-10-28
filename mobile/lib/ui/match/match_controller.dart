@@ -4,13 +4,14 @@ import '../../domain/domain.dart';
 
 /// État de l'écran Match en direct (E05). Toute la logique vit dans lib/domain ;
 /// ici on relaie les gestes du coach et on prévient l'interface.
-/// TODO V1 : persistance locale des événements (V1-TEC-02) et choix de l'équipe.
+/// Après chaque saisie et chaque annulation, [onEventsChanged] reçoit la liste complète des
+/// événements pour l'enregistrer sur l'appareil (V1-TEC-02).
 class MatchController extends ChangeNotifier {
-  MatchController(this.team, StartSet firstSet) : _session = MatchSession(team) {
-    _lastRejection = _session.record(firstSet);
-  }
+  MatchController(this.team, {MatchRules? rules, required List<MatchEvent> events, this.onEventsChanged})
+      : _session = MatchSession(team, rules: rules, events: events);
 
   final Team team;
+  final ValueChanged<List<MatchEvent>>? onEventsChanged;
   final MatchSession _session;
   String? _selectedPlayerId;
   Rejection? _lastRejection;
@@ -57,6 +58,7 @@ class MatchController extends ChangeNotifier {
     _selectedPlayerId = null;
     _session.undo();
     _lastRejection = null;
+    onEventsChanged?.call(_session.events);
     notifyListeners();
   }
 
@@ -67,6 +69,7 @@ class MatchController extends ChangeNotifier {
 
   void _record(MatchEvent event) {
     _lastRejection = _session.record(event);
+    if (_lastRejection == null) onEventsChanged?.call(_session.events);
     notifyListeners();
   }
 }

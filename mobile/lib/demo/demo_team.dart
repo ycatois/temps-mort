@@ -1,6 +1,6 @@
 import '../domain/domain.dart';
 
-/// Équipe des maquettes, en attendant les écrans Effectif (E02) et Composition (E04).
+/// Équipe des maquettes : proposée à l'accueil pour essayer l'app, et utilisée par les tests.
 final demoTeam = Team(
   id: 'demo',
   name: 'M18 F',

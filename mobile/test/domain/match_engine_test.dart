@@ -262,5 +262,32 @@ void main() {
       final issues = validateLineup(mixed(GameFormat.six, minWomen: 0), ['a', 'b']);
       expect(issues.single, const WrongSize(6, 2));
     });
+
+    test('une équipe 6x6 mixte jouée en 4x4 reprend le minimum de femmes du 4x4', () {
+      final team = mixed(GameFormat.six, minWomen: 3);
+      expect(team.withFormat(GameFormat.six), same(team));
+      final four = team.withFormat(GameFormat.four);
+      expect(four.format, GameFormat.four);
+      expect(four.minWomenOnCourt, 2);
+      expect(four.players, team.players);
+    });
+  });
+
+  group('Effectif', () {
+    test('une joueuse archivée sort des joueuses disponibles mais reste connue', () {
+      final team = Team(
+        id: 't',
+        name: 'M15',
+        format: GameFormat.six,
+        gender: TeamGender.feminine,
+        category: AgeCategory.m15,
+        players: const [
+          Player(id: 'a', firstName: 'Anna', number: 1, gender: PlayerGender.f),
+          Player(id: 'b', firstName: 'Bea', number: 2, gender: PlayerGender.f, archived: true),
+        ],
+      );
+      expect(team.activePlayers.map((p) => p.id), ['a']);
+      expect(team.player('b')?.firstName, 'Bea');
+    });
   });
 }

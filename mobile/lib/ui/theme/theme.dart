@@ -26,6 +26,11 @@ ThemeData buildTheme() {
     colorScheme: scheme,
     scaffoldBackgroundColor: TmColor.groundApp,
     fontFamily: TmFont.body,
+    appBarTheme: const AppBarTheme(
+      backgroundColor: TmColor.navy,
+      foregroundColor: Colors.white,
+      titleTextStyle: TextStyle(fontFamily: TmFont.body, fontWeight: FontWeight.w700, fontSize: 20, color: Colors.white),
+    ),
     textTheme: const TextTheme(
       displayLarge: display,
       headlineMedium: display,

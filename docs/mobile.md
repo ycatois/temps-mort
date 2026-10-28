@@ -38,12 +38,18 @@ node ../design/build.mjs   # après une modification du design : régénère lib
 mobile/
 ├── lib/
 │   ├── domain/            Dart pur : équipes, catégories, formats, règles, moteur, stats
+│   ├── data/              stockage local SQLite (équipes, matchs, événements) et conversion JSON
 │   ├── ui/theme/          tokens.dart (GÉNÉRÉ) et thème Material
+│   ├── ui/common/         libellés français, cartes, boutons, accès au stockage
+│   ├── ui/home/           accueil : les équipes du coach
+│   ├── ui/team/           E02 Effectif, fiche joueuse, création d'équipe
+│   ├── ui/match_setup/    E03 Nouveau match, composition simple (en attendant E04)
 │   ├── ui/match/          écran E05 Match en direct + son contrôleur
 │   ├── demo/              équipe de démonstration (celle des maquettes)
 │   └── main.dart
-├── test/domain/           24 tests des règles + contrôle « pas de Flutter dans le moteur »
-├── test/widget/           tests de l'écran en tablette et en smartphone
+├── test/domain/           tests des règles + contrôle « pas de Flutter dans le moteur »
+├── test/data/             aller-retour JSON et reprise d'un match depuis SQLite
+├── test/widget/           parcours complet et écran de match, en tablette et en smartphone
 ├── assets/fonts/          Barlow, Barlow Condensed (copiées par design/build.mjs)
 └── tool/creer-plateformes.ps1
 ```
@@ -51,15 +57,19 @@ mobile/
 ## Ce qui existe
 
 - Moteur : équipes, joueuses, catégories (M7 → vétérans, loisir), formats 6x6/4x4/2x2, mixité, règles paramétrables, match à événements, annulation, set suivant, statistiques (side-out, break, par rotation, par joueuse).
-- Écran E05 « Match en direct » sur l'équipe de démonstration, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, libero et rotation automatiques.
-- Rien n'a encore été compilé sur une vraie machine : la première exécution de `flutter analyze` et `flutter test` est l'étape à faire en premier.
+- Stockage sur l'appareil (SQLite) : équipes, matchs, et événements enregistrés après chaque saisie. Un match quitté se reprend au même score.
+- Accueil : les équipes, création d'une équipe, équipe de démonstration pour essayer.
+- E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte) ; liste des matchs de l'équipe.
+- E03 Nouveau match : adversaire, date, heure, domicile ou extérieur, lieu, compétition, format du jour, sets gagnants et points.
+- Composition simple : on touche les joueuses dans l'ordre des postes, libero, premier service. L'écran E04 de la maquette (glisser-déposer) la remplacera.
+- E05 Match en direct, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, libero et rotation automatiques.
 
 ## Prochaines étapes (ordre conseillé)
 
-1. Persistance locale des événements (SQLite) : V1-TEC-02, V1-MAT-12.
-2. Écrans E02 Effectif et E03 Nouveau match, puis E04 Composition (glisser-déposer sur les zones).
-3. E06 Remplacement et règle du retour à la place d'origine (V1-MAT-04).
-4. E07 Stats, E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
+1. E04 Composition de la maquette (glisser-déposer sur les zones), capitaine, système de jeu.
+2. E06 Remplacement et règle du retour à la place d'origine (V1-MAT-04).
+3. E07 Stats en direct, puis E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
+4. Modifier ou supprimer un match, saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
 5. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication

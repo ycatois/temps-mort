@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../demo/demo_team.dart';
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import 'match_controller.dart';
@@ -8,14 +7,23 @@ import 'match_controller.dart';
 /// E05 — Match en direct. Tablette (≥ 840 px de large) : terrain et saisie côte à côte ;
 /// smartphone : empilés, avec défilement. Maquettes : design/maquettes/Main.dc.html et Mobile-Match.dc.html.
 class MatchScreen extends StatefulWidget {
-  const MatchScreen({super.key});
+  const MatchScreen({super.key, required this.team, this.rules, required this.events, this.onEventsChanged});
+
+  /// L'équipe dans le format du match.
+  final Team team;
+  final MatchRules? rules;
+
+  /// Événements déjà saisis (au moins le début du premier set) : un match interrompu reprend où il en était.
+  final List<MatchEvent> events;
+  final ValueChanged<List<MatchEvent>>? onEventsChanged;
 
   @override
   State<MatchScreen> createState() => _MatchScreenState();
 }
 
 class _MatchScreenState extends State<MatchScreen> {
-  late final MatchController _c = MatchController(demoTeam, demoStartSet);
+  late final MatchController _c =
+      MatchController(widget.team, rules: widget.rules, events: widget.events, onEventsChanged: widget.onEventsChanged);
 
   @override
   void dispose() {
@@ -103,6 +111,17 @@ class _ScoreBar extends StatelessWidget {
       ),
       child: Text('Temps mort ${s.timeoutsUsed.us}/${s.rules.timeoutsPerSet}'),
     );
+    // Le match est enregistré à chaque saisie : on peut le quitter et le reprendre depuis la liste des matchs.
+    final back = [
+      if (Navigator.of(context).canPop())
+        IconButton(
+          tooltip: 'Quitter le match (il est enregistré)',
+          onPressed: () => Navigator.of(context).maybePop(),
+          color: TmColor.onNavy,
+          constraints: const BoxConstraints.tightFor(width: TmTouch.minTarget, height: TmTouch.minTarget),
+          icon: const Icon(Icons.arrow_back),
+        ),
+    ];
 
     return Container(
       color: TmColor.navy,
@@ -117,7 +136,7 @@ class _ScoreBar extends StatelessWidget {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(children: [Expanded(child: info), score]),
+                    Row(children: [...back, Expanded(child: info), score]),
                     const SizedBox(height: 8),
                     timeout,
                   ],
@@ -125,6 +144,7 @@ class _ScoreBar extends StatelessWidget {
               }
               return Row(
                 children: [
+                  ...back,
                   Expanded(child: info),
                   score,
                   Expanded(child: Align(alignment: Alignment.centerRight, child: timeout)),

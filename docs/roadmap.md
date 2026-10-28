@@ -16,11 +16,11 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
 | V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ |
-| V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | 🟡 catégories modélisées |
-| V1-EQU-03 | Ajouter une joueuse : prénom, nom, numéro de maillot, poste principal (passeuse, pointue, réceptionneuse-attaquante, centrale, libero) | Indispensable | ⬜ |
+| V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | 🟡 nom, catégorie, format, type ; saison et couleur à faire |
+| V1-EQU-03 | Ajouter une joueuse : prénom, nom, numéro de maillot, poste principal (passeuse, pointue, réceptionneuse-attaquante, centrale, libero) | Indispensable | 🟡 prénom, numéro, poste (pas de nom : données minimales des mineures) |
 | V1-EQU-04 | Poste secondaire et main forte (droitière ou gauchère) | Important | ⬜ |
-| V1-EQU-05 | Modifier, archiver ou réactiver une joueuse en cours de saison | Indispensable | ⬜ |
-| V1-EQU-06 | Gérer plusieurs équipes depuis le même compte et passer de l'une à l'autre | Important | ⬜ |
+| V1-EQU-05 | Modifier, archiver ou réactiver une joueuse en cours de saison | Indispensable | ✅ |
+| V1-EQU-06 | Gérer plusieurs équipes depuis le même compte et passer de l'une à l'autre | Important | 🟡 plusieurs équipes sur l'accueil, sans compte |
 | V1-EQU-07 | Photo de la joueuse (facultative, stockée sur l'appareil) | Confort | ⬜ |
 | V1-EQU-08 | Importer un effectif depuis un fichier CSV | Confort | ⬜ |
 
@@ -35,20 +35,20 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-FOR-05 | 4x4 : terrain à 4 zones, rotation à 4, règles de remplacement et de score paramétrables | Indispensable | ✅ |
 | V1-FOR-06 | 2x2 : pas de zones de rotation, ordre de service suivi automatiquement, pas de libero | Indispensable | ✅ |
 | V1-FOR-07 | Saisie, stats et tableau tactique adaptés au format (6, 4 ou 2 pions, terrain à la bonne échelle) | Indispensable | ⬜ |
-| V1-FOR-08 | Changer de format pour un match précis (une équipe 6x6 qui joue un tournoi 4x4 mixte) | Important | ⬜ |
+| V1-FOR-08 | Changer de format pour un match précis (une équipe 6x6 qui joue un tournoi 4x4 mixte) | Important | ✅ |
 | V1-FOR-09 | Modèles de règles prêts à l'emploi (6x6, 4x4 jeunes, 2x2 jeunes, beach 2x2, mixte loisir), à vérifier avec les règlements FFVolley en vigueur | Important | ⬜ |
 
 ### Préparation du match (PRE)
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-PRE-01 | Créer un match : adversaire, date, heure, lieu, domicile ou extérieur, compétition | Indispensable | ⬜ |
-| V1-PRE-02 | Choisir le format : 2 ou 3 sets gagnants, points par set, tie-break, format repris de l'équipe (6x6, 4x4, 2x2) et modifiable pour ce match | Indispensable | ⬜ |
+| V1-PRE-01 | Créer un match : adversaire, date, heure, lieu, domicile ou extérieur, compétition | Indispensable | ✅ |
+| V1-PRE-02 | Choisir le format : 2 ou 3 sets gagnants, points par set, tie-break, format repris de l'équipe (6x6, 4x4, 2x2) et modifiable pour ce match | Indispensable | ✅ |
 | V1-PRE-03 | Sélectionner les joueuses présentes (jusqu'à 14 dont 2 liberos) | Indispensable | ⬜ |
-| V1-PRE-04 | Composer le six de départ en glissant les joueuses sur les zones 1 à 6 | Indispensable | ⬜ |
-| V1-PRE-05 | Désigner le ou les liberos (6x6 uniquement) et la capitaine | Indispensable | ⬜ |
+| V1-PRE-04 | Composer le six de départ en glissant les joueuses sur les zones 1 à 6 | Indispensable | 🟡 composition simple (toucher dans l'ordre des postes), glisser-déposer E04 à faire |
+| V1-PRE-05 | Désigner le ou les liberos (6x6 uniquement) et la capitaine | Indispensable | 🟡 libero fait, capitaine à faire |
 | V1-PRE-06 | Choisir le système de jeu (4-2, 5-1, 6-2) pour pré-placer les réceptions | Important | ⬜ |
-| V1-PRE-07 | Indiquer qui sert en premier | Indispensable | ⬜ |
+| V1-PRE-07 | Indiquer qui sert en premier | Indispensable | ✅ |
 | V1-PRE-08 | Contrôler la composition : alerte si deux passeuses côte à côte en 5-1, libero placée en zone avant | Important | ⬜ |
 | V1-PRE-09 | Enregistrer une composition type et la réutiliser au match suivant | Important | ⬜ |
 | V1-PRE-10 | Préparer des compositions différentes par set à l'avance | Confort | ⬜ |
@@ -68,7 +68,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-MAT-09 | Corriger à la main le score, le service ou la rotation (cas d'erreur d'arbitrage ou de saisie) | Indispensable | ⬜ |
 | V1-MAT-10 | Chronologie du set : liste des points avec qui et comment | Important | ⬜ |
 | V1-MAT-11 | Carton ou sanction à l'équipe adverse ou à la sienne | Confort | ⬜ |
-| V1-MAT-12 | Mettre un match en pause et le reprendre plus tard | Important | ⬜ |
+| V1-MAT-12 | Mettre un match en pause et le reprendre plus tard | Important | ✅ un match quitté se reprend depuis la liste des matchs |
 
 ### Saisie des statistiques (STA)
 
@@ -122,14 +122,14 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ⬜ |
 | V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ⬜ |
 | V1-FIN-04 | Export des données brutes en CSV | Important | ⬜ |
-| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | ⬜ |
+| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | 🟡 liste des matchs par équipe, modification à faire |
 
 ### Technique et expérience (TEC)
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
 | V1-TEC-01 | Fonctionnement complet hors ligne pendant le match | Indispensable | ⬜ |
-| V1-TEC-02 | Sauvegarde automatique après chaque action, aucune perte en cas de fermeture | Indispensable | ⬜ |
+| V1-TEC-02 | Sauvegarde automatique après chaque action, aucune perte en cas de fermeture | Indispensable | ✅ SQLite, après chaque saisie et chaque annulation |
 | V1-TEC-03 | Synchronisation avec le serveur dès que le réseau revient | Indispensable | ⬜ |
 | V1-TEC-04 | Mise en page tablette en paysage et smartphone en portrait | Indispensable | ⬜ |
 | V1-TEC-05 | Boutons d'au moins 56 px, contraste fort pour gymnase éclairé ou sombre | Indispensable | ⬜ |

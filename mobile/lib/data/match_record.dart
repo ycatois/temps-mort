@@ -32,3 +32,24 @@ class MatchRecord {
   /// L'équipe telle qu'elle joue ce match.
   Team teamFor(Team team) => team.withFormat(format);
 }
+
+/// Composition type d'une équipe dans un format (V1-PRE-09), rechargée au match suivant.
+class LineupTemplate {
+  LineupTemplate({
+    required this.teamId,
+    required this.format,
+    required List<String> lineup,
+    this.liberoId,
+    this.captainId,
+    this.system,
+  }) : lineup = List.unmodifiable(lineup);
+
+  final String teamId;
+  final GameFormat format;
+
+  /// Index 0 = poste 1, comme dans [StartSet].
+  final List<String> lineup;
+  final String? liberoId;
+  final String? captainId;
+  final GameSystem? system;
+}

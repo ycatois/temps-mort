@@ -37,22 +37,28 @@ sealed class MatchEvent {
 }
 
 /// Début de set : qui sert en premier et la composition (index 0 = poste 1).
+/// [captainId] et [system] décrivent la composition sans changer les règles appliquées.
 final class StartSet extends MatchEvent {
-  StartSet(this.firstServer, List<String> lineup, {this.liberoId}) : lineup = List.unmodifiable(lineup);
+  StartSet(this.firstServer, List<String> lineup, {this.liberoId, this.captainId, this.system})
+      : lineup = List.unmodifiable(lineup);
   final Side firstServer;
   final List<String> lineup;
   final String? liberoId;
+  final String? captainId;
+  final GameSystem? system;
 
-  StartSet withFirstServer(Side side) => StartSet(side, lineup, liberoId: liberoId);
+  StartSet withFirstServer(Side side) => StartSet(side, lineup, liberoId: liberoId, captainId: captainId, system: system);
 
   @override
   bool operator ==(Object other) =>
       other is StartSet &&
       other.firstServer == firstServer &&
       other.liberoId == liberoId &&
+      other.captainId == captainId &&
+      other.system == system &&
       _sameList(other.lineup, lineup);
   @override
-  int get hashCode => Object.hash(firstServer, liberoId, Object.hashAll(lineup));
+  int get hashCode => Object.hash(firstServer, liberoId, captainId, system, Object.hashAll(lineup));
 }
 
 final class Rally extends MatchEvent {

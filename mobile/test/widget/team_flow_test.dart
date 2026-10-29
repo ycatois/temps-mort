@@ -5,8 +5,8 @@ import 'package:temps_mort/data/store.dart';
 import 'package:temps_mort/demo/demo_team.dart';
 import 'package:temps_mort/domain/domain.dart';
 import 'package:temps_mort/ui/common/store_scope.dart';
+import 'package:temps_mort/ui/composition/composition_screen.dart';
 import 'package:temps_mort/ui/home/home_screen.dart';
-import 'package:temps_mort/ui/match_setup/lineup_screen.dart';
 import 'package:temps_mort/ui/match_setup/new_match_screen.dart';
 import 'package:temps_mort/ui/team/team_screen.dart';
 import 'package:temps_mort/ui/theme/theme.dart';
@@ -61,12 +61,17 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Adversaire'), 'Brest');
     await tester.tap(find.text('Composer le six de départ'));
     await tester.pumpAndSettle();
-    expect(find.byType(LineupScreen), findsOneWidget);
-    await tester.tap(find.text('#4 Lina'));
-    await tester.tap(find.text('#8 Maya'));
-    await tester.tap(find.text('Nous servons'));
+    expect(find.byType(CompositionScreen), findsOneWidget);
+    await tester.tap(find.text('Lina'));
+    await tester.pump();
+    await tester.tap(find.text('Sert en premier · à placer'));
+    await tester.pump();
+    await tester.tap(find.text('Maya'));
+    await tester.pump();
+    await tester.tap(find.text('Sert en second · à placer'));
+    await tester.tap(find.text('Nous'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Commencer le match'));
+    await tester.tap(find.text('Commencer le set 1'));
     await tester.pumpAndSettle();
 
     // Match en direct
@@ -123,8 +128,8 @@ void main() {
       format: GameFormat.six,
       rules: MatchRules.defaultFor(GameFormat.six),
     );
-    await pumpApp(tester, phone, store, LineupScreen(team: demoTeam, match: match));
+    await pumpApp(tester, phone, store, CompositionScreen(team: demoTeam, rules: match.rules, match: match));
     expect(tester.takeException(), isNull);
-    expect(find.text('Poste 1'), findsOneWidget);
+    expect(find.text('Zone 1 · à placer'), findsOneWidget);
   });
 }

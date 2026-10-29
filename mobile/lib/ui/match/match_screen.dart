@@ -4,10 +4,18 @@ import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import 'match_controller.dart';
 
+/// Ouvre l'écran E04 pour composer le set [setNumber] à partir de [suggested] ; null si le coach renonce.
+typedef ComposeSet = Future<StartSet?> Function(
+  BuildContext context,
+  StartSet suggested, {
+  required int setNumber,
+  required bool serverLocked,
+});
+
 /// E05 — Match en direct. Tablette (≥ 840 px de large) : terrain et saisie côte à côte ;
 /// smartphone : empilés, avec défilement. Maquettes : design/maquettes/Main.dc.html et Mobile-Match.dc.html.
 class MatchScreen extends StatefulWidget {
-  const MatchScreen({super.key, required this.team, this.rules, required this.events, this.onEventsChanged});
+  const MatchScreen({super.key, required this.team, this.rules, required this.events, this.onEventsChanged, this.composeNextSet});
 
   /// L'équipe dans le format du match.
   final Team team;
@@ -16,6 +24,9 @@ class MatchScreen extends StatefulWidget {
   /// Événements déjà saisis (au moins le début du premier set) : un match interrompu reprend où il en était.
   final List<MatchEvent> events;
   final ValueChanged<List<MatchEvent>>? onEventsChanged;
+
+  /// Sans cette fonction, le set suivant ne peut reprendre que la même composition.
+  final ComposeSet? composeNextSet;
 
   @override
   State<MatchScreen> createState() => _MatchScreenState();
@@ -52,7 +63,7 @@ class _MatchScreenState extends State<MatchScreen> {
                           children: [
                             Expanded(flex: 11, child: SingleChildScrollView(child: _Court(c: _c))),
                             const SizedBox(width: 16),
-                            Expanded(flex: 10, child: SingleChildScrollView(child: _ActionPanel(c: _c))),
+                            Expanded(flex: 10, child: SingleChildScrollView(child: _ActionPanel(c: _c, compose: widget.composeNextSet))),
                           ],
                         ),
                       );
@@ -61,7 +72,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [_Court(c: _c), const SizedBox(height: 12), _ActionPanel(c: _c)],
+                        children: [_Court(c: _c), const SizedBox(height: 12), _ActionPanel(c: _c, compose: widget.composeNextSet)],
                       ),
                     );
                   },
@@ -279,8 +290,22 @@ class _PlayerToken extends StatelessWidget {
 }
 
 class _ActionPanel extends StatelessWidget {
-  const _ActionPanel({required this.c});
+  const _ActionPanel({required this.c, this.compose});
   final MatchController c;
+  final ComposeSet? compose;
+
+  /// Ouvre E04 sur la composition du set précédent, puis démarre le set choisi.
+  Future<void> _changeLineup(BuildContext context) async {
+    final suggested = c.suggestedNextSet;
+    if (suggested == null) return;
+    final start = await compose!(
+      context,
+      suggested,
+      setNumber: c.state.setIndex + 1,
+      serverLocked: !c.nextSetIsDeciding,
+    );
+    if (start != null) c.startSet(start);
+  }
 
   static const _gains = [RallyAction.attaque, RallyAction.ace, RallyAction.contre];
   static const _faults = [RallyAction.attaqueFaute, RallyAction.serviceFaute, RallyAction.receptionFaute];
@@ -336,6 +361,15 @@ class _ActionPanel extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        if (c.canStartNextSet && compose != null)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+              onPressed: () => _changeLineup(context),
+              child: Text('Set ${s.setIndex + 1} : changer la composition'),
             ),
           ),
         Text(

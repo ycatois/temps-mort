@@ -5,8 +5,8 @@ import '../../domain/domain.dart';
 import '../common/labels.dart';
 import '../common/store_scope.dart';
 import '../common/widgets.dart';
+import '../composition/composition_screen.dart';
 import '../match/match_screen.dart';
-import '../match_setup/lineup_screen.dart';
 import '../match_setup/new_match_screen.dart';
 import '../theme/tokens.dart';
 import 'player_form.dart';
@@ -112,8 +112,10 @@ class _TeamScreenState extends State<TeamScreen> {
     final navigator = Navigator.of(context);
     final team = match.teamFor(_team);
     if ((await store.events(match.id)).isEmpty) {
-      final started = await navigator.push<bool>(MaterialPageRoute(builder: (_) => LineupScreen(team: team, match: match)));
-      if (started != true) return;
+      final start = await navigator.push<StartSet>(
+          MaterialPageRoute(builder: (_) => CompositionScreen(team: team, rules: match.rules, match: match)));
+      if (start == null) return;
+      await store.saveEvents(match.id, [start]);
     }
     final events = await store.events(match.id);
     await navigator.push(MaterialPageRoute<void>(
@@ -122,6 +124,18 @@ class _TeamScreenState extends State<TeamScreen> {
         rules: match.rules,
         events: events,
         onEventsChanged: (e) => store.saveEvents(match.id, e),
+        composeNextSet: (context, suggested, {required setNumber, required serverLocked}) =>
+            Navigator.of(context).push<StartSet>(MaterialPageRoute(
+          builder: (_) => CompositionScreen(
+            team: team,
+            rules: match.rules,
+            match: match,
+            setNumber: setNumber,
+            initial: suggested,
+            initialServer: serverLocked ? suggested.firstServer : null,
+            serverLocked: serverLocked,
+          ),
+        )),
       ),
     ));
     await _loadMatches();

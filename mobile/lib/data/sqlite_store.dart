@@ -22,7 +22,7 @@ class SqliteStore implements AppStore {
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 1,
+        version: 2,
         onCreate: (db, version) async {
           await db.execute('CREATE TABLE teams (id TEXT PRIMARY KEY, data TEXT NOT NULL)');
           await db.execute(
@@ -30,6 +30,11 @@ class SqliteStore implements AppStore {
           await db.execute('CREATE INDEX matches_team ON matches (team_id, date)');
           await db.execute('CREATE TABLE match_events (match_id TEXT NOT NULL, seq INTEGER NOT NULL, '
               'data TEXT NOT NULL, PRIMARY KEY (match_id, seq))');
+          await _createTemplates(db);
+        },
+        // Version 2 : compositions types (E04).
+        onUpgrade: (db, from, to) async {
+          if (from < 2) await _createTemplates(db);
         },
       ),
     );
@@ -76,6 +81,23 @@ class SqliteStore implements AppStore {
         }
         await batch.commit(noResult: true);
       });
+
+  @override
+  Future<LineupTemplate?> lineupTemplate(String teamId, GameFormat format) async {
+    final rows = await _db.query('lineup_templates',
+        where: 'team_id = ? AND format = ?', whereArgs: [teamId, format.name], limit: 1);
+    return rows.isEmpty ? null : templateFromJson(_decode(rows.single['data']));
+  }
+
+  @override
+  Future<void> saveLineupTemplate(LineupTemplate template) => _db.insert(
+        'lineup_templates',
+        {'team_id': template.teamId, 'format': template.format.name, 'data': jsonEncode(templateToJson(template))},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+  static Future<void> _createTemplates(Database db) => db.execute('CREATE TABLE lineup_templates '
+      '(team_id TEXT NOT NULL, format TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (team_id, format))');
 
   static Json _decode(Object? data) => jsonDecode(data! as String) as Json;
 }

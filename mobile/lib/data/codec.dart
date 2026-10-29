@@ -94,6 +94,8 @@ Json eventToJson(MatchEvent e) => switch (e) {
           'firstServer': e.firstServer.name,
           'lineup': e.lineup,
           if (e.liberoId != null) 'liberoId': e.liberoId,
+          if (e.captainId != null) 'captainId': e.captainId,
+          if (e.system != null) 'system': e.system!.name,
         },
       Rally() => {
           'type': 'rally',
@@ -115,6 +117,8 @@ MatchEvent eventFromJson(Json j) {
         side('firstServer'),
         [for (final id in j['lineup']! as List<Object?>) id! as String],
         liberoId: j['liberoId'] as String?,
+        captainId: j['captainId'] as String?,
+        system: j['system'] == null ? null : GameSystem.values.byName(j['system']! as String),
       ),
     'rally' => Rally(
         side('winner'),
@@ -128,3 +132,21 @@ MatchEvent eventFromJson(Json j) {
     _ => throw FormatException('Événement inconnu : $type'),
   };
 }
+
+Json templateToJson(LineupTemplate t) => {
+      'teamId': t.teamId,
+      'format': t.format.name,
+      'lineup': t.lineup,
+      if (t.liberoId != null) 'liberoId': t.liberoId,
+      if (t.captainId != null) 'captainId': t.captainId,
+      if (t.system != null) 'system': t.system!.name,
+    };
+
+LineupTemplate templateFromJson(Json j) => LineupTemplate(
+      teamId: j['teamId']! as String,
+      format: GameFormat.values.byName(j['format']! as String),
+      lineup: [for (final id in j['lineup']! as List<Object?>) id! as String],
+      liberoId: j['liberoId'] as String?,
+      captainId: j['captainId'] as String?,
+      system: j['system'] == null ? null : GameSystem.values.byName(j['system']! as String),
+    );

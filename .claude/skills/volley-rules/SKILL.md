@@ -36,6 +36,11 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 ## Mixité
 - `Team.gender == TeamGender.mixte` impose `minWomenOnCourt` (par défaut la moitié des joueurs sur le terrain). Vérifié au `StartSet`, à chaque remplacement et à l'entrée du libero.
 
+## Composition (E04)
+- `StartSet` porte aussi `captainId` et `system` (`GameSystem` : 5-1, 4-2, 6-2) : ils décrivent la composition sans changer le jeu.
+- `validateLineup` bloque (taille, doublon, libero dans le six, mixité). `lineupWarnings` alerte sans bloquer, en 6x6 seulement : nombre de passeuses (poste `Role.passeur`) différent du système ; en 4-2 et 6-2, passeuses qui ne sont pas opposées (trois postes d'écart) ; joueuse de poste libero placée en zone avant (postes 2, 3, 4).
+- Premier service : le coach le choisit au set 1 et au set décisif (tirage au sort) ; il alterne aux autres sets.
+
 ## Catégories
 - `AgeCategory` : M7 (baby-volley), M9, M11, M13, M15, M18, M21, Seniors, Vétérans, Loisir. `suggestedFormat` n'est qu'une valeur par défaut à la création d'équipe ; le coach choisit le format et les règles.
 

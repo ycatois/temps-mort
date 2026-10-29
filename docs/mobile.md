@@ -43,7 +43,8 @@ mobile/
 │   ├── ui/common/         libellés français, cartes, boutons, accès au stockage
 │   ├── ui/home/           accueil : les équipes du coach
 │   ├── ui/team/           E02 Effectif, fiche joueuse, création d'équipe
-│   ├── ui/match_setup/    E03 Nouveau match, composition simple (en attendant E04)
+│   ├── ui/match_setup/    E03 Nouveau match
+│   ├── ui/composition/    E04 Composition (glisser-déposer, libero, capitaine, système, compo type)
 │   ├── ui/match/          écran E05 Match en direct + son contrôleur
 │   ├── demo/              équipe de démonstration (celle des maquettes)
 │   └── main.dart
@@ -61,16 +62,15 @@ mobile/
 - Accueil : les équipes, création d'une équipe, équipe de démonstration pour essayer.
 - E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte) ; liste des matchs de l'équipe.
 - E03 Nouveau match : adversaire, date, heure, domicile ou extérieur, lieu, compétition, format du jour, sets gagnants et points.
-- Composition simple : on touche les joueuses dans l'ordre des postes, libero, premier service. L'écran E04 de la maquette (glisser-déposer) la remplacera.
+- E04 Composition, pour le premier set et les suivants : glisser-déposer sur les zones (appui long sur smartphone, ou toucher une joueuse puis une zone), libero, capitaine, système 5-1 / 4-2 / 6-2 avec alertes, premier service (en alternance à partir du set 2, au choix au set décisif), compo type enregistrée et rechargée.
 - E05 Match en direct, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, libero et rotation automatiques.
 
 ## Prochaines étapes (ordre conseillé)
 
-1. E04 Composition de la maquette (glisser-déposer sur les zones), capitaine, système de jeu.
-2. E06 Remplacement et règle du retour à la place d'origine (V1-MAT-04).
-3. E07 Stats en direct, puis E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
-4. Modifier ou supprimer un match, saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
-5. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
+1. E06 Remplacement et règle du retour à la place d'origine (V1-MAT-04).
+2. E07 Stats en direct, puis E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
+3. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
+4. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication
 

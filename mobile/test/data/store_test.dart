@@ -32,7 +32,8 @@ final match = MatchRecord(
 );
 
 final events = <MatchEvent>[
-  StartSet(Side.them, const ['manon', 'chloe', 'emma', 'ines', 'lucie', 'lea'], liberoId: 'jade'),
+  StartSet(Side.them, const ['manon', 'chloe', 'emma', 'ines', 'lucie', 'lea'],
+      liberoId: 'jade', captainId: 'emma', system: GameSystem.s51),
   const Rally(Side.us, playerId: 'lucie', action: RallyAction.attaque),
   const Rally(Side.them),
   const TimeoutTaken(Side.us),
@@ -84,5 +85,16 @@ void main() {
     final reloaded = MatchSession(demoTeam, events: await store.events('m1'));
     expect(reloaded.state.score, const Score(1, 0));
     expect(reloaded.events.length, 2);
+    expect((reloaded.events.first as StartSet).liberoId, 'jade');
+
+    // Composition type : une par équipe et par format
+    expect(await store.lineupTemplate('demo', GameFormat.six), isNull);
+    await store.saveLineupTemplate(LineupTemplate(
+        teamId: 'demo', format: GameFormat.six, lineup: demoStartSet.lineup, liberoId: 'jade', captainId: 'emma', system: GameSystem.s51));
+    final template = await store.lineupTemplate('demo', GameFormat.six);
+    expect(template!.lineup, demoStartSet.lineup);
+    expect(template.captainId, 'emma');
+    expect(template.system, GameSystem.s51);
+    expect(await store.lineupTemplate('demo', GameFormat.four), isNull);
   });
 }

@@ -290,4 +290,57 @@ void main() {
       expect(team.player('b')?.firstName, 'Bea');
     });
   });
+
+  group('Alertes de composition (6x6)', () {
+    // Deux passeuses (Léa 14, Camille 11) et une libero de poste (Jade) dans l'effectif.
+    final team = Team(
+      id: 't',
+      name: 'M18 F',
+      format: GameFormat.six,
+      gender: TeamGender.feminine,
+      category: AgeCategory.m18,
+      players: const [
+        Player(id: 'lea', firstName: 'Léa', number: 14, gender: PlayerGender.f, role: Role.passeur),
+        Player(id: 'camille', firstName: 'Camille', number: 11, gender: PlayerGender.f, role: Role.passeur),
+        Player(id: 'jade', firstName: 'Jade', number: 1, gender: PlayerGender.f, role: Role.libero),
+        Player(id: 'a', firstName: 'Anna', number: 2, gender: PlayerGender.f),
+        Player(id: 'b', firstName: 'Bea', number: 3, gender: PlayerGender.f),
+        Player(id: 'c', firstName: 'Cleo', number: 4, gender: PlayerGender.f),
+        Player(id: 'd', firstName: 'Dina', number: 5, gender: PlayerGender.f),
+      ],
+    );
+
+    test('5-1 avec une passeuse : rien à signaler', () {
+      expect(lineupWarnings(team, ['lea', 'a', 'b', 'c', 'd', 'jade'], GameSystem.s51), isEmpty);
+    });
+
+    test('5-1 avec deux passeuses : alerte', () {
+      expect(lineupWarnings(team, ['lea', 'camille', 'a', 'b', 'c', 'd'], GameSystem.s51),
+          [const SetterCount(GameSystem.s51, 2)]);
+    });
+
+    test('4-2 : les passeuses doivent être opposées, pas côte à côte', () {
+      expect(lineupWarnings(team, ['lea', 'a', 'b', 'camille', 'c', 'd'], GameSystem.s42), isEmpty);
+      expect(lineupWarnings(team, ['lea', 'camille', 'a', 'b', 'c', 'd'], GameSystem.s62),
+          [const SettersNotOpposite('lea', 'camille')]);
+      expect(lineupWarnings(team, ['lea', 'a', 'b', 'c', 'd', 'jade'], GameSystem.s42),
+          [const SetterCount(GameSystem.s42, 1)]);
+    });
+
+    test('une libero de poste placée en zone avant est signalée', () {
+      expect(lineupWarnings(team, ['lea', 'a', 'jade', 'b', 'c', 'd'], null), [const LiberoRoleInFrontRow('jade')]);
+    });
+
+    test('rien à contrôler hors 6x6', () {
+      expect(lineupWarnings(team.withFormat(GameFormat.four), ['lea', 'camille', 'a', 'b'], GameSystem.s51), isEmpty);
+    });
+
+    test('capitaine et système accompagnent le début de set sans changer le jeu', () {
+      final s = MatchSession(team);
+      final start = StartSet(Side.us, const ['lea', 'a', 'b', 'c', 'd', 'jade'], captainId: 'a', system: GameSystem.s51);
+      expect(s.record(start), isNull);
+      expect(start.withFirstServer(Side.them).captainId, 'a');
+      expect(start.withFirstServer(Side.them).system, GameSystem.s51);
+    });
+  });
 }

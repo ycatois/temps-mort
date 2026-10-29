@@ -54,6 +54,12 @@ class MatchController extends ChangeNotifier {
     if (next != null) _record(next);
   }
 
+  /// Proposition pour le set suivant (composition du set précédent), ou null si aucun set n'est à démarrer.
+  StartSet? get suggestedNextSet => _session.nextSetStart();
+
+  /// Set suivant avec une composition choisie sur l'écran E04.
+  void startSet(StartSet start) => _record(start);
+
   void undo() {
     _selectedPlayerId = null;
     _session.undo();

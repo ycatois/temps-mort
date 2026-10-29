@@ -45,12 +45,12 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-PRE-01 | Créer un match : adversaire, date, heure, lieu, domicile ou extérieur, compétition | Indispensable | ✅ |
 | V1-PRE-02 | Choisir le format : 2 ou 3 sets gagnants, points par set, tie-break, format repris de l'équipe (6x6, 4x4, 2x2) et modifiable pour ce match | Indispensable | ✅ |
 | V1-PRE-03 | Sélectionner les joueuses présentes (jusqu'à 14 dont 2 liberos) | Indispensable | ⬜ |
-| V1-PRE-04 | Composer le six de départ en glissant les joueuses sur les zones 1 à 6 | Indispensable | 🟡 composition simple (toucher dans l'ordre des postes), glisser-déposer E04 à faire |
-| V1-PRE-05 | Désigner le ou les liberos (6x6 uniquement) et la capitaine | Indispensable | 🟡 libero fait, capitaine à faire |
-| V1-PRE-06 | Choisir le système de jeu (4-2, 5-1, 6-2) pour pré-placer les réceptions | Important | ⬜ |
+| V1-PRE-04 | Composer le six de départ en glissant les joueuses sur les zones 1 à 6 | Indispensable | ✅ glisser-déposer (tablette), appui long ou toucher puis zone (smartphone) |
+| V1-PRE-05 | Désigner le ou les liberos (6x6 uniquement) et la capitaine | Indispensable | ✅ un libero et la capitaine (second libero à faire) |
+| V1-PRE-06 | Choisir le système de jeu (4-2, 5-1, 6-2) pour pré-placer les réceptions | Important | 🟡 système choisi et contrôlé, pré-placement des réceptions à faire |
 | V1-PRE-07 | Indiquer qui sert en premier | Indispensable | ✅ |
-| V1-PRE-08 | Contrôler la composition : alerte si deux passeuses côte à côte en 5-1, libero placée en zone avant | Important | ⬜ |
-| V1-PRE-09 | Enregistrer une composition type et la réutiliser au match suivant | Important | ⬜ |
+| V1-PRE-08 | Contrôler la composition : alerte si deux passeuses côte à côte en 5-1, libero placée en zone avant | Important | ✅ passeuses selon le système, libero de poste en zone avant |
+| V1-PRE-09 | Enregistrer une composition type et la réutiliser au match suivant | Important | ✅ une compo type par équipe et par format |
 | V1-PRE-10 | Préparer des compositions différentes par set à l'avance | Confort | ⬜ |
 
 ### Feuille de match vivante (MAT)

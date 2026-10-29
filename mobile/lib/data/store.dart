@@ -17,12 +17,17 @@ abstract interface class AppStore {
 
   /// Remplace la liste d'événements du match : appelé après chaque saisie et chaque annulation (V1-TEC-02).
   Future<void> saveEvents(String matchId, List<MatchEvent> events);
+
+  /// Composition type de l'équipe dans ce format, ou null.
+  Future<LineupTemplate?> lineupTemplate(String teamId, GameFormat format);
+  Future<void> saveLineupTemplate(LineupTemplate template);
 }
 
 class MemoryStore implements AppStore {
   final _teams = <String, Team>{};
   final _matches = <String, MatchRecord>{};
   final _events = <String, List<MatchEvent>>{};
+  final _templates = <String, LineupTemplate>{};
 
   @override
   Future<List<Team>> teams() async => _teams.values.toList();
@@ -42,6 +47,13 @@ class MemoryStore implements AppStore {
 
   @override
   Future<void> saveEvents(String matchId, List<MatchEvent> events) async => _events[matchId] = [...events];
+
+  @override
+  Future<LineupTemplate?> lineupTemplate(String teamId, GameFormat format) async => _templates['$teamId/${format.name}'];
+
+  @override
+  Future<void> saveLineupTemplate(LineupTemplate template) async =>
+      _templates['${template.teamId}/${template.format.name}'] = template;
 }
 
 final _random = Random.secure();

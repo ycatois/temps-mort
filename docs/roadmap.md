@@ -109,7 +109,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-TAC-05 | Effacer tout ou annuler le dernier trait | Indispensable | ✅ |
 | V1-TAC-06 | Ajouter des pions adverses et un ballon | Important | ✅ |
 | V1-TAC-07 | Enregistrer un schéma et le rappeler (bibliothèque) | Important | ✅ par équipe et par format |
-| V1-TAC-08 | Schémas de réception pré-construits pour les 6 rotations en 4-2 et 5-1 | Important | ⬜ |
+| V1-TAC-08 | Schémas de réception pré-construits pour les 6 rotations en 4-2 et 5-1 | Important | ↪ abandonné (Yann, 2026-10-30) : chaque coach crée et enregistre les siens (TAC-07) |
 | V1-TAC-09 | Basculer entre demi-terrain et terrain entier | Confort | ✅ |
 
 ### Temps mort et fin de match (TMO, FIN)

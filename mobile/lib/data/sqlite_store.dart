@@ -70,6 +70,12 @@ class SqliteStore implements AppStore {
       );
 
   @override
+  Future<void> deleteMatch(String id) => _db.transaction((txn) async {
+        await txn.delete('match_events', where: 'match_id = ?', whereArgs: [id]);
+        await txn.delete('matches', where: 'id = ?', whereArgs: [id]);
+      });
+
+  @override
   Future<List<MatchEvent>> events(String matchId) async {
     final rows = await _db.query('match_events', where: 'match_id = ?', whereArgs: [matchId], orderBy: 'seq');
     return [for (final r in rows) eventFromJson(_decode(r['data']))];

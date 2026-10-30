@@ -14,6 +14,9 @@ abstract interface class AppStore {
   Future<List<MatchRecord>> matches(String teamId);
   Future<void> saveMatch(MatchRecord match);
 
+  /// Supprime le match et tous ses événements (E11).
+  Future<void> deleteMatch(String id);
+
   Future<List<MatchEvent>> events(String matchId);
 
   /// Remplace la liste d'événements du match : appelé après chaque saisie et chaque annulation (V1-TEC-02).
@@ -52,6 +55,12 @@ class MemoryStore implements AppStore {
 
   @override
   Future<void> saveMatch(MatchRecord match) async => _matches[match.id] = match;
+
+  @override
+  Future<void> deleteMatch(String id) async {
+    _matches.remove(id);
+    _events.remove(id);
+  }
 
   @override
   Future<List<MatchEvent>> events(String matchId) async => [...?_events[matchId]];

@@ -34,17 +34,29 @@ class MatchRecord {
   /// Choisie à la création du match, modifiable pendant le match (V1-STA-11).
   final bool fullInput;
 
-  MatchRecord withFullInput(bool value) => MatchRecord(
+  MatchRecord withFullInput(bool value) => copyWith(fullInput: value);
+
+  MatchRecord copyWith({
+    String? opponent,
+    DateTime? date,
+    String? venue,
+    bool? home,
+    String? competition,
+    GameFormat? format,
+    MatchRules? rules,
+    bool? fullInput,
+  }) =>
+      MatchRecord(
         id: id,
         teamId: teamId,
-        opponent: opponent,
-        date: date,
-        venue: venue,
-        home: home,
-        competition: competition,
-        format: format,
-        rules: rules,
-        fullInput: value,
+        opponent: opponent ?? this.opponent,
+        date: date ?? this.date,
+        venue: venue ?? this.venue,
+        home: home ?? this.home,
+        competition: competition ?? this.competition,
+        format: format ?? this.format,
+        rules: rules ?? this.rules,
+        fullInput: fullInput ?? this.fullInput,
       );
 
   /// L'équipe telle qu'elle joue ce match.

@@ -88,7 +88,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Matchs (1)'));
     await tester.pumpAndSettle();
-    expect(find.text('En cours · sets 0–0 · reprendre'), findsOneWidget);
+    expect(find.text('En cours · sets 0–0 · set 1 à 0–1 · toucher pour reprendre'), findsOneWidget);
     await tester.tap(find.text('Brest'));
     await tester.pumpAndSettle();
     expect(find.text('0 – 1'), findsOneWidget);

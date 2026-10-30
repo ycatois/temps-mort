@@ -11,10 +11,14 @@ import '../common/widgets.dart';
 typedef NewMatchResult = ({MatchRecord match, bool composeNow});
 
 /// E03 — Nouveau match (V1-PRE-01, V1-PRE-02). Tablette : informations et règles côte à côte.
+/// Avec [match], modification d'un match existant (E11) : une fois le match commencé ([started]),
+/// format et règles ne bougent plus, car ils donnent leur sens aux points déjà saisis.
 class NewMatchScreen extends StatefulWidget {
-  const NewMatchScreen({super.key, required this.team});
+  const NewMatchScreen({super.key, required this.team, this.match, this.started = false});
 
   final Team team;
+  final MatchRecord? match;
+  final bool started;
 
   @override
   State<NewMatchScreen> createState() => _NewMatchScreenState();
@@ -22,14 +26,16 @@ class NewMatchScreen extends StatefulWidget {
 
 class _NewMatchScreenState extends State<NewMatchScreen> {
   final _form = GlobalKey<FormState>();
-  final _opponent = TextEditingController();
-  final _venue = TextEditingController();
-  final _competition = TextEditingController();
-  late DateTime _date = _nextHour();
-  bool _home = true;
-  bool _fullInput = false;
-  late GameFormat _format = widget.team.format;
-  late MatchRules _rules = MatchRules.defaultFor(_format);
+  late final _opponent = TextEditingController(text: widget.match?.opponent);
+  late final _venue = TextEditingController(text: widget.match?.venue);
+  late final _competition = TextEditingController(text: widget.match?.competition);
+  late DateTime _date = widget.match?.date ?? _nextHour();
+  late bool _home = widget.match?.home ?? true;
+  late bool _fullInput = widget.match?.fullInput ?? false;
+  late GameFormat _format = widget.match?.format ?? widget.team.format;
+  late MatchRules _rules = widget.match?.rules ?? MatchRules.defaultFor(_format);
+
+  bool get _editing => widget.match != null;
   bool _saving = false;
 
   static DateTime _nextHour() {
@@ -63,8 +69,9 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
   Future<void> _save({required bool composeNow}) async {
     if (!_form.currentState!.validate()) return;
     setState(() => _saving = true);
+    final old = widget.match;
     final match = MatchRecord(
-      id: newId(),
+      id: old?.id ?? newId(),
       teamId: widget.team.id,
       opponent: _opponent.text.trim(),
       date: _date,
@@ -79,6 +86,33 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
     if (mounted) Navigator.of(context).pop<NewMatchResult>((match: match, composeNow: composeNow));
   }
 
+  /// Match commencé : les règles s'affichent sans pouvoir être changées ; seul le mode de saisie reste libre.
+  Widget _locked(BuildContext context) {
+    final r = _rules;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          '${_format.label} · ${r.setsToWin} sets gagnants · ${r.pointsPerSet} points, ${r.pointsDecidingSet} au set décisif',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        const SizedBox(height: 4),
+        Text('Le match a commencé : format et règles ne se modifient plus.', style: Theme.of(context).textTheme.bodyMedium),
+        const SizedBox(height: 16),
+        Text('Saisie des statistiques', style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(height: 8),
+        SegmentedButton<bool>(
+          segments: const [
+            ButtonSegment(value: false, label: Text('Simple')),
+            ButtonSegment(value: true, label: Text('Complète')),
+          ],
+          selected: {_fullInput},
+          onSelectionChanged: (s) => setState(() => _fullInput = s.single),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final info = TmCard(
@@ -88,7 +122,7 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
         children: [
           TextFormField(
             controller: _opponent,
-            autofocus: true,
+            autofocus: !_editing,
             textCapitalization: TextCapitalization.words,
             decoration: const InputDecoration(labelText: 'Adversaire', hintText: 'ex. Rennes EC'),
             validator: (v) => (v ?? '').trim().isEmpty ? 'Indiquez l\'adversaire' : null,
@@ -134,7 +168,7 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
 
     final rules = TmCard(
       title: 'Format et règles',
-      child: Column(
+      child: widget.started ? _locked(context) : Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SegmentedButton<GameFormat>(
@@ -217,7 +251,9 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
 
     final actions = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
+      children: _editing
+          ? [YellowButton(label: 'Enregistrer les modifications', onPressed: _saving ? null : () => _save(composeNow: false))]
+          : [
         YellowButton(label: 'Composer le six de départ', onPressed: _saving ? null : () => _save(composeNow: true)),
         const SizedBox(height: 8),
         OutlinedButton(onPressed: _saving ? null : () => _save(composeNow: false), child: const Text('Enregistrer pour plus tard')),
@@ -225,7 +261,7 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text('Nouveau match · ${widget.team.name}')),
+      appBar: AppBar(title: Text('${_editing ? 'Modifier le match' : 'Nouveau match'} · ${widget.team.name}')),
       body: Form(
         key: _form,
         child: LayoutBuilder(builder: (context, box) {

@@ -62,8 +62,9 @@ mobile/
 
 - Moteur : équipes, joueuses, catégories (M7 → vétérans, loisir), formats 6x6/4x4/2x2, mixité, règles paramétrables, match à événements, annulation, set suivant, statistiques (side-out, break, par rotation, par joueuse).
 - Stockage sur l'appareil (SQLite) : équipes, matchs, et événements enregistrés après chaque saisie. Un match quitté se reprend au même score.
-- Accueil : les équipes, création d'une équipe, équipe de démonstration pour essayer.
-- E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte) ; liste des matchs de l'équipe.
+- E01 Accueil : matchs en cours à reprendre et prochains matchs de toutes les équipes (tablette : à gauche, équipes à droite), les équipes avec leur nombre de matchs, création d'une équipe, équipe de démonstration pour essayer.
+- E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte) .
+- E11 Historique (onglet Matchs de l'équipe) : en cours, à venir (le plus proche d'abord), terminés avec le score des sets. Menu de chaque match : voir le résumé, modifier les informations (E03 pré-rempli ; format et règles verrouillés une fois le match commencé), supprimer après confirmation.
 - E03 Nouveau match : adversaire, date, heure, domicile ou extérieur, lieu, compétition, format du jour, sets gagnants et points.
 - E04 Composition, pour le premier set et les suivants : glisser-déposer sur les zones (appui long sur smartphone, ou toucher une joueuse puis une zone), libero, capitaine, système 5-1 / 4-2 / 6-2 avec alertes, premier service (en alternance à partir du set 2, au choix au set décisif), compo type enregistrée et rechargée.
 - E05 Match en direct, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, rotation automatique. Deux modes de saisie, choisis dans E03 et modifiables en cours de match : simple (l'action qui termine l'échange) ou complète (chaque geste : service, réception de 0 à 3, attaque, contre, défense, passe ; les gestes en jeu ne changent pas le score).
@@ -76,8 +77,8 @@ mobile/
 
 ## Prochaines étapes (ordre conseillé)
 
-1. E01 Accueil complet et E11 Historique (modifier ou supprimer un match), schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
-2. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
+1. Schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
+2. Joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
 3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication

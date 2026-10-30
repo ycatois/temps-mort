@@ -3,6 +3,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:temps_mort/data/codec.dart';
 import 'package:temps_mort/data/match_record.dart';
 import 'package:temps_mort/data/sqlite_store.dart';
+import 'package:temps_mort/data/tactic_play.dart';
 import 'package:temps_mort/demo/demo_team.dart';
 import 'package:temps_mort/domain/domain.dart';
 
@@ -98,5 +99,31 @@ void main() {
     expect(template.captainId, 'emma');
     expect(template.system, GameSystem.s51);
     expect(await store.lineupTemplate('demo', GameFormat.four), isNull);
+  });
+
+  test('les schémas tactiques sont enregistrés par équipe, du plus récent au plus ancien', () async {
+    sqfliteFfiInit();
+    final store = await SqliteStore.open(path: inMemoryDatabasePath, factory: databaseFactoryFfi);
+    addTearDown(store.close);
+
+    final board = TacticBoard.forLineup(GameFormat.six, demoStartSet.lineup)
+        .addOpponent()
+        .addBall()
+        .moveToken('p:lucie', const BoardPoint(0.4, 0.7))
+        .addStroke(Stroke(tool: StrokeTool.arrow, color: StrokeColor.red, points: const [BoardPoint(0.2, 0.9), BoardPoint(0.3, 0.6)]));
+    TacticPlay play(String id, String name, int day) =>
+        TacticPlay(id: id, teamId: 'demo', name: name, savedAt: DateTime(2026, 11, day), board: board);
+    await store.savePlay(play('a', 'Réception R1', 8));
+    await store.savePlay(play('b', 'Couverture zone 4', 9));
+    await store.savePlay(TacticPlay(id: 'c', teamId: 't1', name: 'Autre équipe', savedAt: DateTime(2026, 11, 10), board: board));
+
+    final plays = await store.plays('demo');
+    expect(plays.map((p) => p.name), ['Couverture zone 4', 'Réception R1']);
+    expect(boardToJson(plays.first.board), boardToJson(board));
+    expect(plays.first.board.token('p:lucie')!.position, const BoardPoint(0.4, 0.7));
+    expect(plays.first.board.strokes.single.tool, StrokeTool.arrow);
+
+    await store.deletePlay('b');
+    expect((await store.plays('demo')).map((p) => p.id), ['a']);
   });
 }

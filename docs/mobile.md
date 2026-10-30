@@ -47,6 +47,7 @@ mobile/
 │   ├── ui/composition/    E04 Composition (glisser-déposer, libero, capitaine, système, compo type)
 │   ├── ui/match/          écran E05 Match en direct, son contrôleur, panneau E06 Remplacement
 │   ├── ui/stats/          E07 Statistiques en direct
+│   ├── ui/tactics/        E08 Tableau tactique (terrain dessiné avec CustomPainter, outils, bibliothèque)
 │   ├── demo/              équipe de démonstration (celle des maquettes)
 │   └── main.dart
 ├── test/domain/           tests des règles + contrôle « pas de Flutter dans le moteur »
@@ -67,10 +68,11 @@ mobile/
 - E05 Match en direct, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, rotation automatique. Deux modes de saisie, choisis dans E03 et modifiables en cours de match : simple (l'action qui termine l'échange) ou complète (chaque geste : service, réception de 0 à 3, attaque, contre, défense, passe ; les gestes en jeu ne changent pas le score).
 - E06 Remplacement (panneau latéral sur tablette, feuille du bas sur smartphone) : qui sort, qui entre, compteur, retour à la place d'origine (désactivable dans E03), entrée et sortie du libero. Les choix impossibles sont grisés avec la raison.
 - E07 Statistiques en direct, ouvert depuis le match : side-out, break, origine des points, fautes directes, tableau par joueuse (points, attaques, aces, contres, fautes), points gagnés et perdus par rotation avec la plus faible mise en avant, filtre par set ou match. Smartphone : onglets Joueuses, Rotations, Équipe. Efficacité en attaque et réception moyenne quand la période contient de la saisie complète.
+- E08 Tableau tactique, ouvert depuis le match (pions sur la rotation en cours) ou depuis l'équipe (pions sur la compo type) : déplacer les pions au doigt, crayon, flèche et zone en jaune, rouge ou blanc, annuler le dernier trait, tout effacer, adversaires et ballon, demi-terrain ou terrain entier, schémas enregistrés par équipe (enregistrer, rappeler, supprimer). Les schémas de réception pré-construits (V1-TAC-08) restent à faire.
 
 ## Prochaines étapes (ordre conseillé)
 
-1. E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
+1. E09 Temps mort (variante plein écran de E08), E10 Résumé + partage image/PDF, schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
 2. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
 3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 

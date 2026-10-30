@@ -8,6 +8,7 @@ import '../common/widgets.dart';
 import '../composition/composition_screen.dart';
 import '../match/match_screen.dart';
 import '../match_setup/new_match_screen.dart';
+import '../tactics/tactics_screen.dart';
 import '../theme/tokens.dart';
 import 'player_form.dart';
 import 'team_form_screen.dart';
@@ -106,6 +107,22 @@ class _TeamScreenState extends State<TeamScreen> {
     if (result != null && result.composeNow) await _openMatch(result.match);
   }
 
+  /// Hors match (entraînement, causerie) : pions sur la composition type, sinon sur les premiers numéros.
+  Future<void> _openTactics() async {
+    final navigator = Navigator.of(context);
+    final template = await StoreScope.of(context).lineupTemplate(_team.id, _team.format);
+    final lineup = template?.lineup ??
+        [
+          for (final p in (_team.activePlayers.where((p) => p.role != Role.libero).toList()
+                ..sort((a, b) => a.number.compareTo(b.number)))
+              .take(_team.format.playersOnCourt))
+            p.id,
+        ];
+    await navigator.push(MaterialPageRoute<void>(
+      builder: (_) => TacticsScreen(team: _team, lineup: lineup, liberoId: template?.liberoId),
+    ));
+  }
+
   /// Pas encore commencé : composition d'abord. Sinon on reprend le match là où il en était (V1-MAT-12).
   Future<void> _openMatch(MatchRecord match) async {
     final store = StoreScope.of(context);
@@ -158,6 +175,7 @@ class _TeamScreenState extends State<TeamScreen> {
             ],
           ),
           actions: [
+            IconButton(tooltip: 'Tableau tactique', onPressed: _openTactics, icon: const Icon(Icons.draw_outlined)),
             IconButton(tooltip: 'Modifier l\'équipe', onPressed: _editTeam, icon: const Icon(Icons.edit_outlined)),
             Padding(
               padding: const EdgeInsets.only(right: 12),

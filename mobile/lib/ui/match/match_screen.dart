@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import '../stats/stats_screen.dart';
+import '../tactics/tactics_screen.dart';
 import 'match_controller.dart';
 import 'substitution_panel.dart';
 
@@ -500,6 +501,25 @@ class _ActionPanel extends StatelessWidget {
           onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => StatsScreen(c: c))),
           icon: const Icon(Icons.bar_chart),
           label: const Text('Statistiques'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+          onPressed: () {
+            final s = c.state;
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => TacticsScreen(
+                team: c.team,
+                lineup: s.lineup,
+                liberoId: s.liberoId,
+                rotation: s.lineup.isEmpty ? null : s.rotation,
+                serving: s.lineup.isEmpty ? null : s.serving == Side.us,
+                score: '${s.score.us} – ${s.score.them}',
+              ),
+            ));
+          },
+          icon: const Icon(Icons.draw_outlined),
+          label: const Text('Tableau tactique'),
         ),
         const SizedBox(height: 8),
         OutlinedButton(onPressed: c.canUndo ? c.undo : null, child: const Text('Annuler la dernière saisie')),

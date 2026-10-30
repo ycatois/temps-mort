@@ -90,7 +90,11 @@ class MatchController extends ChangeNotifier {
   /// Joueuses sur le banc qui peuvent entrer : ni sur le terrain, ni libero, ni remplacée par le libero.
   List<Player> get bench => [
         for (final p in team.activePlayers)
-          if (!state.lineup.contains(p.id) && p.id != state.liberoId && p.id != state.liberoReplacing) p,
+          if (!state.lineup.contains(p.id) &&
+              p.id != state.liberoId &&
+              p.id != state.secondLiberoId &&
+              p.id != state.liberoReplacing)
+            p,
       ]..sort((a, b) => a.number.compareTo(b.number));
 
   /// E06 : remplacement (V1-MAT-04). Renvoie le refus éventuel, sans rien changer dans ce cas.
@@ -99,6 +103,9 @@ class MatchController extends ChangeNotifier {
   /// E06 : entrée du libero à la place d'une joueuse arrière, et sortie (V1-MAT-05).
   Rejection? liberoIn(String replacedId) => _record(LiberoIn(replacedId));
   Rejection? liberoOut() => _record(const LiberoOut());
+
+  /// Changement de libero : le second libero prend la place du premier (V1-PRE-05).
+  Rejection? liberoSwap() => _record(const LiberoSwap());
 
   /// Proposition pour le set suivant (composition du set précédent), ou null si aucun set n'est à démarrer.
   StartSet? get suggestedNextSet => _session.nextSetStart();

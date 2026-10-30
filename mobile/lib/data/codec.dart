@@ -79,6 +79,7 @@ Json matchToJson(MatchRecord m) => {
       'format': m.format.name,
       'rules': rulesToJson(m.rules),
       if (m.fullInput) 'fullInput': true,
+      if (m.present != null) 'present': m.present,
     };
 
 MatchRecord matchFromJson(Json j) => MatchRecord(
@@ -92,6 +93,7 @@ MatchRecord matchFromJson(Json j) => MatchRecord(
       format: GameFormat.values.byName(j['format']! as String),
       rules: rulesFromJson(j['rules']! as Json),
       fullInput: j['fullInput'] as bool? ?? false,
+      present: j['present'] == null ? null : [for (final id in j['present']! as List<Object?>) id! as String],
     );
 
 Json eventToJson(MatchEvent e) => switch (e) {
@@ -100,6 +102,7 @@ Json eventToJson(MatchEvent e) => switch (e) {
           'firstServer': e.firstServer.name,
           'lineup': e.lineup,
           if (e.liberoId != null) 'liberoId': e.liberoId,
+          if (e.secondLiberoId != null) 'secondLiberoId': e.secondLiberoId,
           if (e.captainId != null) 'captainId': e.captainId,
           if (e.system != null) 'system': e.system!.name,
         },
@@ -112,6 +115,7 @@ Json eventToJson(MatchEvent e) => switch (e) {
       Substitution() => {'type': 'substitution', 'outId': e.outId, 'inId': e.inId},
       LiberoIn() => {'type': 'liberoIn', 'replacedId': e.replacedId},
       LiberoOut() => {'type': 'liberoOut'},
+      LiberoSwap() => {'type': 'liberoSwap'},
       TimeoutTaken() => {'type': 'timeout', 'side': e.side.name},
       Touch() => {'type': 'touch', 'playerId': e.playerId, 'kind': e.kind.name},
     };
@@ -124,6 +128,7 @@ MatchEvent eventFromJson(Json j) {
         side('firstServer'),
         [for (final id in j['lineup']! as List<Object?>) id! as String],
         liberoId: j['liberoId'] as String?,
+        secondLiberoId: j['secondLiberoId'] as String?,
         captainId: j['captainId'] as String?,
         system: j['system'] == null ? null : GameSystem.values.byName(j['system']! as String),
       ),
@@ -135,6 +140,7 @@ MatchEvent eventFromJson(Json j) {
     'substitution' => Substitution(j['outId']! as String, j['inId']! as String),
     'liberoIn' => LiberoIn(j['replacedId']! as String),
     'liberoOut' => const LiberoOut(),
+    'liberoSwap' => const LiberoSwap(),
     'timeout' => TimeoutTaken(side('side')),
     'touch' => Touch(j['playerId']! as String, TouchKind.values.byName(j['kind']! as String)),
     _ => throw FormatException('Événement inconnu : $type'),
@@ -146,6 +152,7 @@ Json templateToJson(LineupTemplate t) => {
       'format': t.format.name,
       'lineup': t.lineup,
       if (t.liberoId != null) 'liberoId': t.liberoId,
+      if (t.secondLiberoId != null) 'secondLiberoId': t.secondLiberoId,
       if (t.captainId != null) 'captainId': t.captainId,
       if (t.system != null) 'system': t.system!.name,
     };
@@ -155,6 +162,7 @@ LineupTemplate templateFromJson(Json j) => LineupTemplate(
       format: GameFormat.values.byName(j['format']! as String),
       lineup: [for (final id in j['lineup']! as List<Object?>) id! as String],
       liberoId: j['liberoId'] as String?,
+      secondLiberoId: j['secondLiberoId'] as String?,
       captainId: j['captainId'] as String?,
       system: j['system'] == null ? null : GameSystem.values.byName(j['system']! as String),
     );

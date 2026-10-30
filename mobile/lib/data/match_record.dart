@@ -14,6 +14,7 @@ class MatchRecord {
     required this.format,
     required this.rules,
     this.fullInput = false,
+    this.present,
   });
 
   final String id;
@@ -34,6 +35,9 @@ class MatchRecord {
   /// Choisie à la création du match, modifiable pendant le match (V1-STA-11).
   final bool fullInput;
 
+  /// Joueuses présentes ce jour-là, liberos compris (V1-PRE-03) ; null = tout l'effectif actif.
+  final List<String>? present;
+
   MatchRecord withFullInput(bool value) => copyWith(fullInput: value);
 
   MatchRecord copyWith({
@@ -45,6 +49,7 @@ class MatchRecord {
     GameFormat? format,
     MatchRules? rules,
     bool? fullInput,
+    List<String>? present,
   }) =>
       MatchRecord(
         id: id,
@@ -57,10 +62,11 @@ class MatchRecord {
         format: format ?? this.format,
         rules: rules ?? this.rules,
         fullInput: fullInput ?? this.fullInput,
+        present: present ?? this.present,
       );
 
-  /// L'équipe telle qu'elle joue ce match.
-  Team teamFor(Team team) => team.withFormat(format);
+  /// L'équipe telle qu'elle joue ce match : son format, et seulement les présentes.
+  Team teamFor(Team team) => team.withFormat(format).withSquad(present);
 }
 
 /// Composition type d'une équipe dans un format (V1-PRE-09), rechargée au match suivant.
@@ -70,6 +76,7 @@ class LineupTemplate {
     required this.format,
     required List<String> lineup,
     this.liberoId,
+    this.secondLiberoId,
     this.captainId,
     this.system,
   }) : lineup = List.unmodifiable(lineup);
@@ -80,6 +87,7 @@ class LineupTemplate {
   /// Index 0 = poste 1, comme dans [StartSet].
   final List<String> lineup;
   final String? liberoId;
+  final String? secondLiberoId;
   final String? captainId;
   final GameSystem? system;
 }

@@ -69,6 +69,31 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
     if (c.liberoOut() == null) Navigator.of(context).pop();
   }
 
+  void _liberoSwap() {
+    if (c.liberoSwap() == null) Navigator.of(context).pop();
+  }
+
+  /// Changement de libero (V1-PRE-05) : proposé dès qu'un second libero est désigné pour le set.
+  Widget? _swapButton() {
+    final s = c.state;
+    final second = s.secondLiberoId == null ? null : c.team.player(s.secondLiberoId!);
+    if (second == null) return null;
+    final libero = c.team.player(s.liberoId!)!;
+    final refusal = c.check(const LiberoSwap());
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: OutlinedButton.icon(
+        style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+        onPressed: refusal == null ? _liberoSwap : null,
+        icon: const Icon(Icons.swap_horiz),
+        label: Text(refusal?.message ??
+            (s.liberoReplacing == null
+                ? 'Changer de libero : ${second.firstName} au lieu de ${libero.firstName}'
+                : 'Changer de libero : ${second.firstName} remplace ${libero.firstName}')),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -220,6 +245,7 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
               onPressed: _liberoOut,
               child: Text('${libero.firstName} sort, ${replaced.firstName} revient'),
             ),
+            if (_swapButton() case final swap?) swap,
           ],
         ),
       );
@@ -228,21 +254,27 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
     final back = [for (final i in backRow6x6) if (i < s.lineup.length) (index: i, player: team.player(s.lineup[i])!)];
     return TmCard(
       title: 'Libero · ${libero.firstName} entre à la place de',
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final e in back)
-            Builder(builder: (context) {
-              final refusal = c.check(LiberoIn(e.player.id));
-              return _Choice(
-                number: e.player.number,
-                name: e.player.firstName,
-                detail: refusal == null ? zoneName(team.format, e.index) : refusal.message,
-                selected: false,
-                onPressed: refusal == null ? () => _liberoIn(e.player.id) : null,
-              );
-            }),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final e in back)
+                Builder(builder: (context) {
+                  final refusal = c.check(LiberoIn(e.player.id));
+                  return _Choice(
+                    number: e.player.number,
+                    name: e.player.firstName,
+                    detail: refusal == null ? zoneName(team.format, e.index) : refusal.message,
+                    selected: false,
+                    onPressed: refusal == null ? () => _liberoIn(e.player.id) : null,
+                  );
+                }),
+            ],
+          ),
+          if (_swapButton() case final swap?) swap,
         ],
       ),
     );

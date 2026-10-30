@@ -61,6 +61,10 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Adversaire'), 'Brest');
     await tester.tap(find.text('Composer le six de départ'));
     await tester.pumpAndSettle();
+    // Présentes : tout l'effectif est coché par défaut
+    expect(find.text('2 présentes'), findsOneWidget);
+    await tester.tap(find.text('Continuer vers la composition'));
+    await tester.pumpAndSettle();
     expect(find.byType(CompositionScreen), findsOneWidget);
     await tester.tap(find.text('Lina'));
     await tester.pump();

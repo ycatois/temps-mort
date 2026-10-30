@@ -101,6 +101,14 @@ class Team {
   /// Joueuses que l'on peut convoquer et composer (les archivées restent pour l'historique).
   List<Player> get activePlayers => players.where((p) => !p.archived).toList();
 
+  /// L'équipe réduite aux joueuses présentes d'un match (V1-PRE-03) : banc, composition et remplacements
+  /// n'en voient pas d'autres. Null = toutes les joueuses de l'effectif.
+  Team withSquad(Iterable<String>? present) {
+    if (present == null) return this;
+    final ids = present.toSet();
+    return copyWith(players: [for (final p in players) if (ids.contains(p.id)) p]);
+  }
+
   Player? player(String id) {
     for (final p in players) {
       if (p.id == id) return p;

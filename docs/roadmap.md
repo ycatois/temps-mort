@@ -90,13 +90,13 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-LIV-01 | Tableau par joueuse : points marqués, fautes, aces, attaques, réceptions | Indispensable | 🟡 points et fautes par joueuse calculés |
-| V1-LIV-02 | Efficacité en attaque ((points − fautes − contrées) / tentatives) | Indispensable | ⬜ |
-| V1-LIV-03 | Qualité moyenne de réception par joueuse et par équipe | Indispensable | ⬜ |
-| V1-LIV-04 | Taux de side-out (points gagnés en réception) et de break (points gagnés au service) | Important | ✅ |
-| V1-LIV-05 | Points gagnés et perdus par rotation, rotation la plus faible mise en avant | Important | ✅ |
-| V1-LIV-06 | Filtre par set ou pour tout le match | Important | ⬜ |
-| V1-LIV-07 | Origine des points : nos points marqués contre fautes adverses | Confort | ⬜ |
+| V1-LIV-01 | Tableau par joueuse : points marqués, fautes, aces, attaques, réceptions | Indispensable | 🟡 écran E07 : points, attaques, aces, contres, fautes par joueuse ; réceptions avec la saisie complète |
+| V1-LIV-02 | Efficacité en attaque ((points − fautes − contrées) / tentatives) | Indispensable | ⬜ demande la saisie complète (attaques en jeu) |
+| V1-LIV-03 | Qualité moyenne de réception par joueuse et par équipe | Indispensable | ⬜ demande la saisie complète (réception 0 à 3) |
+| V1-LIV-04 | Taux de side-out (points gagnés en réception) et de break (points gagnés au service) | Important | ✅ affiché dans E07 |
+| V1-LIV-05 | Points gagnés et perdus par rotation, rotation la plus faible mise en avant | Important | ✅ barres par rotation, la plus faible mise en avant |
+| V1-LIV-06 | Filtre par set ou pour tout le match | Important | ✅ |
+| V1-LIV-07 | Origine des points : nos points marqués contre fautes adverses | Confort | ✅ |
 
 ### Tableau tactique (TAC)
 

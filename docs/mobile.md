@@ -45,7 +45,8 @@ mobile/
 │   ├── ui/team/           E02 Effectif, fiche joueuse, création d'équipe
 │   ├── ui/match_setup/    E03 Nouveau match
 │   ├── ui/composition/    E04 Composition (glisser-déposer, libero, capitaine, système, compo type)
-│   ├── ui/match/          écran E05 Match en direct + son contrôleur
+│   ├── ui/match/          écran E05 Match en direct, son contrôleur, panneau E06 Remplacement
+│   ├── ui/stats/          E07 Statistiques en direct
 │   ├── demo/              équipe de démonstration (celle des maquettes)
 │   └── main.dart
 ├── test/domain/           tests des règles + contrôle « pas de Flutter dans le moteur »
@@ -65,12 +66,14 @@ mobile/
 - E04 Composition, pour le premier set et les suivants : glisser-déposer sur les zones (appui long sur smartphone, ou toucher une joueuse puis une zone), libero, capitaine, système 5-1 / 4-2 / 6-2 avec alertes, premier service (en alternance à partir du set 2, au choix au set décisif), compo type enregistrée et rechargée.
 - E05 Match en direct, en tablette et smartphone : joueuse puis action, faute adverse, point adverse, temps mort, annulation, set suivant, rotation automatique.
 - E06 Remplacement (panneau latéral sur tablette, feuille du bas sur smartphone) : qui sort, qui entre, compteur, retour à la place d'origine (désactivable dans E03), entrée et sortie du libero. Les choix impossibles sont grisés avec la raison.
+- E07 Statistiques en direct, ouvert depuis le match : side-out, break, origine des points, fautes directes, tableau par joueuse (points, attaques, aces, contres, fautes), points gagnés et perdus par rotation avec la plus faible mise en avant, filtre par set ou match. Smartphone : onglets Joueuses, Rotations, Équipe. Efficacité en attaque et qualité de réception attendent la saisie complète.
 
 ## Prochaines étapes (ordre conseillé)
 
-1. E07 Stats en direct, puis E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
-2. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
-3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
+1. Saisie complète (V1-STA-02 à 05 : réception 0 à 3, attaques en jeu), qui débloque efficacité et réception dans E07.
+2. E08 Tactique (dessin au doigt avec `CustomPainter`), E09 Temps mort, E10 Résumé + partage image/PDF.
+3. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
+4. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication
 

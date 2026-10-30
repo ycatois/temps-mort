@@ -13,6 +13,7 @@ class MatchRecord {
     this.competition = '',
     required this.format,
     required this.rules,
+    this.fullInput = false,
   });
 
   final String id;
@@ -28,6 +29,23 @@ class MatchRecord {
   /// Format joué ce jour-là : celui de l'équipe par défaut, modifiable pour ce match (V1-FOR-08).
   final GameFormat format;
   final MatchRules rules;
+
+  /// Saisie complète (chaque geste noté) plutôt que simple (l'action qui conclut l'échange).
+  /// Choisie à la création du match, modifiable pendant le match (V1-STA-11).
+  final bool fullInput;
+
+  MatchRecord withFullInput(bool value) => MatchRecord(
+        id: id,
+        teamId: teamId,
+        opponent: opponent,
+        date: date,
+        venue: venue,
+        home: home,
+        competition: competition,
+        format: format,
+        rules: rules,
+        fullInput: value,
+      );
 
   /// L'équipe telle qu'elle joue ce match.
   Team teamFor(Team team) => team.withFormat(format);

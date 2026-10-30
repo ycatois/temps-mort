@@ -7,11 +7,20 @@ import '../../domain/domain.dart';
 /// Après chaque saisie et chaque annulation, [onEventsChanged] reçoit la liste complète des
 /// événements pour l'enregistrer sur l'appareil (V1-TEC-02).
 class MatchController extends ChangeNotifier {
-  MatchController(this.team, {MatchRules? rules, required List<MatchEvent> events, this.onEventsChanged})
-      : _session = MatchSession(team, rules: rules, events: events);
+  MatchController(
+    this.team, {
+    MatchRules? rules,
+    required List<MatchEvent> events,
+    this.onEventsChanged,
+    bool fullInput = false,
+    this.onFullInputChanged,
+  })  : _session = MatchSession(team, rules: rules, events: events),
+        _fullInput = fullInput;
 
   final Team team;
   final ValueChanged<List<MatchEvent>>? onEventsChanged;
+  final ValueChanged<bool>? onFullInputChanged;
+  bool _fullInput;
   final MatchSession _session;
   String? _selectedPlayerId;
   Rejection? _lastRejection;
@@ -22,6 +31,26 @@ class MatchController extends ChangeNotifier {
   bool get canUndo => _session.canUndo;
   bool get canStartNextSet => _session.nextSetStart() != null;
   bool get nextSetIsDeciding => _session.nextSetIsDeciding;
+
+  /// Saisie complète : chaque geste d'une joueuse est noté, y compris ceux qui ne terminent pas l'échange.
+  bool get fullInput => _fullInput;
+
+  void setFullInput(bool value) {
+    if (value == _fullInput) return;
+    _fullInput = value;
+    _selectedPlayerId = null;
+    onFullInputChanged?.call(value);
+    notifyListeners();
+  }
+
+  /// Saisie complète : geste en jeu de la joueuse choisie (réception notée, attaque en jeu…).
+  void touch(TouchKind kind) {
+    final id = _selectedPlayerId;
+    if (id == null) return;
+    _record(Touch(id, kind));
+    _selectedPlayerId = null;
+    notifyListeners();
+  }
 
   void select(String playerId) {
     _selectedPlayerId = _selectedPlayerId == playerId ? null : playerId;

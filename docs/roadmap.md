@@ -74,25 +74,25 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-STA-01 | Mode simple : point gagné ou perdu, puis la joueuse concernée (ou « faute adverse ») | Indispensable | 🟡 modèle d'événement prêt, écran à faire |
-| V1-STA-02 | Mode complet : joueuse puis action, en 2 tapes maximum | Indispensable | ⬜ |
-| V1-STA-03 | Service : ace, en jeu, faute | Indispensable | ⬜ |
-| V1-STA-04 | Réception notée de 0 à 3 (faute, mauvaise, moyenne, parfaite) | Indispensable | ⬜ |
-| V1-STA-05 | Attaque : point, en jeu, faute, contrée | Indispensable | ⬜ |
-| V1-STA-06 | Contre : point, touché en jeu, faute (filet, invasion) | Indispensable | ⬜ |
-| V1-STA-07 | Défense : réussie ou ratée | Important | ⬜ |
-| V1-STA-08 | Passe : faute de passe (double, porté) | Important | ⬜ |
-| V1-STA-09 | Fautes adverses (service, attaque, filet) pour que le score reste juste | Indispensable | ⬜ |
+| V1-STA-01 | Mode simple : point gagné ou perdu, puis la joueuse concernée (ou « faute adverse ») | Indispensable | ✅ |
+| V1-STA-02 | Mode complet : joueuse puis action, en 2 tapes maximum | Indispensable | ✅ joueuse puis geste, gestes groupés par compétence |
+| V1-STA-03 | Service : ace, en jeu, faute | Indispensable | ✅ |
+| V1-STA-04 | Réception notée de 0 à 3 (faute, mauvaise, moyenne, parfaite) | Indispensable | ✅ |
+| V1-STA-05 | Attaque : point, en jeu, faute, contrée | Indispensable | 🟡 point, en jeu, faute ; faute et contrée regroupées |
+| V1-STA-06 | Contre : point, touché en jeu, faute (filet, invasion) | Indispensable | ✅ |
+| V1-STA-07 | Défense : réussie ou ratée | Important | ✅ |
+| V1-STA-08 | Passe : faute de passe (double, porté) | Important | ✅ |
+| V1-STA-09 | Fautes adverses (service, attaque, filet) pour que le score reste juste | Indispensable | 🟡 un bouton « faute adverse », sans le type de faute |
 | V1-STA-10 | Zone d'attaque ou de service en touchant le terrain | Confort | ⬜ |
-| V1-STA-11 | Choisir le mode simple ou complet par match, et changer en cours de match | Important | ⬜ |
+| V1-STA-11 | Choisir le mode simple ou complet par match, et changer en cours de match | Important | ✅ choisi dans E03, modifiable dans E05 |
 
 ### Statistiques en direct (LIV)
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-LIV-01 | Tableau par joueuse : points marqués, fautes, aces, attaques, réceptions | Indispensable | 🟡 écran E07 : points, attaques, aces, contres, fautes par joueuse ; réceptions avec la saisie complète |
-| V1-LIV-02 | Efficacité en attaque ((points − fautes − contrées) / tentatives) | Indispensable | ⬜ demande la saisie complète (attaques en jeu) |
-| V1-LIV-03 | Qualité moyenne de réception par joueuse et par équipe | Indispensable | ⬜ demande la saisie complète (réception 0 à 3) |
+| V1-LIV-01 | Tableau par joueuse : points marqués, fautes, aces, attaques, réceptions | Indispensable | ✅ |
+| V1-LIV-02 | Efficacité en attaque ((points − fautes − contrées) / tentatives) | Indispensable | ✅ en saisie complète |
+| V1-LIV-03 | Qualité moyenne de réception par joueuse et par équipe | Indispensable | ✅ en saisie complète |
 | V1-LIV-04 | Taux de side-out (points gagnés en réception) et de break (points gagnés au service) | Important | ✅ affiché dans E07 |
 | V1-LIV-05 | Points gagnés et perdus par rotation, rotation la plus faible mise en avant | Important | ✅ barres par rotation, la plus faible mise en avant |
 | V1-LIV-06 | Filtre par set ou pour tout le match | Important | ✅ |

@@ -18,6 +18,9 @@ enum RallyAction {
   serviceFaute('Faute de service', false),
   attaqueFaute('Attaque out / bloquée', false),
   receptionFaute('Réception ratée', false),
+  contreFaute('Faute de contre', false),
+  defenseFaute('Défense ratée', false),
+  passeFaute('Faute de passe', false),
   autreFaute('Autre faute', false);
 
   const RallyAction(this.label, this.scoring);
@@ -83,6 +86,35 @@ final class LiberoOut extends MatchEvent {
   const LiberoOut();
 }
 
+/// Geste qui ne termine pas l'échange, en saisie complète (V1-STA-02 à 07) : il ne change ni le score
+/// ni la rotation, il nourrit les statistiques. Les gestes qui terminent l'échange restent des [Rally].
+enum TouchKind {
+  serveInPlay('En jeu'),
+  reception3('3 · parfaite'),
+  reception2('2 · moyenne'),
+  reception1('1 · mauvaise'),
+  attackInPlay('En jeu'),
+  blockTouch('Touché'),
+  digOk('Réussie');
+
+  const TouchKind(this.label);
+  final String label;
+
+  /// Note de réception de 1 à 3 (la réception ratée, notée 0, est un [Rally] perdu) ; null sinon.
+  int? get receptionGrade => switch (this) {
+        reception3 => 3,
+        reception2 => 2,
+        reception1 => 1,
+        _ => null,
+      };
+}
+
+final class Touch extends MatchEvent {
+  const Touch(this.playerId, this.kind);
+  final String playerId;
+  final TouchKind kind;
+}
+
 final class TimeoutTaken extends MatchEvent {
   const TimeoutTaken(this.side);
   final Side side;
@@ -136,6 +168,15 @@ class RallyRecord {
   final RallyAction? action;
 }
 
+/// Trace d'un geste en jeu ([Touch]), pour les statistiques de la saisie complète.
+class TouchRecord {
+  const TouchRecord({required this.setIndex, required this.rotation, required this.playerId, required this.kind});
+  final int setIndex;
+  final int rotation;
+  final String playerId;
+  final TouchKind kind;
+}
+
 class MatchState {
   const MatchState({
     required this.rules,
@@ -152,6 +193,7 @@ class MatchState {
     this.substitutions = const [],
     this.timeoutsUsed = const Score(),
     this.history = const [],
+    this.touches = const [],
   });
 
   final MatchRules rules;
@@ -176,6 +218,9 @@ class MatchState {
   final List<Substitution> substitutions;
   final Score timeoutsUsed;
   final List<RallyRecord> history;
+
+  /// Gestes en jeu de la saisie complète, tous sets confondus.
+  final List<TouchRecord> touches;
 
   int get setIndex => setsDone.length;
 
@@ -221,6 +266,7 @@ class MatchState {
     List<Substitution>? substitutions,
     Score? timeoutsUsed,
     List<RallyRecord>? history,
+    List<TouchRecord>? touches,
   }) =>
       MatchState(
         rules: rules,
@@ -237,6 +283,7 @@ class MatchState {
         substitutions: substitutions ?? this.substitutions,
         timeoutsUsed: timeoutsUsed ?? this.timeoutsUsed,
         history: history ?? this.history,
+        touches: touches ?? this.touches,
       );
 }
 
@@ -435,6 +482,9 @@ class MatchEngine {
       final Substitution s => _checkSubstitution(state, s),
       final LiberoIn l => _checkLiberoIn(state, l),
       LiberoOut() => state.liberoReplacing == null ? const LiberoNotIn() : null,
+      final Touch t => team.player(t.playerId) == null
+          ? UnknownPlayerRejection(t.playerId)
+          : (state.lineup.contains(t.playerId) ? null : NotOnCourt(t.playerId)),
       StartSet() => throw StateError('traité plus haut'),
     };
   }
@@ -467,6 +517,12 @@ class MatchEngine {
           liberoReplacing: l.replacedId,
         ),
       LiberoOut() => _liberoOut(state),
+      final Touch t => state.copyWith(
+          touches: List.unmodifiable([
+            ...state.touches,
+            TouchRecord(setIndex: state.setIndex, rotation: state.rotation, playerId: t.playerId, kind: t.kind),
+          ]),
+        ),
     };
   }
 

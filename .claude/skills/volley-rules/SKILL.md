@@ -7,7 +7,8 @@ description: Règles du volley-ball modélisées dans le moteur Temps Mort (rota
 Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine_test.dart` (`flutter test`).
 
 ## Modèle
-- Un match = liste de `MatchEvent` : `StartSet`, `Rally`, `Substitution`, `LiberoIn`, `LiberoOut`, `TimeoutTaken`.
+- Un match = liste de `MatchEvent` : `StartSet`, `Rally`, `Substitution`, `LiberoIn`, `LiberoOut`, `TimeoutTaken`, `Touch`.
+- `Touch` (saisie complète) : geste en jeu d'une joueuse sur le terrain (`TouchKind` : service en jeu, réception 3/2/1, attaque en jeu, contre touché, défense réussie). Il ne change ni score ni rotation ; il est gardé dans `MatchState.touches`. Les gestes qui terminent l'échange restent des `Rally` (réception ratée = réception notée 0).
 - `MatchEngine.check()` renvoie un `Rejection` (raison lisible) ou null ; `apply()` produit le nouvel état ; `replay()` rejoue tout (annulation, reprise, synchro).
 - `lineup[0]` = poste 1 (serveur quand l'équipe a le service), puis postes 2, 3, 4, 5, 6.
 
@@ -52,7 +53,7 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 - Bilan par rotation ; `weakestRotation` alimente le bloc « À retenir » du résumé (E10) et l'écran E07.
 - `byPlayer` (`PlayerStats` : aces, attaques, contres gagnants ; fautes de service, d'attaque, de réception, autres). Une action gagnante n'est créditée que sur un point gagné, une faute que sur un point perdu.
 - `origin` (`PointOrigin`) : points marqués, fautes adverses, sans détail ; `teamErrors` compte aussi les fautes saisies sans joueuse.
-- Efficacité en attaque et qualité de réception ne sont pas calculables avec la saisie actuelle (seule l'action qui conclut l'échange est saisie) : ne pas les estimer.
+- Efficacité en attaque = (points − fautes et contrées) / tentatives, tentatives = points + fautes + attaques en jeu. Réception moyenne sur 0 à 3. Elles n'ont de sens que si la période contient des `Touch` (`MatchStats.fullInput`) : en saisie simple, les attaques en jeu manquent, ne pas les estimer.
 
 ## En cas de doute
 Proposer un paramètre plutôt qu'une règle codée en dur, et le signaler à Yann (coach) qui tranche.

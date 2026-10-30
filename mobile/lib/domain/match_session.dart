@@ -54,5 +54,5 @@ class MatchSession {
     return null;
   }
 
-  MatchStats stats({int? setIndex}) => computeStats(_state.history, setIndex: setIndex);
+  MatchStats stats({int? setIndex}) => computeStats(_state.history, touches: _state.touches, setIndex: setIndex);
 }

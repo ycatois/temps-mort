@@ -226,6 +226,55 @@ void main() {
       expect(s.stats().weakestRotation, 2);
     });
 
+    test('saisie complète : un geste en jeu ne change ni le score ni la rotation', () {
+      final s = session()..record(StartSet(Side.them, start));
+      expect(s.record(const Touch('lucie', TouchKind.reception2)), isNull);
+      expect(s.state.score, const Score());
+      expect(s.state.rotation, 1);
+      expect(s.record(const Touch('zoe', TouchKind.digOk)), isA<NotOnCourt>(), reason: 'Zoé est sur le banc');
+      s.undo();
+      expect(s.state.touches, isEmpty);
+    });
+
+    test('saisie complète : réception moyenne, efficacité en attaque, service', () {
+      final s = session()..record(StartSet(Side.them, start));
+      // Échange 1 : Lucie réceptionne à 3, Emma attaque en jeu, puis Lucie attaque et marque.
+      s.record(const Touch('lucie', TouchKind.reception3));
+      s.record(const Touch('emma', TouchKind.attackInPlay));
+      s.record(const Rally(Side.us, playerId: 'lucie', action: RallyAction.attaque));
+      // Échange 2 : Lucie sert en jeu, Manon réussit une défense, Emma attaque dehors.
+      s.record(const Touch('lucie', TouchKind.serveInPlay));
+      s.record(const Touch('manon', TouchKind.digOk));
+      s.record(const Rally(Side.them, playerId: 'emma', action: RallyAction.attaqueFaute));
+      // Échange 3 : Lucie rate sa réception (0).
+      s.record(const Rally(Side.them, playerId: 'lucie', action: RallyAction.receptionFaute));
+
+      final st = s.stats();
+      expect(st.fullInput, isTrue);
+      final lucie = st.byPlayer['lucie']!;
+      expect(lucie.receptions, 2);
+      expect(lucie.receptionAverage, 1.5);
+      expect(lucie.servesInPlay, 1);
+      final emma = st.byPlayer['emma']!;
+      expect(emma.attackAttempts, 2);
+      expect(emma.attackEfficiency, -0.5);
+      expect(st.byPlayer['manon']!.digs, 1);
+      expect(st.team.attackEfficiency, 0.0, reason: '1 point − 1 faute sur 3 tentatives');
+      expect(st.team.receptionAverage, 1.5);
+      expect(s.stats(setIndex: 1).fullInput, isFalse);
+    });
+
+    test('nouvelles fautes : contre, défense, passe', () {
+      final s = session()..record(StartSet(Side.us, start));
+      s.record(const Rally(Side.them, playerId: 'emma', action: RallyAction.contreFaute));
+      s.record(const Rally(Side.them, playerId: 'manon', action: RallyAction.defenseFaute));
+      s.record(const Rally(Side.them, playerId: 'lea', action: RallyAction.passeFaute));
+      final st = s.stats();
+      expect(st.errorsByPlayer, {'emma': 1, 'manon': 1, 'lea': 1});
+      expect(st.teamErrors, 3);
+      expect(st.fullInput, isFalse);
+    });
+
     test('stats : détail par joueuse, origine des points, filtre par set', () {
       final s = session()..record(StartSet(Side.us, start));
       s.record(const Rally(Side.us, playerId: 'lucie', action: RallyAction.attaque));

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
-import 'match_controller.dart';
 import '../stats/stats_screen.dart';
+import 'match_controller.dart';
 import 'substitution_panel.dart';
 
 /// Ouvre l'écran E04 pour composer le set [setNumber] à partir de [suggested] ; null si le coach renonce.
@@ -17,7 +17,16 @@ typedef ComposeSet = Future<StartSet?> Function(
 /// E05 — Match en direct. Tablette (≥ 840 px de large) : terrain et saisie côte à côte ;
 /// smartphone : empilés, avec défilement. Maquettes : design/maquettes/Main.dc.html et Mobile-Match.dc.html.
 class MatchScreen extends StatefulWidget {
-  const MatchScreen({super.key, required this.team, this.rules, required this.events, this.onEventsChanged, this.composeNextSet});
+  const MatchScreen({
+    super.key,
+    required this.team,
+    this.rules,
+    required this.events,
+    this.onEventsChanged,
+    this.composeNextSet,
+    this.fullInput = false,
+    this.onFullInputChanged,
+  });
 
   /// L'équipe dans le format du match.
   final Team team;
@@ -30,13 +39,23 @@ class MatchScreen extends StatefulWidget {
   /// Sans cette fonction, le set suivant ne peut reprendre que la même composition.
   final ComposeSet? composeNextSet;
 
+  /// Mode de saisie au départ, et où enregistrer un changement de mode (V1-STA-11).
+  final bool fullInput;
+  final ValueChanged<bool>? onFullInputChanged;
+
   @override
   State<MatchScreen> createState() => _MatchScreenState();
 }
 
 class _MatchScreenState extends State<MatchScreen> {
-  late final MatchController _c =
-      MatchController(widget.team, rules: widget.rules, events: widget.events, onEventsChanged: widget.onEventsChanged);
+  late final MatchController _c = MatchController(
+    widget.team,
+    rules: widget.rules,
+    events: widget.events,
+    onEventsChanged: widget.onEventsChanged,
+    fullInput: widget.fullInput,
+    onFullInputChanged: widget.onFullInputChanged,
+  );
 
   @override
   void dispose() {
@@ -383,11 +402,32 @@ class _ActionPanel extends StatelessWidget {
               child: Text('Set ${s.setIndex + 1} : changer la composition'),
             ),
           ),
-        Text(
-          selected == null ? "Touchez une joueuse, puis l'action" : "#${selected.number} ${selected.name} : choisir l'action",
-          style: Theme.of(context).textTheme.titleMedium,
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                selected == null
+                    ? "Touchez une joueuse, puis l'action"
+                    : "#${selected.number} ${selected.name} : choisir l'action",
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            const SizedBox(width: 8),
+            SegmentedButton<bool>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(value: false, label: Text('Simple')),
+                ButtonSegment(value: true, label: Text('Complète')),
+              ],
+              selected: {c.fullInput},
+              onSelectionChanged: (s) => c.setFullInput(s.single),
+            ),
+          ],
         ),
         const SizedBox(height: 10),
+        if (c.fullInput)
+          _FullInput(c: c, enabled: playing && selected != null)
+        else ...[
         Row(
           children: [
             for (final a in _gains) ...[
@@ -422,6 +462,7 @@ class _ActionPanel extends StatelessWidget {
             ],
           ],
         ),
+        ],
         const SizedBox(height: 8),
         Row(
           children: [
@@ -469,6 +510,97 @@ class _ActionPanel extends StatelessWidget {
           ),
       ],
     );
+  }
+}
+
+/// Saisie complète (V1-STA-02 à 08) : la joueuse, puis son geste, en deux touches. Les gestes qui
+/// terminent l'échange donnent le point ; les autres (réception notée, attaque en jeu…) le laissent en jeu.
+class _FullInput extends StatelessWidget {
+  const _FullInput({required this.c, required this.enabled});
+
+  final MatchController c;
+  final bool enabled;
+
+  static const _skills = <(String, List<_Gesture>)>[
+    ('Service', [_Gesture.end(RallyAction.ace, 'Ace'), _Gesture.play(TouchKind.serveInPlay), _Gesture.end(RallyAction.serviceFaute, 'Faute')]),
+    ('Réception', [
+      _Gesture.play(TouchKind.reception3, '3'),
+      _Gesture.play(TouchKind.reception2, '2'),
+      _Gesture.play(TouchKind.reception1, '1'),
+      _Gesture.end(RallyAction.receptionFaute, '0 · ratée'),
+    ]),
+    ('Attaque', [
+      _Gesture.end(RallyAction.attaque, 'Point'),
+      _Gesture.play(TouchKind.attackInPlay),
+      _Gesture.end(RallyAction.attaqueFaute, 'Faute / contrée'),
+    ]),
+    ('Contre', [_Gesture.end(RallyAction.contre, 'Point'), _Gesture.play(TouchKind.blockTouch), _Gesture.end(RallyAction.contreFaute, 'Faute')]),
+    ('Défense', [_Gesture.play(TouchKind.digOk), _Gesture.end(RallyAction.defenseFaute, 'Ratée')]),
+    ('Passe', [_Gesture.end(RallyAction.passeFaute, 'Faute (double, porté)')]),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final (skill, gestures) in _skills)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 82,
+                  child: Text(skill, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15)),
+                ),
+                for (final (i, g) in gestures.indexed) ...[
+                  if (i > 0) const SizedBox(width: 6),
+                  Expanded(child: g.button(c, skill, enabled: enabled)),
+                ],
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+/// Un geste : soit il termine l'échange ([action]), soit il le laisse en jeu ([touch]).
+class _Gesture {
+  const _Gesture.end(RallyAction this.action, this.label) : touch = null;
+  const _Gesture.play(TouchKind this.touch, [this.label]) : action = null;
+
+  final RallyAction? action;
+  final TouchKind? touch;
+  final String? label;
+
+  Widget button(MatchController c, String skill, {required bool enabled}) {
+    final text = label ?? touch!.label;
+    final a = action;
+    final t = touch;
+    final onPressed = !enabled ? null : (a != null ? () => c.action(a) : () => c.touch(t!));
+    final style = ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, TmTouch.primaryTarget)),
+      padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 4)),
+    );
+    final child = Semantics(label: '$skill : $text', excludeSemantics: true, child: Text(text, textAlign: TextAlign.center));
+    // Point gagné : plein bleu ; faute : bordure orange ; geste en jeu : neutre. Le libellé dit toujours lequel.
+    if (a != null && a.scoring) {
+      return FilledButton(
+          onPressed: onPressed,
+          style: style.merge(FilledButton.styleFrom(backgroundColor: TmColor.accent, foregroundColor: Colors.white)),
+          child: child);
+    }
+    if (a != null) {
+      return OutlinedButton(
+          onPressed: onPressed,
+          style: style.merge(OutlinedButton.styleFrom(side: const BorderSide(color: TmColor.error, width: 2))),
+          child: child);
+    }
+    return FilledButton(
+        onPressed: onPressed,
+        style: style.merge(FilledButton.styleFrom(backgroundColor: TmColor.surfaceAlt, foregroundColor: TmColor.navy)),
+        child: child);
   }
 }
 

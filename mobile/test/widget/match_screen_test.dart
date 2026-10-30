@@ -37,4 +37,15 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('+1 adversaire'), findsOneWidget);
   });
+
+  testWidgets('smartphone : la saisie complète tient sans débordement', (tester) async {
+    await pumpMatch(tester, const Size(390, 844));
+    await tester.tap(find.text('Complète'));
+    await tester.pump();
+    await tester.tap(find.text('Lucie'));
+    await tester.pump();
+    expect(find.text('0 · ratée'), findsOneWidget);
+    expect(find.text('Faute (double, porté)'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

@@ -41,7 +41,7 @@ void main() {
     expect(find.text('SIDE-OUT'), findsOneWidget);
     expect(find.text('67 %', findRichText: true), findsOneWidget);
     expect(find.text('0 %', findRichText: true), findsOneWidget);
-    expect(find.textContaining('qualité de réception'), findsOneWidget, reason: 'pas de chiffre inventé');
+    expect(find.textContaining('passez en saisie complète'), findsOneWidget, reason: 'pas de chiffre inventé');
     expect(find.textContaining('Aucune rotation déficitaire', findRichText: true), findsOneWidget);
     expect(find.text('1–1'), findsNWidgets(2), reason: 'R1 et R2');
 
@@ -83,5 +83,47 @@ void main() {
     await tester.tap(find.text('Statistiques'));
     await tester.pumpAndSettle();
     expect(find.byType(StatsScreen), findsOneWidget);
+  });
+
+  testWidgets("saisie complète : du geste dans E05 à l'efficacité dans E07", (tester) async {
+    tester.view.physicalSize = const Size(1194, 834);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    bool? savedMode;
+    await tester.pumpWidget(MaterialApp(
+      theme: buildTheme(),
+      home: MatchScreen(team: demoTeam, events: [demoStartSet], onFullInputChanged: (v) => savedMode = v),
+    ));
+    await tester.tap(find.text('Complète'));
+    await tester.pump();
+    expect(savedMode, isTrue);
+
+    // [at] : rang du bouton quand le libellé existe pour plusieurs gestes (« En jeu » : service, attaque).
+    Future<void> gesture(String player, String button, {int at = 0}) async {
+      await tester.tap(find.text(player));
+      await tester.pump();
+      final target = find
+          .ancestor(of: find.text(button), matching: find.byWidgetPredicate((w) => w is ButtonStyleButton))
+          .at(at);
+      await tester.ensureVisible(target);
+      await tester.tap(target);
+      await tester.pump();
+    }
+
+    // Lucie réceptionne à 2, Emma attaque en jeu, Lucie marque en attaque
+    await gesture('Lucie', '2');
+    expect(find.text('0 – 0'), findsOneWidget, reason: 'un geste en jeu ne donne pas de point');
+    await gesture('Emma', 'En jeu', at: 1);
+    await gesture('Lucie', 'Point');
+    expect(find.text('1 – 0'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Statistiques'));
+    await tester.tap(find.text('Statistiques'));
+    await tester.pumpAndSettle();
+    expect(find.text('EFFICACITÉ'), findsOneWidget);
+    expect(find.text('+100 %'), findsOneWidget, reason: 'Lucie : 1 point sur 1 attaque');
+    expect(find.text('0 %'), findsWidgets, reason: 'Emma : 0 point sur 1 attaque');
+    expect(find.text('2,0', findRichText: true), findsWidgets, reason: "réception moyenne de Lucie et de l'équipe");
+    expect(tester.takeException(), isNull);
   });
 }

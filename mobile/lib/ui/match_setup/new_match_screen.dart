@@ -27,6 +27,7 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
   final _competition = TextEditingController();
   late DateTime _date = _nextHour();
   bool _home = true;
+  bool _fullInput = false;
   late GameFormat _format = widget.team.format;
   late MatchRules _rules = MatchRules.defaultFor(_format);
   bool _saving = false;
@@ -72,6 +73,7 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
       competition: _competition.text.trim(),
       format: _format,
       rules: _rules,
+      fullInput: _fullInput,
     );
     await StoreScope.of(context).saveMatch(match);
     if (mounted) Navigator.of(context).pop<NewMatchResult>((match: match, composeNow: composeNow));
@@ -180,6 +182,24 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
           ),
           const SizedBox(height: 8),
           Text('Deux points d\'écart pour gagner un set.', style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 16),
+          Text('Saisie des statistiques', style: Theme.of(context).textTheme.bodyLarge),
+          const SizedBox(height: 8),
+          SegmentedButton<bool>(
+            segments: const [
+              ButtonSegment(value: false, label: Text('Simple')),
+              ButtonSegment(value: true, label: Text('Complète')),
+            ],
+            selected: {_fullInput},
+            onSelectionChanged: (s) => setState(() => _fullInput = s.single),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            _fullInput
+                ? 'Chaque geste noté : réceptions de 0 à 3, attaques en jeu, défenses. Pour un adjoint au bord du terrain.'
+                : 'L\'action qui termine l\'échange. Modifiable pendant le match.',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           if (_rules.substitutionsPerSet != 0) ...[
             const SizedBox(height: 8),
             SwitchListTile(

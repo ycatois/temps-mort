@@ -40,6 +40,8 @@ final events = <MatchEvent>[
   const Substitution('emma', 'zoe'),
   const LiberoIn('manon'),
   const LiberoOut(),
+  const Touch('lucie', TouchKind.reception2),
+  const Rally(Side.them, playerId: 'lea', action: RallyAction.passeFaute),
 ];
 
 void expectSameTeam(Team actual, Team expected) {

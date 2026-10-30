@@ -8,8 +8,8 @@ import '../theme/tokens.dart';
 /// E07 — Statistiques en direct (V1-LIV-01, 04 à 07). Maquettes : design/maquettes/Tablette-Stats.dc.html
 /// et Mobile-Stats.dc.html. Se met à jour pendant le match ; tous les calculs viennent de `computeStats`.
 ///
-/// La qualité de réception (0 à 3) et l'efficacité en attaque de la maquette demandent la saisie
-/// complète (V1-STA-02 à 05) : tant qu'elle n'existe pas, l'écran le dit au lieu d'afficher des chiffres.
+/// La qualité de réception (0 à 3) et l'efficacité en attaque (V1-LIV-02, 03) ne s'affichent que si la
+/// période contient de la saisie complète : en saisie simple, les attaques restées en jeu manquent.
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key, required this.c});
 
@@ -38,7 +38,7 @@ class _StatsScreenState extends State<StatsScreen> {
     return ListenableBuilder(
       listenable: c,
       builder: (context, _) {
-        final stats = computeStats(c.state.history, setIndex: _set);
+        final stats = computeStats(c.state.history, touches: c.state.touches, setIndex: _set);
         final scores = _scores;
         return LayoutBuilder(builder: (context, box) {
           final tablet = box.maxWidth >= tabletWidth;
@@ -146,9 +146,17 @@ class _StatsScreenState extends State<StatsScreen> {
     return [
       _Tile(label: 'Side-out', value: _percent(st.sideOutRate), caption: phone ? null : 'points gagnés en réception'),
       _Tile(label: 'Break', value: _percent(st.breakRate), caption: phone ? null : 'points gagnés au service'),
-      if (phone)
-        _Tile(label: 'Fautes', value: '${st.teamErrors}')
-      else ...[
+      _Tile(
+        label: phone ? 'Réception' : 'Réception moyenne',
+        value: st.fullInput ? _grade(st.team.receptionAverage) : '—',
+        extra: phone || !st.fullInput || st.team.receptionAverage == null ? null : ' / 3',
+        caption: phone
+            ? null
+            : st.fullInput
+                ? '${st.team.receptions} réception${st.team.receptions > 1 ? 's' : ''}'
+                : 'en saisie complète',
+      ),
+      if (!phone) ...[
         _Tile(
           label: 'Origine des points',
           value: '${o.scored}',
@@ -183,6 +191,10 @@ class _StatsScreenState extends State<StatsScreen> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: Text('$v', textAlign: TextAlign.center, style: strong ? cell.copyWith(fontWeight: FontWeight.w800) : cell),
         );
+    Widget text(String v) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: Text(v, textAlign: TextAlign.center, style: cell),
+        );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -192,7 +204,7 @@ class _StatsScreenState extends State<StatsScreen> {
           border: const TableBorder(horizontalInside: BorderSide(color: TmColor.lineSoft)),
           children: [
             TableRow(children: [
-              for (final h in ['JOUEUSE', 'POINTS', 'ATTAQUES', 'ACES', 'CONTRES', 'FAUTES'])
+              for (final h in ['JOUEUSE', 'POINTS', 'ATTAQUES', 'EFFICACITÉ', 'ACES', 'CONTRES', 'RÉCEPTION', 'FAUTES'])
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Text(h, textAlign: h == 'JOUEUSE' ? TextAlign.start : TextAlign.center, style: head),
@@ -208,19 +220,21 @@ class _StatsScreenState extends State<StatsScreen> {
                     Flexible(child: Text(p.firstName, overflow: TextOverflow.ellipsis, style: cell)),
                   ]),
                   num(s.points, strong: true),
-                  num(s.attackPoints),
+                  text(st.fullInput ? '${s.attackPoints}/${s.attackAttempts}' : '${s.attackPoints}'),
+                  text(st.fullInput ? _signedPercent(s.attackEfficiency) : '—'),
                   num(s.aces),
                   num(s.blocks),
+                  text(st.fullInput ? _grade(s.receptionAverage) : '—'),
                   num(s.errors),
                 ]);
               }(),
           ],
         ),
         const SizedBox(height: 12),
-        const _Note(
-          'Attaques, aces et contres gagnants. Efficacité en attaque et qualité de réception (0 à 3) : '
-          'avec la saisie complète, à venir.',
-        ),
+        _Note(st.fullInput
+            ? 'Attaques : points / tentatives. Efficacité = (points − fautes et contrées) / tentatives. '
+                'Réception notée de 0 à 3.'
+            : 'Attaques gagnantes. Efficacité et réception (0 à 3) : passez en saisie complète pendant le match.'),
       ],
     );
   }
@@ -237,6 +251,8 @@ class _StatsScreenState extends State<StatsScreen> {
               if (s.aces > 0) '${s.aces} ace${s.aces > 1 ? 's' : ''}',
               if (s.blocks > 0) '${s.blocks} contre${s.blocks > 1 ? 's' : ''}',
               if (s.errors > 0) '${s.errors} faute${s.errors > 1 ? 's' : ''}',
+              if (st.fullInput && s.attackAttempts > 0) 'attaque ${_signedPercent(s.attackEfficiency)}',
+              if (st.fullInput && s.receptions > 0) 'réception ${_grade(s.receptionAverage)}',
             ];
             return TmCard(
               child: Row(children: [
@@ -258,7 +274,7 @@ class _StatsScreenState extends State<StatsScreen> {
           }(),
           const SizedBox(height: 8),
         ],
-        const _Note('Efficacité en attaque et qualité de réception : avec la saisie complète, à venir.'),
+        if (!st.fullInput) const _Note('Efficacité et réception (0 à 3) : passez en saisie complète pendant le match.'),
       ],
     );
   }
@@ -323,13 +339,16 @@ class _StatsScreenState extends State<StatsScreen> {
 
   Widget _teamDetails(MatchStats st) {
     final o = st.origin;
-    final errors = <String, int>{'Service': 0, 'Attaque': 0, 'Réception': 0, 'Autre': 0};
-    for (final s in st.byPlayer.values) {
-      errors['Service'] = errors['Service']! + s.serviceErrors;
-      errors['Attaque'] = errors['Attaque']! + s.attackErrors;
-      errors['Réception'] = errors['Réception']! + s.receptionErrors;
-      errors['Autre'] = errors['Autre']! + s.otherErrors;
-    }
+    final t = st.team;
+    final errors = <String, int>{
+      'Service': t.serviceErrors,
+      'Attaque (dehors ou contrée)': t.attackErrors,
+      'Réception': t.receptionErrors,
+      'Contre': t.blockErrors,
+      'Défense': t.digErrors,
+      'Passe': t.setErrors,
+      'Autre': t.otherErrors,
+    };
     final unassigned = st.teamErrors - errors.values.fold<int>(0, (a, b) => a + b);
     Widget line(String label, int v) => Padding(
           padding: const EdgeInsets.symmetric(vertical: 6),
@@ -360,6 +379,16 @@ class _StatsScreenState extends State<StatsScreen> {
       ],
     );
   }
+
+  /// « +33 % », « −50 % » : l'efficacité peut être négative.
+  static String _signedPercent(double? v) {
+    if (v == null) return '—';
+    final n = (v * 100).round();
+    return '${n > 0 ? '+' : n < 0 ? '−' : ''}${n.abs()} %';
+  }
+
+  /// Moyenne de réception à la française : « 2,0 ».
+  static String _grade(double? v) => v == null ? '—' : v.toStringAsFixed(1).replaceAll('.', ',');
 
   static String _percent(double? v) => v == null ? '—' : '${(v * 100).round()} %';
 }

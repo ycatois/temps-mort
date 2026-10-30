@@ -77,6 +77,7 @@ Json matchToJson(MatchRecord m) => {
       'competition': m.competition,
       'format': m.format.name,
       'rules': rulesToJson(m.rules),
+      if (m.fullInput) 'fullInput': true,
     };
 
 MatchRecord matchFromJson(Json j) => MatchRecord(
@@ -89,6 +90,7 @@ MatchRecord matchFromJson(Json j) => MatchRecord(
       competition: j['competition'] as String? ?? '',
       format: GameFormat.values.byName(j['format']! as String),
       rules: rulesFromJson(j['rules']! as Json),
+      fullInput: j['fullInput'] as bool? ?? false,
     );
 
 Json eventToJson(MatchEvent e) => switch (e) {
@@ -110,6 +112,7 @@ Json eventToJson(MatchEvent e) => switch (e) {
       LiberoIn() => {'type': 'liberoIn', 'replacedId': e.replacedId},
       LiberoOut() => {'type': 'liberoOut'},
       TimeoutTaken() => {'type': 'timeout', 'side': e.side.name},
+      Touch() => {'type': 'touch', 'playerId': e.playerId, 'kind': e.kind.name},
     };
 
 MatchEvent eventFromJson(Json j) {
@@ -132,6 +135,7 @@ MatchEvent eventFromJson(Json j) {
     'liberoIn' => LiberoIn(j['replacedId']! as String),
     'liberoOut' => const LiberoOut(),
     'timeout' => TimeoutTaken(side('side')),
+    'touch' => Touch(j['playerId']! as String, TouchKind.values.byName(j['kind']! as String)),
     _ => throw FormatException('Événement inconnu : $type'),
   };
 }

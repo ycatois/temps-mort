@@ -25,6 +25,8 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 - Chaque set commence par un `StartSet` explicite (composition et premier serveur choisis par le coach).
 
 ## Remplacements et temps morts
+- Blessure (FIVB 15.7, `InjurySubstitution`) : `MatchSession.injuryReplacement` choisit le remplacement normal s'il est permis, sinon le remplacement exceptionnel : n'importe quelle joueuse du banc (hors liberos et joueuse remplacée par le libero), sans quota ni règle du couple, mixité respectée. La blessée va dans `MatchState.excluded` et ne rejoue plus de tout le match (refus `InjuredCannotReturn`, y compris au `StartSet` suivant). Le coach ne coche que « blessure » (décision de Yann : le plus simple possible).
+- Retour à la place d'origine : activé par défaut en 6x6, donc chez les jeunes M15 à M21 (confirmé par Yann le 2026-10-30) ; désactivable dans E03.
 - 6x6 : 6 remplacements par set ; 4x4 : illimités par défaut ; 2x2 : aucun. 2 temps morts par set (1 en 2x2).
 - Règle du « couple » (FIVB 15.6), paramètre `MatchRules.pairedSubstitutions` (actif par défaut en 6x6, modifiable dans E03) : une titulaire ne sort qu'une fois par set et ne revient qu'à sa place d'origine, à la place de sa remplaçante ; une remplaçante n'entre qu'une fois par set et seule sa titulaire peut la remplacer. Titulaires = composition du `StartSet` du set ; `MatchState.partnerOf` donne le binôme. Refus : `StarterAlreadyLeft`, `SubstituteAlreadyPlayed`, `OnlyPartnerReturns`, `ReturnToOwnPlace`.
 - Matchs enregistrés avant ce paramètre : il vaut `false` à la relecture, pour que leurs remplacements se rejouent.

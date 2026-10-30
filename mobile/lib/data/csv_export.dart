@@ -50,6 +50,12 @@ String matchCsv(Team team, MatchRules rules, List<MatchEvent> events) {
           set, '', '${before.score}', '', '', '', ...who(outId),
           'Remplacement : sort pour ${inPlayer == null ? '?' : '${inPlayer.number} ${inPlayer.firstName}'}',
         ]);
+      case InjurySubstitution(:final outId, :final inId):
+        final inPlayer = team.player(inId);
+        rows.add([
+          set, '', '${before.score}', '', '', '', ...who(outId),
+          'Blessure, remplacement exceptionnel : sort pour ${inPlayer == null ? '?' : '${inPlayer.number} ${inPlayer.firstName}'}',
+        ]);
       case LiberoIn(:final replacedId):
         rows.add([set, '', '${before.score}', '', '', '', ...who(replacedId), 'Entrée du libero à sa place']);
       case LiberoOut():

@@ -61,7 +61,8 @@ void main() {
 
     // Libero : pas à la place de la serveuse, oui en zone 5
     await openPanel(tester);
-    await tester.ensureVisible(inPanel('Manon').last);
+    await tester.scrollUntilVisible(inPanel('Le libero ne peut pas servir.'), 200,
+        scrollable: find.descendant(of: find.byType(SubstitutionPanel), matching: find.byType(Scrollable)).first);
     expect(inPanel('Le libero ne peut pas servir.'), findsOneWidget);
     await tester.ensureVisible(inPanel('Lucie').last);
     await tester.pumpAndSettle();
@@ -69,7 +70,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Jade · L'), findsOneWidget);
     await openPanel(tester);
+    await tester.scrollUntilVisible(find.text('Jade sort, Lucie revient'), 200,
+        scrollable: find.descendant(of: find.byType(SubstitutionPanel), matching: find.byType(Scrollable)).first);
     await tester.ensureVisible(find.text('Jade sort, Lucie revient'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Jade sort, Lucie revient'));
     await tester.pumpAndSettle();
     expect(find.text('Jade · L'), findsNothing);

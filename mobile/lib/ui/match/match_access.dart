@@ -5,6 +5,7 @@ import '../../data/store.dart';
 import '../../domain/domain.dart';
 import '../common/store_scope.dart';
 import '../composition/composition_screen.dart';
+import '../match_setup/squad_screen.dart';
 import '../summary/summary_screen.dart';
 import 'match_screen.dart';
 
@@ -32,6 +33,15 @@ Future<List<MatchRow>> loadMatchRows(AppStore store, Team team) async {
 Future<void> openMatch(BuildContext context, Team team, MatchRecord match) async {
   final store = StoreScope.of(context);
   final navigator = Navigator.of(context);
+  if ((await store.events(match.id)).isEmpty) {
+    // Présentes d'abord (V1-PRE-03), puis composition parmi elles.
+    final present = await navigator.push<List<String>>(MaterialPageRoute(
+      builder: (_) => SquadScreen(team: team.withFormat(match.format), opponent: match.opponent, initial: match.present),
+    ));
+    if (present == null) return;
+    match = match.copyWith(present: present);
+    await store.saveMatch(match);
+  }
   final playing = match.teamFor(team);
   if ((await store.events(match.id)).isEmpty) {
     final start = await navigator.push<StartSet>(
@@ -64,6 +74,26 @@ Future<void> openMatch(BuildContext context, Team team, MatchRecord match) async
       )),
     ),
   ));
+}
+
+/// Modifie les présentes d'un match (E11). Les joueuses déjà apparues dans le match restent cochées.
+/// Renvoie true si la liste a changé.
+Future<bool> editSquad(BuildContext context, Team team, MatchRecord match) async {
+  final store = StoreScope.of(context);
+  final navigator = Navigator.of(context);
+  final events = await store.events(match.id);
+  final present = await navigator.push<List<String>>(MaterialPageRoute(
+    builder: (_) => SquadScreen(
+      team: team.withFormat(match.format),
+      opponent: match.opponent,
+      initial: match.present,
+      locked: playersInvolved(events),
+      confirmLabel: 'Enregistrer les présentes',
+    ),
+  ));
+  if (present == null) return false;
+  await store.saveMatch(match.copyWith(present: present));
+  return true;
 }
 
 /// Résumé (E10) d'un match commencé, sans passer par l'écran de match.

@@ -54,6 +54,12 @@ String matchCsv(Team team, MatchRules rules, List<MatchEvent> events) {
         rows.add([set, '', '${before.score}', '', '', '', ...who(replacedId), 'Entrée du libero à sa place']);
       case LiberoOut():
         rows.add([set, '', '${before.score}', '', '', '', '', '', 'Sortie du libero']);
+      case LiberoSwap():
+        final entering = team.player(after.liberoId ?? '');
+        rows.add([
+          set, '', '${before.score}', '', '', '', ...who(before.liberoId),
+          'Changement de libero : laisse sa place à ${entering == null ? '?' : '${entering.number} ${entering.firstName}'}',
+        ]);
       case TimeoutTaken(side: final s):
         rows.add([set, '', '${before.score}', '', '', '', '', '', 'Temps mort ${s == Side.us ? '' : 'adverse'}'.trim()]);
     }

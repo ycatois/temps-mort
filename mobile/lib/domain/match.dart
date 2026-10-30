@@ -41,27 +41,32 @@ sealed class MatchEvent {
 
 /// Début de set : qui sert en premier et la composition (index 0 = poste 1).
 /// [captainId] et [system] décrivent la composition sans changer les règles appliquées.
+/// [liberoId] est le libero en action au début du set, [secondLiberoId] le second libero (V1-PRE-05),
+/// qui peut prendre sa place par un [LiberoSwap].
 final class StartSet extends MatchEvent {
-  StartSet(this.firstServer, List<String> lineup, {this.liberoId, this.captainId, this.system})
+  StartSet(this.firstServer, List<String> lineup, {this.liberoId, this.secondLiberoId, this.captainId, this.system})
       : lineup = List.unmodifiable(lineup);
   final Side firstServer;
   final List<String> lineup;
   final String? liberoId;
+  final String? secondLiberoId;
   final String? captainId;
   final GameSystem? system;
 
-  StartSet withFirstServer(Side side) => StartSet(side, lineup, liberoId: liberoId, captainId: captainId, system: system);
+  StartSet withFirstServer(Side side) =>
+      StartSet(side, lineup, liberoId: liberoId, secondLiberoId: secondLiberoId, captainId: captainId, system: system);
 
   @override
   bool operator ==(Object other) =>
       other is StartSet &&
       other.firstServer == firstServer &&
       other.liberoId == liberoId &&
+      other.secondLiberoId == secondLiberoId &&
       other.captainId == captainId &&
       other.system == system &&
       _sameList(other.lineup, lineup);
   @override
-  int get hashCode => Object.hash(firstServer, liberoId, captainId, system, Object.hashAll(lineup));
+  int get hashCode => Object.hash(firstServer, liberoId, secondLiberoId, captainId, system, Object.hashAll(lineup));
 }
 
 final class Rally extends MatchEvent {
@@ -84,6 +89,12 @@ final class LiberoIn extends MatchEvent {
 
 final class LiberoOut extends MatchEvent {
   const LiberoOut();
+}
+
+/// Changement de libero (FIVB 19.3.2.4) : le second libero prend la place du libero en action,
+/// sur le terrain s'il y est, sinon pour les prochaines entrées. Ne compte pas comme remplacement.
+final class LiberoSwap extends MatchEvent {
+  const LiberoSwap();
 }
 
 /// Geste qui ne termine pas l'échange, en saisie complète (V1-STA-02 à 07) : il ne change ni le score
@@ -187,6 +198,7 @@ class MatchState {
     this.lineup = const [],
     this.rotation = 1,
     this.liberoId,
+    this.secondLiberoId,
     this.liberoReplacing,
     this.substitutionsUsed = 0,
     this.starters = const [],
@@ -205,7 +217,11 @@ class MatchState {
   /// Joueurs sur le terrain, index 0 = poste 1 (serveur quand on a le service).
   final List<String> lineup;
   final int rotation;
+  /// Libero en action (celui qui entre à la place d'une arrière).
   final String? liberoId;
+
+  /// Second libero, sur le banc ; échangé avec [liberoId] par un [LiberoSwap].
+  final String? secondLiberoId;
 
   /// Joueur remplacé par le libero (sur le banc tant que le libero est en jeu).
   final String? liberoReplacing;
@@ -260,6 +276,7 @@ class MatchState {
     List<String>? lineup,
     int? rotation,
     Object? liberoId = _keep,
+    Object? secondLiberoId = _keep,
     Object? liberoReplacing = _keep,
     int? substitutionsUsed,
     List<String>? starters,
@@ -277,6 +294,7 @@ class MatchState {
         lineup: lineup ?? this.lineup,
         rotation: rotation ?? this.rotation,
         liberoId: identical(liberoId, _keep) ? this.liberoId : liberoId as String?,
+        secondLiberoId: identical(secondLiberoId, _keep) ? this.secondLiberoId : secondLiberoId as String?,
         liberoReplacing: identical(liberoReplacing, _keep) ? this.liberoReplacing : liberoReplacing as String?,
         substitutionsUsed: substitutionsUsed ?? this.substitutionsUsed,
         starters: starters ?? this.starters,
@@ -374,6 +392,18 @@ final class LiberoFrontRow extends Rejection {
   String get message => 'Le libero ne peut remplacer qu\'une joueuse de la ligne arrière.';
 }
 
+final class NoSecondLibero extends Rejection {
+  const NoSecondLibero();
+  @override
+  String get message => 'Aucun second libero n\'a été désigné pour ce set.';
+}
+
+final class SecondLiberoInvalid extends Rejection {
+  const SecondLiberoInvalid();
+  @override
+  String get message => 'Le second libero doit être une autre joueuse que le premier, désigné lui aussi.';
+}
+
 final class LiberoCannotServe extends Rejection {
   const LiberoCannotServe();
   @override
@@ -469,9 +499,17 @@ class MatchEngine {
     if (event is StartSet) {
       if (state.phase == Phase.inPlay) return const SetInProgress();
       final libero = event.liberoId;
-      if (libero != null && (!rules.liberoAllowed || _n != 6)) return const LiberoNotAllowed();
+      final second = event.secondLiberoId;
+      if ((libero != null || second != null) && (!rules.liberoAllowed || _n != 6)) return const LiberoNotAllowed();
       if (libero != null && team.player(libero) == null) return UnknownPlayerRejection(libero);
-      final issues = validateLineup(team, event.lineup, liberoId: libero);
+      if (second != null) {
+        if (libero == null || second == libero) return const SecondLiberoInvalid();
+        if (team.player(second) == null) return UnknownPlayerRejection(second);
+      }
+      final issues = [
+        ...validateLineup(team, event.lineup, liberoId: libero),
+        if (second != null && event.lineup.contains(second)) LiberoInLineup(second),
+      ];
       return issues.isEmpty ? null : InvalidLineup(issues);
     }
     if (state.phase != Phase.inPlay) return const SetNotStarted();
@@ -482,6 +520,7 @@ class MatchEngine {
       final Substitution s => _checkSubstitution(state, s),
       final LiberoIn l => _checkLiberoIn(state, l),
       LiberoOut() => state.liberoReplacing == null ? const LiberoNotIn() : null,
+      LiberoSwap() => _checkLiberoSwap(state),
       final Touch t => team.player(t.playerId) == null
           ? UnknownPlayerRejection(t.playerId)
           : (state.lineup.contains(t.playerId) ? null : NotOnCourt(t.playerId)),
@@ -499,6 +538,7 @@ class MatchEngine {
           lineup: s.lineup,
           rotation: 1,
           liberoId: s.liberoId,
+          secondLiberoId: s.secondLiberoId,
           liberoReplacing: null,
           substitutionsUsed: 0,
           starters: s.lineup,
@@ -517,6 +557,11 @@ class MatchEngine {
           liberoReplacing: l.replacedId,
         ),
       LiberoOut() => _liberoOut(state),
+      LiberoSwap() => state.copyWith(
+          lineup: List.unmodifiable(state.lineup.map((id) => id == state.liberoId ? state.secondLiberoId! : id)),
+          liberoId: state.secondLiberoId,
+          secondLiberoId: state.liberoId,
+        ),
       final Touch t => state.copyWith(
           touches: List.unmodifiable([
             ...state.touches,
@@ -574,7 +619,8 @@ class MatchEngine {
     if (!state.lineup.contains(e.outId)) return NotOnCourt(e.outId);
     if (team.player(e.inId) == null) return UnknownPlayerRejection(e.inId);
     if (state.lineup.contains(e.inId)) return AlreadyOnCourt(e.inId);
-    if (e.outId == state.liberoId || e.inId == state.liberoId || e.inId == state.liberoReplacing) {
+    final liberos = {state.liberoId, state.secondLiberoId}..remove(null);
+    if (liberos.contains(e.outId) || liberos.contains(e.inId) || e.inId == state.liberoReplacing) {
       return const LiberoCannotBeSubstituted();
     }
     if (rules.pairedSubstitutions) {
@@ -614,6 +660,13 @@ class MatchEngine {
     return _womenCheck(state.lineup.map((id) => id == e.replacedId ? libero : id));
   }
 
+  Rejection? _checkLiberoSwap(MatchState state) {
+    final second = state.secondLiberoId;
+    if (second == null || state.liberoId == null) return const NoSecondLibero();
+    if (state.liberoReplacing == null) return null;
+    return _womenCheck(state.lineup.map((id) => id == state.liberoId ? second : id));
+  }
+
   MatchState _liberoOut(MatchState state) {
     final back = state.liberoReplacing;
     if (back == null) return state;
@@ -628,4 +681,33 @@ class MatchEngine {
     final women = lineup.where((id) => team.player(id)?.gender == PlayerGender.f).length;
     return women < team.minWomenOnCourt ? NotEnoughWomen(team.minWomenOnCourt, women) : null;
   }
+}
+
+/// Joueuses qui apparaissent dans les événements d'un match (composition, liberos, remplacements, actions).
+/// Elles ne peuvent plus être retirées des présentes (V1-PRE-03) : leurs statistiques en dépendent.
+Set<String> playersInvolved(Iterable<MatchEvent> events) {
+  final ids = <String>{};
+  void add(String? id) {
+    if (id != null) ids.add(id);
+  }
+
+  for (final e in events) {
+    switch (e) {
+      case StartSet():
+        ids.addAll(e.lineup);
+        add(e.liberoId);
+        add(e.secondLiberoId);
+      case Rally():
+        add(e.playerId);
+      case Substitution():
+        ids.addAll([e.outId, e.inId]);
+      case LiberoIn():
+        add(e.replacedId);
+      case Touch():
+        add(e.playerId);
+      case LiberoOut() || LiberoSwap() || TimeoutTaken():
+        break;
+    }
+  }
+  return ids;
 }

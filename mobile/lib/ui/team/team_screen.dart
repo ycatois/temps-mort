@@ -232,6 +232,9 @@ class _TeamScreenState extends State<TeamScreen> {
               onEdit: _editMatch,
               onDelete: _deleteMatch,
               onSummary: (row) => openSummary(context, _team, row.record),
+              onSquad: (row) async {
+                if (await editSquad(context, _team, row.record)) await _loadMatches();
+              },
             ),
           ],
         ),
@@ -331,6 +334,7 @@ class _MatchList extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onSummary,
+    required this.onSquad,
   });
 
   final List<MatchRow> matches;
@@ -339,6 +343,7 @@ class _MatchList extends StatelessWidget {
   final ValueChanged<MatchRow> onEdit;
   final ValueChanged<MatchRow> onDelete;
   final ValueChanged<MatchRow> onSummary;
+  final ValueChanged<MatchRow> onSquad;
 
   @override
   Widget build(BuildContext context) {
@@ -386,6 +391,7 @@ class _MatchList extends StatelessWidget {
                               onEdit: () => onEdit(m),
                               onDelete: () => onDelete(m),
                               onSummary: m.notStarted ? null : () => onSummary(m),
+                              onSquad: () => onSquad(m),
                             ),
                         ],
                       ),
@@ -403,13 +409,23 @@ class _MatchList extends StatelessWidget {
 
 /// Une ligne de match : adversaire, date, lieu, état, et le menu des actions (s'il y en a).
 class MatchTile extends StatelessWidget {
-  const MatchTile({super.key, required this.row, required this.onTap, this.onEdit, this.onDelete, this.onSummary, this.teamName});
+  const MatchTile({
+    super.key,
+    required this.row,
+    required this.onTap,
+    this.onEdit,
+    this.onDelete,
+    this.onSummary,
+    this.onSquad,
+    this.teamName,
+  });
 
   final MatchRow row;
   final VoidCallback onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
   final VoidCallback? onSummary;
+  final VoidCallback? onSquad;
 
   /// Sur l'accueil, l'équipe concernée.
   final String? teamName;
@@ -417,7 +433,7 @@ class MatchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = row.record;
-    final actions = onEdit != null || onDelete != null || onSummary != null;
+    final actions = onEdit != null || onDelete != null || onSummary != null || onSquad != null;
     return ListTile(
       minTileHeight: TmTouch.primaryTarget,
       contentPadding: EdgeInsets.zero,
@@ -443,11 +459,20 @@ class MatchTile extends StatelessWidget {
               onSelected: (v) => switch (v) {
                 'edit' => onEdit?.call(),
                 'summary' => onSummary?.call(),
+                'squad' => onSquad?.call(),
                 _ => onDelete?.call(),
               },
               itemBuilder: (_) => [
                 if (onSummary != null)
                   const PopupMenuItem(value: 'summary', child: ListTile(leading: Icon(Icons.summarize_outlined), title: Text('Voir le résumé'))),
+                if (onSquad != null)
+                  PopupMenuItem(
+                    value: 'squad',
+                    child: ListTile(
+                      leading: const Icon(Icons.how_to_reg_outlined),
+                      title: Text(r.present == null ? 'Joueuses présentes' : 'Joueuses présentes (${r.present!.length})'),
+                    ),
+                  ),
                 if (onEdit != null)
                   const PopupMenuItem(value: 'edit', child: ListTile(leading: Icon(Icons.edit_outlined), title: Text('Modifier les informations'))),
                 if (onDelete != null)

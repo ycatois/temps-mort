@@ -61,6 +61,65 @@ List<LineupIssue> validateLineup(Team team, List<String> lineup, {String? libero
   return issues;
 }
 
+/// Problème dans la liste des présentes d'un match (V1-PRE-03).
+sealed class SquadIssue {
+  const SquadIssue();
+}
+
+/// Trop de joueuses inscrites : 14 au plus en 6x6, libero(s) compris (FIVB 4.1.1).
+final class TooManyInSquad extends SquadIssue {
+  const TooManyInSquad(this.max, this.actual);
+  final int max;
+  final int actual;
+
+  @override
+  bool operator ==(Object other) => other is TooManyInSquad && other.max == max && other.actual == actual;
+  @override
+  int get hashCode => Object.hash(max, actual);
+}
+
+/// Pas assez de joueuses pour composer le terrain.
+final class NotEnoughInSquad extends SquadIssue {
+  const NotEnoughInSquad(this.required, this.actual);
+  final int required;
+  final int actual;
+
+  @override
+  bool operator ==(Object other) => other is NotEnoughInSquad && other.required == required && other.actual == actual;
+  @override
+  int get hashCode => Object.hash(required, actual);
+}
+
+/// Équipe mixte : pas assez de femmes présentes pour respecter le minimum sur le terrain.
+final class NotEnoughWomenInSquad extends SquadIssue {
+  const NotEnoughWomenInSquad(this.required, this.actual);
+  final int required;
+  final int actual;
+
+  @override
+  bool operator ==(Object other) => other is NotEnoughWomenInSquad && other.required == required && other.actual == actual;
+  @override
+  int get hashCode => Object.hash(required, actual);
+}
+
+/// Nombre maximum de joueuses inscrites sur la feuille de match, ou null sans limite.
+/// 6x6 : 14, dont deux liberos au plus (FIVB 4.1.1, 19.1.1). Ailleurs, pas de limite connue.
+int? maxSquad(GameFormat format) => format == GameFormat.six ? 14 : null;
+
+/// Contrôle la liste des présentes d'un match ([present] : identifiants de l'effectif).
+List<SquadIssue> validateSquad(Team team, Iterable<String> present) {
+  final ids = present.toSet();
+  final issues = <SquadIssue>[];
+  final max = maxSquad(team.format);
+  if (max != null && ids.length > max) issues.add(TooManyInSquad(max, ids.length));
+  if (ids.length < team.format.playersOnCourt) issues.add(NotEnoughInSquad(team.format.playersOnCourt, ids.length));
+  if (team.gender == TeamGender.mixte) {
+    final women = ids.where((id) => team.player(id)?.gender == PlayerGender.f).length;
+    if (women < team.minWomenOnCourt) issues.add(NotEnoughWomenInSquad(team.minWomenOnCourt, women));
+  }
+  return issues;
+}
+
 /// Rotation dans le sens des aiguilles d'une montre : le joueur du poste 2 passe au service (poste 1).
 List<String> rotate(List<String> lineup) =>
     lineup.isEmpty ? lineup : List.unmodifiable(List.generate(lineup.length, (i) => lineup[(i + 1) % lineup.length]));

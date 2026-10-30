@@ -44,6 +44,7 @@ class _CompositionScreenState extends State<CompositionScreen> {
   late final CompositionDraft _draft =
       CompositionDraft(widget.team.format.playersOnCourt, lineup: widget.initial?.lineup);
   late String? _liberoId = widget.initial?.liberoId;
+  late String? _secondLiberoId = widget.initial?.secondLiberoId;
   late String? _captainId = widget.initial?.captainId;
   late GameSystem? _system = _sixes ? (widget.initial?.system ?? GameSystem.s51) : null;
   late Side? _firstServer = widget.initialServer;
@@ -70,7 +71,9 @@ class _CompositionScreenState extends State<CompositionScreen> {
 
   void _place(String id, int slot) => setState(() {
         _draft.place(id, slot);
-        if (_liberoId == id) _liberoId = null;
+        // Une libero placée sur le terrain redevient joueuse de champ ; sans premier libero, pas de second.
+        if (_liberoId == id) _liberoId = _secondLiberoId = null;
+        if (_secondLiberoId == id) _secondLiberoId = null;
         // L'occupante renvoyée sur le banc perd le capitanat.
         if (_captainId != null && !_draft.onCourt(_captainId!)) _captainId = null;
         _picked = null;
@@ -97,6 +100,8 @@ class _CompositionScreenState extends State<CompositionScreen> {
     setState(() {
       _draft.load(t.lineup, active.contains);
       _liberoId = t.liberoId != null && active.contains(t.liberoId) && !_draft.onCourt(t.liberoId!) ? t.liberoId : null;
+      final second = t.secondLiberoId;
+      _secondLiberoId = _liberoId != null && second != null && active.contains(second) && !_draft.onCourt(second) ? second : null;
       _captainId = t.captainId != null && _draft.onCourt(t.captainId!) ? t.captainId : null;
       if (_sixes) _system = t.system ?? _system;
       _picked = null;
@@ -109,6 +114,7 @@ class _CompositionScreenState extends State<CompositionScreen> {
       format: _team.format,
       lineup: _draft.lineup,
       liberoId: _liberoId,
+      secondLiberoId: _secondLiberoId,
       captainId: _captainId,
       system: _system,
     );
@@ -122,6 +128,7 @@ class _CompositionScreenState extends State<CompositionScreen> {
         _firstServer!,
         _draft.lineup,
         liberoId: _liberoId,
+        secondLiberoId: _secondLiberoId,
         captainId: _captainId,
         system: _system,
       ));
@@ -465,7 +472,7 @@ class _CompositionScreenState extends State<CompositionScreen> {
                       _BenchCard(
                         team: _team,
                         player: p,
-                        isLibero: p.id == _liberoId,
+                        isLibero: p.id == _liberoId || p.id == _secondLiberoId,
                         picked: p.id == picked,
                         compact: !tablet,
                         onTap: () => setState(() => _picked = _picked == p.id ? null : p.id),
@@ -539,7 +546,25 @@ class _CompositionScreenState extends State<CompositionScreen> {
               const DropdownMenuItem(value: null, child: Text('Aucune')),
               for (final p in bench) DropdownMenuItem(value: p.id, child: Text('#${p.number} ${p.firstName}')),
             ],
-            onChanged: (id) => setState(() => _liberoId = id),
+            onChanged: (id) => setState(() {
+              _liberoId = id;
+              if (id == null || id == _secondLiberoId) _secondLiberoId = null;
+            }),
+          ),
+        ),
+      // Second libero (V1-PRE-05) : sur le banc, il peut prendre la place du premier pendant le set.
+      if (_liberoPossible && _liberoId != null)
+        _Setting(
+          label: 'Second libero',
+          child: DropdownButton<String?>(
+            value: _secondLiberoId,
+            isExpanded: true,
+            items: [
+              const DropdownMenuItem(value: null, child: Text('Aucune')),
+              for (final p in bench)
+                if (p.id != _liberoId) DropdownMenuItem(value: p.id, child: Text('#${p.number} ${p.firstName}')),
+            ],
+            onChanged: (id) => setState(() => _secondLiberoId = id),
           ),
         ),
       _Setting(

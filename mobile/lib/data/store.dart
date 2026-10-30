@@ -27,6 +27,10 @@ abstract interface class AppStore {
   Future<List<TacticPlay>> plays(String teamId);
   Future<void> savePlay(TacticPlay play);
   Future<void> deletePlay(String id);
+
+  /// Efface les matchs (et leurs événements), compositions types et schémas de l'équipe ;
+  /// l'équipe et son effectif restent. Sert à remettre l'équipe de démonstration à zéro.
+  Future<void> clearTeamData(String teamId);
 }
 
 class MemoryStore implements AppStore {
@@ -71,6 +75,17 @@ class MemoryStore implements AppStore {
 
   @override
   Future<void> deletePlay(String id) async => _plays.remove(id);
+
+  @override
+  Future<void> clearTeamData(String teamId) async {
+    final matchIds = [for (final m in _matches.values) if (m.teamId == teamId) m.id];
+    for (final id in matchIds) {
+      _matches.remove(id);
+      _events.remove(id);
+    }
+    _templates.removeWhere((_, t) => t.teamId == teamId);
+    _plays.removeWhere((_, p) => p.teamId == teamId);
+  }
 }
 
 final _random = Random.secure();

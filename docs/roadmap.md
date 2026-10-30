@@ -116,8 +116,8 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-TMO-01 | Bouton « Temps mort » : vue plein écran avec score, 3 chiffres clés du set et tableau tactique | Indispensable | ⬜ |
-| V1-TMO-02 | Chronomètre de 30 secondes | Important | ⬜ |
+| V1-TMO-01 | Bouton « Temps mort » : vue plein écran avec score, 3 chiffres clés du set et tableau tactique | Indispensable | ✅ side-out, break, fautes directes |
+| V1-TMO-02 | Chronomètre de 30 secondes | Important | ✅ |
 | V1-FIN-01 | Résumé automatique : score par set, meilleures joueuses par catégorie, chiffres clés | Indispensable | ⬜ |
 | V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ⬜ |
 | V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ⬜ |

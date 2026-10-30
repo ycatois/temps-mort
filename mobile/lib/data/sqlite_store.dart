@@ -115,6 +115,15 @@ class SqliteStore implements AppStore {
   @override
   Future<void> deletePlay(String id) => _db.delete('tactic_plays', where: 'id = ?', whereArgs: [id]);
 
+  @override
+  Future<void> clearTeamData(String teamId) => _db.transaction((txn) async {
+        await txn.delete('match_events',
+            where: 'match_id IN (SELECT id FROM matches WHERE team_id = ?)', whereArgs: [teamId]);
+        await txn.delete('matches', where: 'team_id = ?', whereArgs: [teamId]);
+        await txn.delete('lineup_templates', where: 'team_id = ?', whereArgs: [teamId]);
+        await txn.delete('tactic_plays', where: 'team_id = ?', whereArgs: [teamId]);
+      });
+
   static Future<void> _createPlays(Database db) => db.execute('CREATE TABLE tactic_plays '
       '(id TEXT PRIMARY KEY, team_id TEXT NOT NULL, saved_at TEXT NOT NULL, data TEXT NOT NULL)');
 

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/store.dart';
 import '../../data/tactic_play.dart';
@@ -15,6 +18,9 @@ import 'tactics_board.dart';
 ///
 /// Ouvert depuis le match, les pions sont placés sur la rotation en cours ([lineup], index 0 = poste 1) ;
 /// depuis l'équipe, sur la composition type.
+///
+/// E09 — Temps mort : le même écran, ouvert par le bouton « Temps mort » du match, avec le chrono
+/// ([timeoutSeconds]) et les trois chiffres clés du set ([setStats]).
 class TacticsScreen extends StatefulWidget {
   const TacticsScreen({
     super.key,
@@ -24,6 +30,8 @@ class TacticsScreen extends StatefulWidget {
     this.rotation,
     this.serving,
     this.score,
+    this.setStats,
+    this.timeoutSeconds,
   });
 
   /// L'équipe dans le format joué.
@@ -37,6 +45,12 @@ class TacticsScreen extends StatefulWidget {
 
   /// Score du set, ex. « 18 – 15 ».
   final String? score;
+
+  /// Statistiques du set en cours : side-out, break et fautes directes (V1-TMO-01).
+  final MatchStats? setStats;
+
+  /// Durée du temps mort à décompter (V1-TMO-02) ; null hors temps mort.
+  final int? timeoutSeconds;
 
   @override
   State<TacticsScreen> createState() => _TacticsScreenState();
@@ -163,6 +177,11 @@ class _TacticsScreenState extends State<TacticsScreen> {
           title: Text(tablet ? _title : _shortTitle,
               style: const TextStyle(fontFamily: TmFont.display, fontWeight: FontWeight.w700, fontSize: 26)),
           actions: [
+            if (widget.timeoutSeconds != null && !tablet)
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: TimeoutClock(seconds: widget.timeoutSeconds!, compact: true),
+              ),
             if (widget.score != null)
               Padding(
                 padding: const EdgeInsets.only(right: 20),
@@ -170,6 +189,8 @@ class _TacticsScreenState extends State<TacticsScreen> {
                     style: const TextStyle(
                         fontFamily: TmFont.display, fontWeight: FontWeight.w700, fontSize: 26, color: Colors.white)),
               ),
+            if (widget.timeoutSeconds != null && tablet)
+              Padding(padding: const EdgeInsets.only(right: 24), child: TimeoutClock(seconds: widget.timeoutSeconds!)),
           ],
         ),
         body: SafeArea(
@@ -184,13 +205,27 @@ class _TacticsScreenState extends State<TacticsScreen> {
                       const SizedBox(width: 16),
                       Expanded(child: board),
                       const SizedBox(width: 16),
-                      SizedBox(width: 300, child: TmCard(child: Expanded(child: library))),
+                      SizedBox(
+                        width: 300,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (widget.setStats != null) ...[_KeyFigures(stats: widget.setStats!), const SizedBox(height: 12)],
+                            Expanded(child: TmCard(child: Expanded(child: library))),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 )
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    if (widget.setStats != null)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: _KeyFigures(stats: widget.setStats!, compact: true),
+                      ),
                     Expanded(child: Padding(padding: const EdgeInsets.fromLTRB(16, 14, 16, 10), child: board)),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -654,6 +689,132 @@ class _NameDialogState extends State<_NameDialog> {
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
         FilledButton(onPressed: () => Navigator.pop(context, _text.text), child: const Text('Enregistrer')),
+      ],
+    );
+  }
+}
+
+/// Chrono du temps mort (V1-TMO-02) : décompte, puis « reprise » en toutes lettres (pas seulement
+/// un changement de couleur) et une vibration.
+class TimeoutClock extends StatefulWidget {
+  const TimeoutClock({super.key, required this.seconds, this.compact = false});
+
+  final int seconds;
+  final bool compact;
+
+  @override
+  State<TimeoutClock> createState() => _TimeoutClockState();
+}
+
+class _TimeoutClockState extends State<TimeoutClock> {
+  late int _left = widget.seconds;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() => _left--);
+      if (_left <= 0) {
+        t.cancel();
+        HapticFeedback.heavyImpact();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final over = _left <= 0;
+    final clock = '${_left ~/ 60}:${(_left % 60).toString().padLeft(2, '0')}';
+    final text = over
+        ? (widget.compact ? 'Reprise' : 'Temps mort · reprise')
+        : (widget.compact ? 'TM $clock' : 'Temps mort · $clock');
+    return Semantics(
+      liveRegion: over,
+      label: over ? 'Temps mort terminé, reprise du jeu' : 'Temps mort, $_left secondes',
+      excludeSemantics: true,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: widget.compact ? 10 : 12, vertical: widget.compact ? 6 : 8),
+        decoration: BoxDecoration(
+          color: over ? Colors.white : TmColor.yellow,
+          borderRadius: BorderRadius.circular(TmRadius.sm),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: TmColor.navy,
+            fontSize: widget.compact ? 14 : 15,
+            fontWeight: FontWeight.w700,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Les trois chiffres du set à dire pendant le temps mort (V1-TMO-01).
+class _KeyFigures extends StatelessWidget {
+  const _KeyFigures({required this.stats, this.compact = false});
+
+  final MatchStats stats;
+  final bool compact;
+
+  static String _percent(double? v) => v == null ? '—' : '${(v * 100).round()}\u202f%';
+
+  @override
+  Widget build(BuildContext context) {
+    final figures = [
+      ('Side-out', _percent(stats.sideOutRate), 'en réception'),
+      ('Break', _percent(stats.breakRate), 'au service'),
+      ('Fautes', '${stats.teamErrors}', 'directes'),
+    ];
+    final tiles = [
+      for (final (label, value, caption) in figures)
+        Expanded(
+          child: Semantics(
+            label: '$label : $value $caption',
+            excludeSemantics: true,
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: compact ? 6 : 10, horizontal: 8),
+              decoration: BoxDecoration(
+                color: TmColor.surface,
+                border: Border.all(color: TmColor.line),
+                borderRadius: BorderRadius.circular(TmRadius.md),
+              ),
+              child: Column(
+                children: [
+                  Text(label.toUpperCase(),
+                      style: const TextStyle(color: TmColor.accent, fontSize: 12, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                  Text(value,
+                      style: TextStyle(
+                          fontFamily: TmFont.display, fontWeight: FontWeight.w700, fontSize: compact ? 24 : 32, height: 1.1)),
+                  if (!compact) Text(caption, style: const TextStyle(color: TmColor.muted, fontSize: 13)),
+                ],
+              ),
+            ),
+          ),
+        ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (!compact) ...[
+          const Text('Ce set', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 8),
+        ],
+        // Même hauteur pour les trois tuiles, même si un libellé passe à la ligne.
+        IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (var i = 0; i < tiles.length; i++) ...[if (i > 0) const SizedBox(width: 8), tiles[i]],
+          ]),
+        ),
       ],
     );
   }

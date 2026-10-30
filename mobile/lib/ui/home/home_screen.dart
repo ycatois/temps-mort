@@ -42,6 +42,35 @@ class _HomeScreenState extends State<HomeScreen> {
     await _load();
   }
 
+  /// Remet l'équipe de démonstration comme au premier jour : effectif d'origine, aucun match.
+  Future<void> _resetDemo() async {
+    final store = StoreScope.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Réinitialiser la démonstration ?'),
+        content: const Text('Les matchs, la compo type et les schémas de l\'équipe de démonstration seront effacés, '
+            'et son effectif remis d\'origine. Vos autres équipes ne changent pas.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: TmColor.error),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Réinitialiser'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await store.clearTeamData(demoTeam.id);
+    await store.saveTeam(demoTeam);
+    await _load();
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Équipe de démonstration réinitialisée')));
+    }
+  }
+
   Future<void> _openTeam(Team team) async {
     if (!mounted) return;
     await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => TeamScreen(team: team)));
@@ -92,9 +121,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             _TeamCard(team: t, onTap: () => _openTeam(t)),
                             const SizedBox(height: 12),
                           ],
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: YellowButton(label: 'Créer une équipe', icon: Icons.add, onPressed: _createTeam),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 8,
+                            children: [
+                              YellowButton(label: 'Créer une équipe', icon: Icons.add, onPressed: _createTeam),
+                              if (teams.any((t) => t.id == demoTeam.id))
+                                OutlinedButton.icon(
+                                  onPressed: _resetDemo,
+                                  icon: const Icon(Icons.restart_alt),
+                                  label: const Text('Réinitialiser la démonstration'),
+                                ),
+                            ],
                           ),
                         ],
                       ],

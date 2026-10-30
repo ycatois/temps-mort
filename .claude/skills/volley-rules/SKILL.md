@@ -55,6 +55,11 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 - `origin` (`PointOrigin`) : points marqués, fautes adverses, sans détail ; `teamErrors` compte aussi les fautes saisies sans joueuse.
 - Efficacité en attaque = (points − fautes et contrées) / tentatives, tentatives = points + fautes + attaques en jeu. Réception moyenne sur 0 à 3. Elles n'ont de sens que si la période contient des `Touch` (`MatchStats.fullInput`) : en saisie simple, les attaques en jeu manquent, ne pas les estimer.
 
+## Résumé du match (`summarize`, E10)
+- Meilleures joueuses : points, contres, aces ; réception seulement en saisie complète, avec au moins `minReceptionsForBest` réceptions. Égalité : moins de fautes, puis le plus petit numéro.
+- À retenir : rotation au meilleur solde positif, rotation au pire solde (`weakestRotation`), fautes de service avec le set qui se détache (cité seulement s'il y a plusieurs sets concernés et pas d'égalité).
+- Le texte est écrit par l'écran (`ui/summary/summary_text.dart`) : le moteur ne renvoie que des données.
+
 ## Tableau tactique (`tactics.dart`, E08)
 - Coordonnées sur le terrain entier : x de 0 à 1 (gauche → droite vu depuis notre camp), y de 0 (fond adverse) à 1 (notre fond), filet en y = 0,5 ; marges hors terrain autorisées (`BoardPoint.marginX`, `marginY`) pour le serveur et la couverture.
 - `courtPositions(format)` : place de chaque poste dans notre camp, dans l'ordre de la composition (index 0 = poste 1 = zone 1, arrière droit). La composition en cours du match étant déjà tournée, `TacticBoard.forLineup(format, state.lineup)` place les pions sur la rotation en cours.

@@ -143,6 +143,8 @@ class _TeamScreenState extends State<TeamScreen> {
         onEventsChanged: (e) => store.saveEvents(match.id, e),
         fullInput: match.fullInput,
         onFullInputChanged: (v) => store.saveMatch(match.withFullInput(v)),
+        opponent: match.opponent,
+        date: match.date,
         composeNextSet: (context, suggested, {required setNumber, required serverLocked}) =>
             Navigator.of(context).push<StartSet>(MaterialPageRoute(
           builder: (_) => CompositionScreen(

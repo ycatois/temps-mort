@@ -118,10 +118,10 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 |---|---|---|---|
 | V1-TMO-01 | Bouton « Temps mort » : vue plein écran avec score, 3 chiffres clés du set et tableau tactique | Indispensable | ✅ side-out, break, fautes directes |
 | V1-TMO-02 | Chronomètre de 30 secondes | Important | ✅ |
-| V1-FIN-01 | Résumé automatique : score par set, meilleures joueuses par catégorie, chiffres clés | Indispensable | ⬜ |
-| V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ⬜ |
-| V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ⬜ |
-| V1-FIN-04 | Export des données brutes en CSV | Important | ⬜ |
+| V1-FIN-01 | Résumé automatique : score par set, meilleures joueuses par catégorie, chiffres clés | Indispensable | ✅ marqueuse, contre, service, réception (saisie complète) ; à retenir par rotation et fautes de service |
+| V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ✅ |
+| V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ✅ |
+| V1-FIN-04 | Export des données brutes en CSV | Important | ✅ un événement par ligne |
 | V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | 🟡 liste des matchs par équipe, modification à faire |
 
 ### Technique et expérience (TEC)

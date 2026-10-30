@@ -47,6 +47,7 @@ mobile/
 │   ├── ui/composition/    E04 Composition (glisser-déposer, libero, capitaine, système, compo type)
 │   ├── ui/match/          écran E05 Match en direct, son contrôleur, panneau E06 Remplacement
 │   ├── ui/stats/          E07 Statistiques en direct
+│   ├── ui/summary/        E10 Résumé du match, PDF détaillé (package pdf) et partage (share_plus)
 │   ├── ui/tactics/        E08 Tableau tactique (terrain dessiné avec CustomPainter, outils, bibliothèque)
 │   ├── demo/              équipe de démonstration (celle des maquettes)
 │   └── main.dart
@@ -70,11 +71,12 @@ mobile/
 - E07 Statistiques en direct, ouvert depuis le match : side-out, break, origine des points, fautes directes, tableau par joueuse (points, attaques, aces, contres, fautes), points gagnés et perdus par rotation avec la plus faible mise en avant, filtre par set ou match. Smartphone : onglets Joueuses, Rotations, Équipe. Efficacité en attaque et réception moyenne quand la période contient de la saisie complète.
 - E08 Tableau tactique, ouvert depuis le match (pions sur la rotation en cours) ou depuis l'équipe (pions sur la compo type) : déplacer les pions au doigt, crayon, flèche et zone en jaune, rouge ou blanc, annuler le dernier trait, tout effacer, adversaires et ballon, demi-terrain ou terrain entier, schémas enregistrés par équipe (enregistrer, rappeler, supprimer). Les schémas de réception pré-construits (V1-TAC-08) restent à faire.
 - E09 Temps mort : le bouton « Temps mort » du match enregistre le temps mort et ouvre le tableau tactique avec un chrono de 30 secondes (vibration et « reprise » à la fin) et les trois chiffres du set : side-out, break, fautes directes.
+- E10 Résumé du match, depuis le match (bouton « Résumé du match », mis en avant en fin de match) : carte avec score, sets, meilleures joueuses et chiffres clés, « à retenir pour l'entraînement » (rotation la plus forte et la plus faible, fautes de service). Partage par la feuille du téléphone : la carte en image PNG, un PDF détaillé (tableaux par joueuse et par rotation, polices embarquées) et les données brutes en CSV (un événement par ligne, point-virgule, pour un tableur en français).
 - Accueil : « Réinitialiser la démonstration » efface les matchs, la compo type et les schémas de l'équipe de démonstration et remet son effectif d'origine.
 
 ## Prochaines étapes (ordre conseillé)
 
-1. E10 Résumé + partage image/PDF, schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
+1. E01 Accueil complet et E11 Historique (modifier ou supprimer un match), schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
 2. Modifier ou supprimer un match, joueuses présentes et second libero (V1-PRE-03), saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
 3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 

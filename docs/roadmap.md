@@ -15,7 +15,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ |
+| V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ décidé : facultatif, e-mail + mot de passe, puis empreinte ou visage (docs/compte-et-synchro.md) |
 | V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | ✅ nom, catégorie, format, type, saison, couleur du maillot |
 | V1-EQU-03 | Ajouter une joueuse : prénom, nom, numéro de maillot, poste principal (passeuse, pointue, réceptionneuse-attaquante, centrale, libero) | Indispensable | 🟡 prénom, numéro, poste (pas de nom : données minimales des mineures) |
 | V1-EQU-04 | Poste secondaire et main forte (droitière ou gauchère) | Important | ⬜ |

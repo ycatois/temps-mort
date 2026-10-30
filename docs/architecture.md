@@ -32,7 +32,7 @@
 - `MatchEvent` (StartSet, Rally, Substitution, LiberoIn/Out, Timeout) est la seule chose stockée.
 - L'état (score, rotation, service, compteurs) est recalculé par `MatchEngine.replay()`.
 - Avantages : annulation illimitée (V1-MAT-08), reprise après fermeture (V1-TEC-02), synchronisation simple (on envoie des événements), stats recalculables à volonté.
-- À venir : persistance locale (SQLite, par exemple avec le paquet `drift`) et synchro vers une API.
+- Persistance locale : SQLite (`sqflite`), un événement par ligne. Synchro vers l'API : voir `docs/compte-et-synchro.md`.
 
 ### Site : PHP natif + MariaDB
 - o2switch est un hébergement mutualisé : PHP et MariaDB y sont natifs, sans démon ni Node.
@@ -44,11 +44,8 @@
 - Thème classique (PHP) plutôt que bloc (FSE) : l'en-tête et le pied sont le même balisage que le site, vérifié par `scripts/check-parity.mjs`.
 - `theme.json` est généré depuis les tokens : l'éditeur ne propose que les couleurs et polices de la marque.
 
-### Où vivra l'API de synchro ?
-Pas décidé. Deux options :
-1. **o2switch** (PHP + MariaDB, dans `web/app`, routes `/api/…`) : simple, hébergé en France, suffisant pour la V1.
-2. **VPS OVH** (Docker) : nécessaire si temps réel (V2 : saisie par un parent, coach adjoint) ou charge importante.
-Recommandation : démarrer en option 1 avec une API versionnée (`/api/v1`) pour pouvoir déménager sans changer l'app.
+### API de synchro : sur o2switch, sous `/api/v1`
+Décidé avec Yann le 2026-10-30 : PHP + MariaDB dans `web/app`, sur le domaine du site, API versionnée pour pouvoir déménager sur un VPS (OVH, Docker) si la V2 demande du temps réel. Compte facultatif, mot de passe puis empreinte ou visage, synchro par révisions : voir `docs/compte-et-synchro.md`.
 
 ## Arborescence
 

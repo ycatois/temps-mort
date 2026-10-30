@@ -15,7 +15,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ |
+| V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ décidé : facultatif, e-mail + mot de passe, puis empreinte ou visage (docs/compte-et-synchro.md) |
 | V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | ✅ nom, catégorie, format, type, saison, couleur du maillot |
 | V1-EQU-03 | Ajouter une joueuse : prénom, nom, numéro de maillot, poste principal (passeuse, pointue, réceptionneuse-attaquante, centrale, libero) | Indispensable | 🟡 prénom, numéro, poste (pas de nom : données minimales des mineures) |
 | V1-EQU-04 | Poste secondaire et main forte (droitière ou gauchère) | Important | ⬜ |
@@ -109,7 +109,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-TAC-05 | Effacer tout ou annuler le dernier trait | Indispensable | ✅ |
 | V1-TAC-06 | Ajouter des pions adverses et un ballon | Important | ✅ |
 | V1-TAC-07 | Enregistrer un schéma et le rappeler (bibliothèque) | Important | ✅ par équipe et par format |
-| V1-TAC-08 | Schémas de réception pré-construits pour les 6 rotations en 4-2 et 5-1 | Important | ⬜ |
+| V1-TAC-08 | Schémas de réception pré-construits pour les 6 rotations en 4-2 et 5-1 | Important | ↪ abandonné (Yann, 2026-10-30) : chaque coach crée et enregistre les siens (TAC-07) |
 | V1-TAC-09 | Basculer entre demi-terrain et terrain entier | Confort | ✅ |
 
 ### Temps mort et fin de match (TMO, FIN)

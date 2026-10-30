@@ -78,9 +78,8 @@ mobile/
 
 ## Prochaines étapes (ordre conseillé)
 
-1. Schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
+1. Compte coach et synchro (V1-EQU-01, V1-TEC-03) : voir docs/compte-et-synchro.md.
 2. Poste secondaire et main forte (V1-EQU-04), import d'effectif CSV (V1-EQU-08).
-3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication
 

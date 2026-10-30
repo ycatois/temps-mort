@@ -74,7 +74,7 @@ L'app vise les clubs amateurs et le loisir, pas le haut niveau : une règle FIVB
 ## Tableau tactique (`tactics.dart`, E08)
 - Coordonnées sur le terrain entier : x de 0 à 1 (gauche → droite vu depuis notre camp), y de 0 (fond adverse) à 1 (notre fond), filet en y = 0,5 ; marges hors terrain autorisées (`BoardPoint.marginX`, `marginY`) pour le serveur et la couverture.
 - `courtPositions(format)` : place de chaque poste dans notre camp, dans l'ordre de la composition (index 0 = poste 1 = zone 1, arrière droit). La composition en cours du match étant déjà tournée, `TacticBoard.forLineup(format, state.lineup)` place les pions sur la rotation en cours.
-- Pas de schéma de réception pré-construit (V1-TAC-08) tant que les placements par rotation en 4-2 et 5-1 n'ont pas été validés avec Yann.
+- Pas de schéma de réception pré-construit (V1-TAC-08 abandonné, décision de Yann le 2026-10-30) : chaque coach crée les siens et les enregistre dans la bibliothèque.
 
 ## En cas de doute
 Proposer un paramètre plutôt qu'une règle codée en dur, et le signaler à Yann (coach) qui tranche.

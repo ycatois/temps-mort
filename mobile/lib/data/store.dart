@@ -34,6 +34,9 @@ abstract interface class AppStore {
   /// Efface les matchs (et leurs événements), compositions types et schémas de l'équipe ;
   /// l'équipe et son effectif restent. Sert à remettre l'équipe de démonstration à zéro.
   Future<void> clearTeamData(String teamId);
+
+  /// Supprime l'équipe, son effectif et toutes ses données (RGPD).
+  Future<void> deleteTeam(String teamId);
 }
 
 class MemoryStore implements AppStore {
@@ -94,6 +97,12 @@ class MemoryStore implements AppStore {
     }
     _templates.removeWhere((_, t) => t.teamId == teamId);
     _plays.removeWhere((_, p) => p.teamId == teamId);
+  }
+
+  @override
+  Future<void> deleteTeam(String teamId) async {
+    await clearTeamData(teamId);
+    _teams.remove(teamId);
   }
 }
 

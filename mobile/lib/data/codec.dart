@@ -14,6 +14,8 @@ Json teamToJson(Team t) => {
       'gender': t.gender.name,
       'category': t.category.name,
       'minWomenOnCourt': t.minWomenOnCourt,
+      'season': t.season,
+      if (t.color != null) 'color': t.color!.name,
       'players': [for (final p in t.players) playerToJson(p)],
     };
 
@@ -24,6 +26,8 @@ Team teamFromJson(Json j) => Team(
       gender: TeamGender.values.byName(j['gender']! as String),
       category: AgeCategory.values.byName(j['category']! as String),
       minWomenOnCourt: j['minWomenOnCourt'] as int?,
+      season: j['season'] as String?,
+      color: j['color'] == null ? null : TeamColor.values.byName(j['color']! as String),
       players: [for (final p in j['players']! as List<Object?>) playerFromJson(p! as Json)],
     );
 
@@ -34,6 +38,7 @@ Json playerToJson(Player p) => {
       'gender': p.gender.name,
       'role': p.role.name,
       if (p.archived) 'archived': true,
+      if (p.deleted) 'deleted': true,
     };
 
 Player playerFromJson(Json j) => Player(
@@ -43,6 +48,7 @@ Player playerFromJson(Json j) => Player(
       gender: PlayerGender.values.byName(j['gender']! as String),
       role: Role.values.byName(j['role']! as String),
       archived: j['archived'] as bool? ?? false,
+      deleted: j['deleted'] as bool? ?? false,
     );
 
 Json rulesToJson(MatchRules r) => {

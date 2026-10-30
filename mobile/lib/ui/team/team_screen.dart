@@ -4,6 +4,7 @@ import '../../data/match_record.dart';
 import '../../domain/domain.dart';
 import '../common/labels.dart';
 import '../common/store_scope.dart';
+import '../common/team_colors.dart';
 import '../common/widgets.dart';
 import '../match/match_access.dart';
 import '../match_setup/new_match_screen.dart';
@@ -26,6 +27,9 @@ class TeamScreen extends StatefulWidget {
 class _TeamScreenState extends State<TeamScreen> {
   late Team _team = widget.team;
   List<MatchRow> _matches = const [];
+
+  /// Saison affichée dans l'historique ; null = celle de l'équipe.
+  String? _season;
 
   /// Tablette : joueuse ouverte dans la fiche, ou [_adding] pour une nouvelle.
   Player? _selected;
@@ -59,6 +63,49 @@ class _TeamScreenState extends State<TeamScreen> {
     });
   }
 
+  /// Suppression des données d'une joueuse à sa demande (RGPD, V1-TEC-09). Si elle a joué un match,
+  /// il reste une trace anonyme pour que ses matchs se rejouent ; sinon elle disparaît complètement.
+  Future<bool> _deletePlayer(Player player) async {
+    final store = StoreScope.of(context);
+    var played = false;
+    for (final row in _matches) {
+      if (playersInvolved(await store.events(row.record.id)).contains(player.id)) {
+        played = true;
+        break;
+      }
+    }
+    if (!mounted) return false;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Supprimer les données de ${player.firstName} ?'),
+        content: Text(played
+            ? 'Son prénom et son numéro seront effacés de cet appareil. Les matchs déjà joués gardent '
+                'ses statistiques, sous le nom « Anonyme ». Cette action est définitive.'
+            : 'Son prénom, son numéro et son poste seront effacés de cet appareil. Cette action est définitive.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: TmColor.error),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return false;
+    final team = _team.deletePlayer(player.id, keepTrace: played);
+    await store.saveTeam(team);
+    if (mounted) {
+      setState(() {
+        _team = team;
+        _selected = null;
+        _adding = false;
+      });
+    }
+    return true;
+  }
+
   Future<void> _openPlayer(BuildContext context, Player? player, {required bool tablet}) async {
     if (tablet) {
       setState(() {
@@ -79,6 +126,9 @@ class _TeamScreenState extends State<TeamScreen> {
               onSaved: (p) async {
                 await _savePlayer(p);
                 if (context.mounted) Navigator.of(context).pop();
+              },
+              onDelete: (p) async {
+                if (await _deletePlayer(p) && context.mounted) Navigator.of(context).pop();
               },
             ),
           ),
@@ -161,7 +211,10 @@ class _TeamScreenState extends State<TeamScreen> {
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_team.name),
+              Row(children: [
+                if (_team.color != null) ...[TeamColorDot(_team.color!, size: 18), const SizedBox(width: 8)],
+                Flexible(child: Text(_team.name, overflow: TextOverflow.ellipsis)),
+              ]),
               Text(teamSummary(_team), style: const TextStyle(fontSize: 14, color: TmColor.onNavyMuted)),
             ],
           ),
@@ -214,6 +267,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                 team: _team,
                                 player: _selected,
                                 onSaved: _savePlayer,
+                                onDelete: _deletePlayer,
                                 onCancel: () => setState(() {
                                   _selected = null;
                                   _adding = false;
@@ -227,6 +281,8 @@ class _TeamScreenState extends State<TeamScreen> {
             }),
             _MatchList(
               matches: _matches,
+              season: _season ?? _team.season,
+              onSeason: (s) => setState(() => _season = s),
               onOpen: _openMatch,
               onNew: _newMatch,
               onEdit: _editMatch,
@@ -253,7 +309,7 @@ class _RosterList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final archived = team.players.where((p) => p.archived).toList()..sort((a, b) => a.number.compareTo(b.number));
+    final archived = team.archivedPlayers..sort((a, b) => a.number.compareTo(b.number));
     final word = playerWord(team);
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -335,9 +391,15 @@ class _MatchList extends StatelessWidget {
     required this.onDelete,
     required this.onSummary,
     required this.onSquad,
+    required this.season,
+    required this.onSeason,
   });
 
   final List<MatchRow> matches;
+
+  /// Saison affichée, et son changement (V1-FIN-05 : matchs de la saison).
+  final String season;
+  final ValueChanged<String> onSeason;
   final ValueChanged<MatchRecord> onOpen;
   final VoidCallback onNew;
   final ValueChanged<MatchRow> onEdit;
@@ -362,12 +424,15 @@ class _MatchList extends StatelessWidget {
         ),
       );
     }
+    // Les saisons des matchs, et celle de l'équipe ; on n'affiche le choix que s'il y en a plusieurs.
+    final seasons = {season, for (final m in matches) seasonOf(m.record.date)}.toList()..sort((a, b) => b.compareTo(a));
+    final shown = matches.where((m) => seasonOf(m.record.date) == season).toList();
     // À venir : le plus proche d'abord ; en cours et terminés : le plus récent d'abord.
-    final upcoming = matches.where((m) => m.notStarted).toList()..sort((a, b) => a.record.date.compareTo(b.record.date));
+    final upcoming = shown.where((m) => m.notStarted).toList()..sort((a, b) => a.record.date.compareTo(b.record.date));
     final sections = [
-      ('En cours', matches.where((m) => m.inProgress).toList()),
+      ('En cours', shown.where((m) => m.inProgress).toList()),
       ('À venir', upcoming),
-      ('Terminés', matches.where((m) => m.finished).toList()),
+      ('Terminés', shown.where((m) => m.finished).toList()),
     ];
     return ListView(
       padding: const EdgeInsets.all(16),
@@ -378,6 +443,23 @@ class _MatchList extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (seasons.length > 1) ...[
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final s in seasons)
+                        ChoiceChip(
+                          label: Text('Saison $s'),
+                          selected: s == season,
+                          onSelected: (_) => onSeason(s),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (shown.isEmpty)
+                  TmCard(child: Text('Aucun match sur la saison $season.', style: Theme.of(context).textTheme.bodyLarge)),
                 for (final (title, rows) in sections)
                   if (rows.isNotEmpty) ...[
                     TmCard(

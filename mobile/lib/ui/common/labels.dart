@@ -24,7 +24,7 @@ String playerWord(Team team) => team.gender == TeamGender.masculine ? 'joueur' :
 /// Genre proposé par défaut pour une nouvelle personne de l'effectif.
 PlayerGender defaultGender(Team team) => team.gender == TeamGender.masculine ? PlayerGender.m : PlayerGender.f;
 
-String teamSummary(Team team) => '${team.category.label} · ${team.format.label} · ${team.gender.label}';
+String teamSummary(Team team) => '${team.category.label} · ${team.format.label} · ${team.gender.label} · ${team.season}';
 
 String lineupIssueLabel(LineupIssue issue) => switch (issue) {
       WrongSize(:final expected, :final actual) => 'Il faut $expected personnes sur le terrain ($actual pour l\'instant)',

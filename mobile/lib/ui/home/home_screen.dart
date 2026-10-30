@@ -4,6 +4,7 @@ import '../../demo/demo_team.dart';
 import '../../domain/domain.dart';
 import '../common/labels.dart';
 import '../common/store_scope.dart';
+import '../common/team_colors.dart';
 import '../common/widgets.dart';
 import '../match/match_access.dart';
 import '../team/team_form_screen.dart';
@@ -242,6 +243,7 @@ class _TeamCard extends StatelessWidget {
       child: ListTile(
         minTileHeight: 72,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: team.color == null ? null : TeamColorDot(team.color!, size: 28),
         title: Text(team.name, style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 26)),
         subtitle: Text('${teamSummary(team)} · $count ${count > 1 ? '${word}s' : word}'
             '${matchCount == 0 ? '' : ' · $matchCount match${matchCount > 1 ? 's' : ''}'}'),

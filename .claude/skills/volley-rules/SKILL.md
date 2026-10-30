@@ -35,12 +35,15 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 - Remplace un joueur arrière (postes 1, 6, 5) ; ne compte pas comme remplacement.
 - Ne peut pas entrer au poste 1 quand son équipe sert (pas de service libero, règle FIVB ; certaines compétitions FFVB l'autorisent → futur paramètre).
 - Sort automatiquement quand la rotation l'amènerait au poste 4.
-- Second libero (`StartSet.secondLiberoId`) : sur le banc, jamais dans la composition, jamais remplaçant. `LiberoSwap` échange les deux liberos (sur le terrain si le libero y est, sinon pour les prochaines entrées), sans compter de remplacement. Non modélisé : l'échange de jeu obligatoire entre deux changements de libero.
+- Second libero (`StartSet.secondLiberoId`) : sur le banc, jamais dans la composition, jamais remplaçant. `LiberoSwap` échange les deux liberos (sur le terrain si le libero y est, sinon pour les prochaines entrées), sans compter de remplacement. Volontairement non contrôlé (décision de Yann, 2026-10-30, app pour amateurs et loisir) : l'échange de jeu obligatoire entre deux changements de libero.
 
 ## Joueuses présentes (`validateSquad`, `Team.withSquad`)
 - 14 au plus en 6x6, liberos compris (`maxSquad`) ; pas de limite connue en 4x4 et 2x2. Assez de joueuses pour le terrain, et de femmes en mixte.
 - L'équipe du match est réduite aux présentes (`MatchRecord.teamFor`) : le moteur ne voit pas les absentes. `playersInvolved` donne les joueuses déjà apparues, qu'on ne peut plus retirer.
-- À valider avec Yann : FIVB impose deux liberos au-delà de 12 inscrites ; ce n'est pas contrôlé.
+- Volontairement libre (décision de Yann, 2026-10-30) : FIVB impose deux liberos au-delà de 12 inscrites ; l'app ne l'impose pas.
+
+## Esprit des règles
+L'app vise les clubs amateurs et le loisir, pas le haut niveau : une règle FIVB stricte qui gênerait un championnat jeunes ou loisir n'est pas imposée, ou devient un paramètre désactivable. En cas de doute, demander à Yann.
 
 ## Mixité
 - `Team.gender == TeamGender.mixte` impose `minWomenOnCourt` (par défaut la moitié des joueurs sur le terrain). Vérifié au `StartSet`, à chaque remplacement et à l'entrée du libero.

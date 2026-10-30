@@ -82,6 +82,16 @@ final class Substitution extends MatchEvent {
   final String inId;
 }
 
+/// Remplacement exceptionnel d'une blessée (FIVB 15.7), quand le remplacement normal est impossible
+/// (quota atteint, retour à la place d'origine) : n'importe quelle joueuse du banc entre, hors liberos ;
+/// il ne compte pas dans les remplacements et la blessée ne peut plus revenir de tout le match.
+/// Les écrans n'ont pas à choisir : voir [MatchSession.injuryReplacement].
+final class InjurySubstitution extends MatchEvent {
+  const InjurySubstitution(this.outId, this.inId);
+  final String outId;
+  final String inId;
+}
+
 final class LiberoIn extends MatchEvent {
   const LiberoIn(this.replacedId);
   final String replacedId;
@@ -206,6 +216,7 @@ class MatchState {
     this.timeoutsUsed = const Score(),
     this.history = const [],
     this.touches = const [],
+    this.excluded = const {},
   });
 
   final MatchRules rules;
@@ -237,6 +248,9 @@ class MatchState {
 
   /// Gestes en jeu de la saisie complète, tous sets confondus.
   final List<TouchRecord> touches;
+
+  /// Blessées sorties par un remplacement exceptionnel : elles ne rejouent plus de tout le match.
+  final Set<String> excluded;
 
   int get setIndex => setsDone.length;
 
@@ -284,6 +298,7 @@ class MatchState {
     Score? timeoutsUsed,
     List<RallyRecord>? history,
     List<TouchRecord>? touches,
+    Set<String>? excluded,
   }) =>
       MatchState(
         rules: rules,
@@ -302,6 +317,7 @@ class MatchState {
         timeoutsUsed: timeoutsUsed ?? this.timeoutsUsed,
         history: history ?? this.history,
         touches: touches ?? this.touches,
+        excluded: excluded ?? this.excluded,
       );
 }
 
@@ -416,6 +432,18 @@ final class LiberoCannotBeSubstituted extends Rejection {
   String get message => 'Le libero et la joueuse qu\'il remplace ne passent pas par un remplacement.';
 }
 
+final class InjuredCannotReturn extends Rejection {
+  const InjuredCannotReturn(this.playerId);
+  final String playerId;
+  @override
+  String get message => 'Sortie sur blessure par un remplacement exceptionnel : elle ne peut plus revenir dans ce match.';
+
+  @override
+  bool operator ==(Object other) => other is InjuredCannotReturn && other.playerId == playerId;
+  @override
+  int get hashCode => playerId.hashCode;
+}
+
 final class StarterAlreadyLeft extends Rejection {
   const StarterAlreadyLeft(this.playerId);
   final String playerId;
@@ -506,6 +534,9 @@ class MatchEngine {
         if (libero == null || second == libero) return const SecondLiberoInvalid();
         if (team.player(second) == null) return UnknownPlayerRejection(second);
       }
+      for (final id in [...event.lineup, if (libero != null) libero, if (second != null) second]) {
+        if (state.excluded.contains(id)) return InjuredCannotReturn(id);
+      }
       final issues = [
         ...validateLineup(team, event.lineup, liberoId: libero),
         if (second != null && event.lineup.contains(second)) LiberoInLineup(second),
@@ -518,6 +549,7 @@ class MatchEngine {
       Rally() => null,
       final TimeoutTaken t => state.timeoutsLeft(t.side) <= 0 ? const NoTimeoutLeft() : null,
       final Substitution s => _checkSubstitution(state, s),
+      final InjurySubstitution s => _checkInjury(state, s),
       final LiberoIn l => _checkLiberoIn(state, l),
       LiberoOut() => state.liberoReplacing == null ? const LiberoNotIn() : null,
       LiberoSwap() => _checkLiberoSwap(state),
@@ -551,6 +583,10 @@ class MatchEngine {
           lineup: List.unmodifiable(state.lineup.map((id) => id == s.outId ? s.inId : id)),
           substitutionsUsed: state.substitutionsUsed + 1,
           substitutions: List.unmodifiable([...state.substitutions, s]),
+        ),
+      final InjurySubstitution s => state.copyWith(
+          lineup: List.unmodifiable(state.lineup.map((id) => id == s.outId ? s.inId : id)),
+          excluded: Set.unmodifiable({...state.excluded, s.outId}),
         ),
       final LiberoIn l => state.copyWith(
           lineup: List.unmodifiable(state.lineup.map((id) => id == l.replacedId ? state.liberoId! : id)),
@@ -623,10 +659,25 @@ class MatchEngine {
     if (liberos.contains(e.outId) || liberos.contains(e.inId) || e.inId == state.liberoReplacing) {
       return const LiberoCannotBeSubstituted();
     }
+    if (state.excluded.contains(e.inId)) return InjuredCannotReturn(e.inId);
     if (rules.pairedSubstitutions) {
       final paired = _checkPaired(state, e);
       if (paired != null) return paired;
     }
+    return _womenCheck(state.lineup.map((id) => id == e.outId ? e.inId : id));
+  }
+
+  /// Remplacement exceptionnel : ni quota ni règle du couple, seulement les liberos, la blessée
+  /// déjà sortie et la mixité.
+  Rejection? _checkInjury(MatchState state, InjurySubstitution e) {
+    if (!state.lineup.contains(e.outId)) return NotOnCourt(e.outId);
+    if (team.player(e.inId) == null) return UnknownPlayerRejection(e.inId);
+    if (state.lineup.contains(e.inId)) return AlreadyOnCourt(e.inId);
+    final liberos = {state.liberoId, state.secondLiberoId}..remove(null);
+    if (liberos.contains(e.outId) || liberos.contains(e.inId) || e.inId == state.liberoReplacing) {
+      return const LiberoCannotBeSubstituted();
+    }
+    if (state.excluded.contains(e.inId)) return InjuredCannotReturn(e.inId);
     return _womenCheck(state.lineup.map((id) => id == e.outId ? e.inId : id));
   }
 
@@ -700,6 +751,8 @@ Set<String> playersInvolved(Iterable<MatchEvent> events) {
       case Rally():
         add(e.playerId);
       case Substitution():
+        ids.addAll([e.outId, e.inId]);
+      case InjurySubstitution():
         ids.addAll([e.outId, e.inId]);
       case LiberoIn():
         add(e.replacedId);

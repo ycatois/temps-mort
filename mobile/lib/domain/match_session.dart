@@ -54,5 +54,13 @@ class MatchSession {
     return null;
   }
 
+  /// Sortie sur blessure de [outId] (FIVB 15.7) : remplacement normal s'il est permis (il compte, et la
+  /// blessée pourra revenir selon les règles habituelles), sinon remplacement exceptionnel. Le coach coche
+  /// seulement « blessure » ; c'est ici que se fait le choix.
+  MatchEvent injuryReplacement(String outId, String inId) {
+    final normal = Substitution(outId, inId);
+    return check(normal) == null ? normal : InjurySubstitution(outId, inId);
+  }
+
   MatchStats stats({int? setIndex}) => computeStats(_state.history, touches: _state.touches, setIndex: setIndex);
 }

@@ -55,10 +55,17 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
   String? _outId;
   String? _inId;
 
+  /// Sortie sur blessure : l'app choisit seule entre remplacement normal et exceptionnel (FIVB 15.7).
+  bool _injury = false;
+
   MatchController get c => widget.c;
 
+  /// Ce qui sera enregistré pour [inId] : remplacement normal, ou exceptionnel si blessure et normal impossible.
+  MatchEvent _eventFor(String inId) => _injury ? c.injuryReplacement(_outId!, inId) : Substitution(_outId!, inId);
+
   void _confirm() {
-    if (c.substitute(_outId!, _inId!) == null) Navigator.of(context).pop();
+    final rejection = _injury ? c.injurySubstitute(_outId!, _inId!) : c.substitute(_outId!, _inId!);
+    if (rejection == null) Navigator.of(context).pop();
   }
 
   void _liberoIn(String id) {
@@ -111,7 +118,16 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
         final partner = _outId == null ? null : s.partnerOf(_outId!);
         final substitutionsPossible = limit != 0 && s.phase == Phase.inPlay;
 
-        return ListView(
+        // Le bouton de validation reste en bas, toujours visible, quelle que soit la longueur du panneau.
+        final confirm = FilledButton(
+          style: FilledButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+          onPressed: _outId != null && _inId != null ? _confirm : null,
+          child: Text(_outId != null && _inId != null
+              ? '${team.player(_inId!)!.firstName} entre, ${out!.firstName} sort'
+                  '${_injury ? (_eventFor(_inId!) is InjurySubstitution ? ' blessée · exceptionnel' : ' blessée') : ''}'
+              : 'Valider le remplacement'),
+        );
+        final list = ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           children: [
             Row(
@@ -166,19 +182,29 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
                   ],
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
+              CheckboxListTile(
+                value: _injury,
+                onChanged: (v) => setState(() {
+                  _injury = v!;
+                  _inId = null;
+                }),
+                controlAffinity: ListTileControlAffinity.leading,
+                contentPadding: EdgeInsets.zero,
+                secondary: const Icon(Icons.healing_outlined),
+                title: const Text('Sortie sur blessure', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                // L'explication n'apparaît qu'une fois la case cochée : le panneau reste court en match.
+                subtitle: _injury
+                    ? const Text('Si le remplacement normal est impossible, il se fait hors quota ; '
+                        'la blessée ne revient plus du match.')
+                    : null,
+              ),
+              const SizedBox(height: 8),
               TmCard(
                 title: '2 · Qui entre ?',
                 child: out == null
                     ? Text('Choisissez d\'abord la $word qui sort.', style: Theme.of(context).textTheme.bodyLarge)
                     : _benchChoices(out, partner),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(
-                onPressed: _outId != null && _inId != null ? _confirm : null,
-                child: Text(_outId != null && _inId != null
-                    ? '${team.player(_inId!)!.firstName} entre, ${out!.firstName} sort'
-                    : 'Valider le remplacement'),
               ),
             ],
             if (s.liberoId != null && s.phase == Phase.inPlay) ...[
@@ -190,6 +216,18 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
                 padding: const EdgeInsets.only(top: 12),
                 child: Text(c.lastRejection!.message, style: const TextStyle(color: TmColor.error, fontSize: 15)),
               ),
+          ],
+        );
+        if (!substitutionsPossible) return list;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: list),
+            Container(
+              decoration: const BoxDecoration(border: Border(top: BorderSide(color: TmColor.line))),
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 14),
+              child: confirm,
+            ),
           ],
         );
       },
@@ -210,12 +248,17 @@ class _SubstitutionPanelState extends State<SubstitutionPanel> {
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Builder(builder: (context) {
-              final refusal = c.check(Substitution(out.id, p.id));
+              final event = _eventFor(p.id);
+              final refusal = c.check(event);
               return _Choice(
                 number: p.number,
                 name: p.firstName,
                 detail: refusal?.message ??
-                    (p.id == partner ? 'Revient à sa place d\'origine' : roleLabel(p.role, p.gender)),
+                    (event is InjurySubstitution
+                        ? 'Remplacement exceptionnel, hors quota'
+                        : p.id == partner
+                            ? 'Revient à sa place d\'origine'
+                            : roleLabel(p.role, p.gender)),
                 selected: p.id == _inId,
                 expand: true,
                 onPressed: refusal == null ? () => setState(() => _inId = p.id) : null,

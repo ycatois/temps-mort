@@ -21,6 +21,7 @@ class CompositionScreen extends StatefulWidget {
     this.initial,
     this.initialServer,
     this.serverLocked = false,
+    this.unavailable = const {},
   });
 
   /// L'équipe dans le format du match.
@@ -36,15 +37,23 @@ class CompositionScreen extends StatefulWidget {
   /// Sets 2 et suivants (hors set décisif) : le premier service alterne, le coach ne le choisit pas.
   final bool serverLocked;
 
+  /// Joueuses qui ne peuvent plus jouer ce match (sorties sur blessure) : ni au banc, ni sur le terrain.
+  final Set<String> unavailable;
+
   @override
   State<CompositionScreen> createState() => _CompositionScreenState();
 }
 
 class _CompositionScreenState extends State<CompositionScreen> {
-  late final CompositionDraft _draft =
-      CompositionDraft(widget.team.format.playersOnCourt, lineup: widget.initial?.lineup);
-  late String? _liberoId = widget.initial?.liberoId;
-  late String? _secondLiberoId = widget.initial?.secondLiberoId;
+  late final Team _team = widget.unavailable.isEmpty
+      ? widget.team
+      : widget.team.copyWith(players: [for (final p in widget.team.players) if (!widget.unavailable.contains(p.id)) p]);
+  late final CompositionDraft _draft = CompositionDraft(widget.team.format.playersOnCourt, lineup: widget.initial?.lineup)
+    ..slots.setAll(0, [for (final id in widget.initial?.lineup ?? const <String>[]) widget.unavailable.contains(id) ? null : id]);
+  late String? _liberoId = _available(widget.initial?.liberoId);
+  late String? _secondLiberoId = _liberoId == null ? null : _available(widget.initial?.secondLiberoId);
+
+  String? _available(String? id) => id == null || widget.unavailable.contains(id) ? null : id;
   late String? _captainId = widget.initial?.captainId;
   late GameSystem? _system = _sixes ? (widget.initial?.system ?? GameSystem.s51) : null;
   late Side? _firstServer = widget.initialServer;
@@ -53,7 +62,6 @@ class _CompositionScreenState extends State<CompositionScreen> {
   /// Joueuse touchée, en attente d'une zone (banc ou terrain).
   String? _picked;
 
-  Team get _team => widget.team;
   bool get _sixes => widget.team.format == GameFormat.six;
   bool get _liberoPossible => _sixes && widget.rules.liberoAllowed;
   List<LineupIssue> get _issues =>

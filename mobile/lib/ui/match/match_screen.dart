@@ -14,6 +14,7 @@ typedef ComposeSet = Future<StartSet?> Function(
   StartSet suggested, {
   required int setNumber,
   required bool serverLocked,
+  Set<String> unavailable,
 });
 
 /// E05 — Match en direct. Tablette (≥ 840 px de large) : terrain et saisie côte à côte ;
@@ -378,6 +379,7 @@ class _ActionPanel extends StatelessWidget {
       suggested,
       setNumber: c.state.setIndex + 1,
       serverLocked: !c.nextSetIsDeciding,
+      unavailable: c.state.excluded,
     );
     if (start != null) c.startSet(start);
   }
@@ -413,7 +415,17 @@ class _ActionPanel extends StatelessWidget {
               onPressed: onSummary,
             ),
           ),
-        if (c.canStartNextSet && !c.nextSetIsDeciding)
+        // Une blessée sortie par un remplacement exceptionnel ne rejoue pas : il faut recomposer.
+        if (c.canStartNextSet && !c.canRepeatLineup)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Text(
+              '${[for (final id in s.excluded) c.label(id).name].join(', ')}, sortie sur blessure, ne peut plus jouer : '
+              'choisissez la composition du set ${s.setIndex + 1}.',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        if (c.canStartNextSet && c.canRepeatLineup && !c.nextSetIsDeciding)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: _BigButton(
@@ -423,7 +435,7 @@ class _ActionPanel extends StatelessWidget {
               onPressed: c.startNextSet,
             ),
           ),
-        if (c.canStartNextSet && c.nextSetIsDeciding)
+        if (c.canStartNextSet && c.canRepeatLineup && c.nextSetIsDeciding)
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(

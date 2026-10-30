@@ -60,7 +60,7 @@ Future<void> openMatch(BuildContext context, Team team, MatchRecord match) async
       onFullInputChanged: (v) => store.saveMatch(match.withFullInput(v)),
       opponent: match.opponent,
       date: match.date,
-      composeNextSet: (context, suggested, {required setNumber, required serverLocked}) =>
+      composeNextSet: (context, suggested, {required setNumber, required serverLocked, unavailable = const {}}) =>
           Navigator.of(context).push<StartSet>(MaterialPageRoute(
         builder: (_) => CompositionScreen(
           team: playing,
@@ -70,6 +70,7 @@ Future<void> openMatch(BuildContext context, Team team, MatchRecord match) async
           initial: suggested,
           initialServer: serverLocked ? suggested.firstServer : null,
           serverLocked: serverLocked,
+          unavailable: unavailable,
         ),
       )),
     ),

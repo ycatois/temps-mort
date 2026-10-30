@@ -31,6 +31,12 @@ class MatchController extends ChangeNotifier {
   Rejection? get lastRejection => _lastRejection;
   bool get canUndo => _session.canUndo;
   bool get canStartNextSet => _session.nextSetStart() != null;
+
+  /// Le set suivant peut-il reprendre la même composition ? Non si une blessée en faisait partie.
+  bool get canRepeatLineup {
+    final next = _session.nextSetStart(firstServer: Side.us);
+    return next != null && _session.check(next) == null;
+  }
   bool get nextSetIsDeciding => _session.nextSetIsDeciding;
 
   /// Saisie complète : chaque geste d'une joueuse est noté, y compris ceux qui ne terminent pas l'échange.
@@ -93,12 +99,19 @@ class MatchController extends ChangeNotifier {
           if (!state.lineup.contains(p.id) &&
               p.id != state.liberoId &&
               p.id != state.secondLiberoId &&
-              p.id != state.liberoReplacing)
+              p.id != state.liberoReplacing &&
+              !state.excluded.contains(p.id))
             p,
       ]..sort((a, b) => a.number.compareTo(b.number));
 
   /// E06 : remplacement (V1-MAT-04). Renvoie le refus éventuel, sans rien changer dans ce cas.
   Rejection? substitute(String outId, String inId) => _record(Substitution(outId, inId));
+
+  /// Sortie sur blessure : l'événement qui sera enregistré (remplacement normal s'il est permis,
+  /// sinon exceptionnel), pour l'annoncer avant de valider.
+  MatchEvent injuryReplacement(String outId, String inId) => _session.injuryReplacement(outId, inId);
+
+  Rejection? injurySubstitute(String outId, String inId) => _record(_session.injuryReplacement(outId, inId));
 
   /// E06 : entrée du libero à la place d'une joueuse arrière, et sortie (V1-MAT-05).
   Rejection? liberoIn(String replacedId) => _record(LiberoIn(replacedId));

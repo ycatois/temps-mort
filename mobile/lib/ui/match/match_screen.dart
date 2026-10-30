@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import 'match_controller.dart';
+import '../stats/stats_screen.dart';
 import 'substitution_panel.dart';
 
 /// Ouvre l'écran E04 pour composer le set [setNumber] à partir de [suggested] ; null si le coach renonce.
@@ -453,6 +454,13 @@ class _ActionPanel extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => StatsScreen(c: c))),
+          icon: const Icon(Icons.bar_chart),
+          label: const Text('Statistiques'),
+        ),
+        const SizedBox(height: 8),
         OutlinedButton(onPressed: c.canUndo ? c.undo : null, child: const Text('Annuler la dernière saisie')),
         if (c.lastRejection != null)
           Padding(

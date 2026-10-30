@@ -225,6 +225,38 @@ void main() {
       s.record(const Rally(Side.them)); // l'adversaire sert et marque, toujours en R2
       expect(s.stats().weakestRotation, 2);
     });
+
+    test('stats : détail par joueuse, origine des points, filtre par set', () {
+      final s = session()..record(StartSet(Side.us, start));
+      s.record(const Rally(Side.us, playerId: 'lucie', action: RallyAction.attaque));
+      s.record(const Rally(Side.us, playerId: 'lucie', action: RallyAction.contre));
+      s.record(const Rally(Side.us, playerId: 'manon', action: RallyAction.ace));
+      s.record(const Rally(Side.us, action: RallyAction.fauteAdverse));
+      s.record(const Rally(Side.us)); // point gagné sans préciser
+      s.record(const Rally(Side.them, playerId: 'lucie', action: RallyAction.attaqueFaute));
+      s.record(const Rally(Side.them, action: RallyAction.receptionFaute)); // faute sans joueuse désignée
+      s.record(const Rally(Side.them));
+      final st = s.stats();
+      final lucie = st.byPlayer['lucie']!;
+      expect([lucie.attackPoints, lucie.blocks, lucie.points, lucie.attackErrors, lucie.errors], [1, 1, 2, 1, 1]);
+      expect(st.byPlayer['manon']!.aces, 1);
+      expect([st.origin.scored, st.origin.opponentErrors, st.origin.unspecified], [3, 1, 1]);
+      expect(st.pointsWon, 5);
+      expect(st.pointsLost, 3);
+      expect(st.teamErrors, 2);
+
+      // Une action gagnante saisie sur un point perdu n'est créditée à personne.
+      s.record(const Rally(Side.them, playerId: 'emma', action: RallyAction.attaque));
+      expect(s.stats().byPlayer.containsKey('emma'), isFalse);
+
+      // Le set 2 ne voit que ses propres échanges.
+      s.win(25);
+      s.record(s.nextSetStart()!);
+      s.record(const Rally(Side.us, playerId: 'emma', action: RallyAction.ace));
+      expect(s.stats(setIndex: 1).pointsByPlayer, {'emma': 1});
+      expect(s.stats(setIndex: 0).pointsByPlayer['lucie'], 2);
+      expect(s.stats().pointsWon, greaterThan(25));
+    });
   });
 
   group('Formats et mixité', () {

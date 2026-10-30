@@ -49,7 +49,10 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 ## Statistiques (`computeStats`)
 - Side-out % = échanges gagnés quand l'adversaire sert ; break % = échanges gagnés sur notre service.
 - Points par joueuse : ace, attaque, contre gagnants. Fautes : action non « scoring » sur un échange perdu (hors faute adverse).
-- Bilan par rotation ; `weakestRotation` alimente le bloc « À retenir » du résumé (E10).
+- Bilan par rotation ; `weakestRotation` alimente le bloc « À retenir » du résumé (E10) et l'écran E07.
+- `byPlayer` (`PlayerStats` : aces, attaques, contres gagnants ; fautes de service, d'attaque, de réception, autres). Une action gagnante n'est créditée que sur un point gagné, une faute que sur un point perdu.
+- `origin` (`PointOrigin`) : points marqués, fautes adverses, sans détail ; `teamErrors` compte aussi les fautes saisies sans joueuse.
+- Efficacité en attaque et qualité de réception ne sont pas calculables avec la saisie actuelle (seule l'action qui conclut l'échange est saisie) : ne pas les estimer.
 
 ## En cas de doute
 Proposer un paramètre plutôt qu'une règle codée en dur, et le signaler à Yann (coach) qui tranche.

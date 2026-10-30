@@ -103,8 +103,11 @@ void main() {
     await pumpApp(tester, phone, store, const HomeScreen());
     await tester.tap(find.text('Créer une équipe'));
     await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Mixte'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Mixte'));
     await tester.pumpAndSettle();
+    expect(find.text('Femmes au minimum sur le terrain'), findsOneWidget);
     expect(tester.takeException(), isNull, reason: 'formulaire équipe');
 
     await store.saveTeam(demoTeam);

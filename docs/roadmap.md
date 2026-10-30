@@ -16,7 +16,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
 | V1-EQU-01 | Créer un compte coach (email + mot de passe, ou lien magique) | Indispensable | ⬜ |
-| V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | 🟡 nom, catégorie, format, type ; saison et couleur à faire |
+| V1-EQU-02 | Créer une équipe : nom, catégorie (toutes les catégories fédérales, des plus jeunes aux seniors et vétérans, plus loisir et catégorie libre ; liste mise à jour chaque saison), saison, couleur | Indispensable | ✅ nom, catégorie, format, type, saison, couleur du maillot |
 | V1-EQU-03 | Ajouter une joueuse : prénom, nom, numéro de maillot, poste principal (passeuse, pointue, réceptionneuse-attaquante, centrale, libero) | Indispensable | 🟡 prénom, numéro, poste (pas de nom : données minimales des mineures) |
 | V1-EQU-04 | Poste secondaire et main forte (droitière ou gauchère) | Important | ⬜ |
 | V1-EQU-05 | Modifier, archiver ou réactiver une joueuse en cours de saison | Indispensable | ✅ |
@@ -122,7 +122,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ✅ |
 | V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ✅ |
 | V1-FIN-04 | Export des données brutes en CSV | Important | ✅ un événement par ligne |
-| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | 🟡 en cours / à venir / terminés, modifier les informations, résumé, supprimer ; pas encore de notion de saison |
+| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | ✅ par saison ; en cours / à venir / terminés, modifier les informations, résumé, supprimer |
 
 ### Technique et expérience (TEC)
 
@@ -136,7 +136,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-TEC-06 | Écran maintenu allumé pendant le match | Indispensable | ✅ |
 | V1-TEC-07 | Thème clair et sombre | Important | ⬜ |
 | V1-TEC-08 | Installation comme application (PWA) depuis le navigateur | Indispensable | ↪ remplacé par apps natives |
-| V1-TEC-09 | Données minimales sur les joueuses mineures, hébergement en France, suppression sur demande | Indispensable | ⬜ |
+| V1-TEC-09 | Données minimales sur les joueuses mineures, hébergement en France, suppression sur demande | Indispensable | 🟡 prénom et numéro seulement, suppression d'une joueuse ou d'une équipe sur l'appareil ; hébergement à faire avec la synchro |
 | V1-TEC-10 | Retour haptique à chaque saisie (vibration courte) | Confort | ⬜ |
 
 ## V2 — L'équipe autour du match

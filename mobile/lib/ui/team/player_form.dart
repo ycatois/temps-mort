@@ -10,13 +10,16 @@ import '../theme/tokens.dart';
 /// Fiche d'une joueuse (V1-EQU-03, 05). Données minimales : prénom, numéro, poste, genre si l'équipe
 /// est mixte. Pas de nom ni de photo : la plupart des joueuses sont mineures.
 class PlayerForm extends StatefulWidget {
-  const PlayerForm({super.key, required this.team, this.player, required this.onSaved, this.onCancel});
+  const PlayerForm({super.key, required this.team, this.player, required this.onSaved, this.onCancel, this.onDelete});
 
   final Team team;
 
   /// null = nouvelle joueuse.
   final Player? player;
   final ValueChanged<Player> onSaved;
+
+  /// Suppression des données à la demande (RGPD, V1-TEC-09), proposée pour une joueuse existante.
+  final ValueChanged<Player>? onDelete;
   final VoidCallback? onCancel;
 
   @override
@@ -126,6 +129,15 @@ class _PlayerFormState extends State<PlayerForm> {
             OutlinedButton(
               onPressed: () => _save(archived: !existing.archived),
               child: Text(existing.archived ? 'Réactiver' : 'Archiver (quitte l\'équipe, reste dans l\'historique)'),
+            ),
+          ],
+          if (existing != null && widget.onDelete != null) ...[
+            const SizedBox(height: 8),
+            TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: TmColor.error, minimumSize: const Size(0, TmTouch.minTarget)),
+              onPressed: () => widget.onDelete!(existing),
+              icon: const Icon(Icons.delete_forever_outlined),
+              label: const Text('Supprimer ses données'),
             ),
           ],
           if (widget.onCancel != null) ...[

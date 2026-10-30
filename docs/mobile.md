@@ -63,8 +63,8 @@ mobile/
 - Moteur : équipes, joueuses, catégories (M7 → vétérans, loisir), formats 6x6/4x4/2x2, mixité, règles paramétrables, match à événements, annulation, set suivant, statistiques (side-out, break, par rotation, par joueuse).
 - Stockage sur l'appareil (SQLite) : équipes, matchs, et événements enregistrés après chaque saisie. Un match quitté se reprend au même score.
 - E01 Accueil : matchs en cours à reprendre et prochains matchs de toutes les équipes (tablette : à gauche, équipes à droite), les équipes avec leur nombre de matchs, création d'une équipe, équipe de démonstration pour essayer.
-- E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte) .
-- E11 Historique (onglet Matchs de l'équipe) : en cours, à venir (le plus proche d'abord), terminés avec le score des sets. Menu de chaque match : voir le résumé, modifier les informations (E03 pré-rempli ; format et règles verrouillés une fois le match commencé), supprimer après confirmation.
+- E02 Effectif : ajouter, modifier, archiver et réactiver une joueuse (prénom, numéro, poste, genre si mixte). « Supprimer ses données » (RGPD) : prénom et numéro effacés ; si elle a joué, une trace « Anonyme » garde les matchs cohérents. Équipe : saison (bascule au 1er juillet) et couleur du maillot ; « Supprimer l'équipe et toutes ses données ».
+- E11 Historique (onglet Matchs de l'équipe), par saison quand il y en a plusieurs : en cours, à venir (le plus proche d'abord), terminés avec le score des sets. Menu de chaque match : voir le résumé, modifier les informations (E03 pré-rempli ; format et règles verrouillés une fois le match commencé), supprimer après confirmation.
 - E03 Nouveau match : adversaire, date, heure, domicile ou extérieur, lieu, compétition, format du jour, sets gagnants et points.
 - Joueuses présentes (V1-PRE-03), juste avant la composition : tout l'effectif coché par défaut, 14 au plus en 6x6, assez de joueuses (et de femmes en mixte) pour composer. Banc, composition et remplacements ne proposent que les présentes. Modifiable depuis l'historique ; les joueuses qui ont déjà joué le match restent cochées.
 - E04 Composition, pour le premier set et les suivants : glisser-déposer sur les zones (appui long sur smartphone, ou toucher une joueuse puis une zone), libero et second libero, capitaine, système 5-1 / 4-2 / 6-2 avec alertes, premier service (en alternance à partir du set 2, au choix au set décisif), compo type enregistrée et rechargée.
@@ -79,7 +79,7 @@ mobile/
 ## Prochaines étapes (ordre conseillé)
 
 1. Schémas de réception pré-construits (V1-TAC-08, à valider avec un coach).
-2. Saison et couleur d'équipe, suppression d'une joueuse sur demande (RGPD).
+2. Poste secondaire et main forte (V1-EQU-04), import d'effectif CSV (V1-EQU-08).
 3. Compte coach et synchro (V1-EQU-01, V1-TEC-03).
 
 ## Publication

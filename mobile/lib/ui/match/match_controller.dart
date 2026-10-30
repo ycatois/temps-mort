@@ -26,6 +26,7 @@ class MatchController extends ChangeNotifier {
   Rejection? _lastRejection;
 
   MatchState get state => _session.state;
+  List<MatchEvent> get events => _session.events;
   String? get selectedPlayerId => _selectedPlayerId;
   Rejection? get lastRejection => _lastRejection;
   bool get canUndo => _session.canUndo;

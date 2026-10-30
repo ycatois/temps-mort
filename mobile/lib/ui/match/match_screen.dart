@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import '../stats/stats_screen.dart';
+import '../summary/summary_screen.dart';
 import '../tactics/tactics_screen.dart';
 import 'match_controller.dart';
 import 'substitution_panel.dart';
@@ -27,6 +28,8 @@ class MatchScreen extends StatefulWidget {
     this.composeNextSet,
     this.fullInput = false,
     this.onFullInputChanged,
+    this.opponent,
+    this.date,
   });
 
   /// L'équipe dans le format du match.
@@ -44,6 +47,10 @@ class MatchScreen extends StatefulWidget {
   final bool fullInput;
   final ValueChanged<bool>? onFullInputChanged;
 
+  /// Adversaire et date, pour le résumé (E10).
+  final String? opponent;
+  final DateTime? date;
+
   @override
   State<MatchScreen> createState() => _MatchScreenState();
 }
@@ -57,6 +64,16 @@ class _MatchScreenState extends State<MatchScreen> {
     fullInput: widget.fullInput,
     onFullInputChanged: widget.onFullInputChanged,
   );
+
+  void _openSummary() => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => SummaryScreen(
+          team: widget.team,
+          rules: widget.rules,
+          events: _c.events,
+          opponent: widget.opponent,
+          date: widget.date,
+        ),
+      ));
 
   @override
   void dispose() {
@@ -85,7 +102,7 @@ class _MatchScreenState extends State<MatchScreen> {
                           children: [
                             Expanded(flex: 11, child: SingleChildScrollView(child: _Court(c: _c))),
                             const SizedBox(width: 16),
-                            Expanded(flex: 10, child: SingleChildScrollView(child: _ActionPanel(c: _c, compose: widget.composeNextSet))),
+                            Expanded(flex: 10, child: SingleChildScrollView(child: _ActionPanel(c: _c, compose: widget.composeNextSet, onSummary: _openSummary))),
                           ],
                         ),
                       );
@@ -94,7 +111,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [_Court(c: _c), const SizedBox(height: 12), _ActionPanel(c: _c, compose: widget.composeNextSet)],
+                        children: [_Court(c: _c), const SizedBox(height: 12), _ActionPanel(c: _c, compose: widget.composeNextSet, onSummary: _openSummary)],
                       ),
                     );
                   },
@@ -338,9 +355,10 @@ class _PlayerToken extends StatelessWidget {
 }
 
 class _ActionPanel extends StatelessWidget {
-  const _ActionPanel({required this.c, this.compose});
+  const _ActionPanel({required this.c, this.compose, required this.onSummary});
   final MatchController c;
   final ComposeSet? compose;
+  final VoidCallback onSummary;
 
   /// Libellé du bouton E06, ou null quand il n'y a ni remplacement ni libero (2x2).
   String? get _substitutionLabel {
@@ -383,6 +401,16 @@ class _ActionPanel extends StatelessWidget {
             child: Text(
               '${s.winner == Side.us ? 'Match gagné' : 'Match perdu'} ${s.setsWon}',
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 28),
+            ),
+          ),
+        if (s.phase == Phase.finished)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _BigButton(
+              label: 'Voir le résumé et le partager',
+              background: TmColor.yellow,
+              foreground: TmColor.navy,
+              onPressed: onSummary,
             ),
           ),
         if (c.canStartNextSet && !c.nextSetIsDeciding)
@@ -534,6 +562,13 @@ class _ActionPanel extends StatelessWidget {
           onPressed: () => _openTactics(context, c),
           icon: const Icon(Icons.draw_outlined),
           label: const Text('Tableau tactique'),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+          onPressed: onSummary,
+          icon: const Icon(Icons.summarize_outlined),
+          label: const Text('Résumé du match'),
         ),
         const SizedBox(height: 8),
         OutlinedButton(onPressed: c.canUndo ? c.undo : null, child: const Text('Annuler la dernière saisie')),

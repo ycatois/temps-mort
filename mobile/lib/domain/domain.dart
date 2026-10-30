@@ -9,5 +9,6 @@ export 'match.dart';
 export 'match_rules.dart';
 export 'match_session.dart';
 export 'stats.dart';
+export 'summary.dart';
 export 'tactics.dart';
 export 'team.dart';

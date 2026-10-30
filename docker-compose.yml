@@ -1,6 +1,8 @@
 # Environnement local identique à o2switch : http://localhost:8080 (site) et http://localhost:8080/blog/ (WordPress)
+# API de l'app : http://localhost:8080/api/v1/… ; e-mails envoyés (mot de passe oublié) : http://localhost:8025
 #   docker compose up -d
 #   docker compose exec web php /var/www/site/app/bin/migrate.php
+# Tablette branchée en USB : adb reverse tcp:8080 tcp:8080, puis l'app parle à http://localhost:8080
 services:
   db:
     image: mariadb:11.4
@@ -13,7 +15,7 @@ services:
 
   web:
     build: { context: ., dockerfile: docker/web.Dockerfile }
-    depends_on: [db]
+    depends_on: [db, mailpit]
     ports: ["8080:80"]
     environment:
       # Site PHP (lu par app/config/app.php si app/.env n'existe pas)
@@ -22,6 +24,11 @@ services:
       DB_DSN: mysql:host=db;dbname=tempsmort;charset=utf8mb4
       DB_USER: tempsmort
       DB_PASSWORD: tempsmort
+      # API de l'app : secret de développement uniquement (jamais celui de la production)
+      APP_SECRET: dev-secret-local-uniquement-0123456789abcdef
+      MAIL_FROM: "Temps Mort <ne-pas-repondre@tempsmort.local>"
+      MAIL_SMTP_HOST: mailpit
+      MAIL_SMTP_PORT: "1025"
       # WordPress
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_NAME: wordpress
@@ -31,6 +38,11 @@ services:
     volumes:
       - ./web:/var/www/site
       - ./wp-theme/temps-mort:/var/www/site/public/blog/wp-content/themes/temps-mort
+
+  # Boîte aux lettres locale : capte tous les e-mails envoyés, rien ne part sur Internet.
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports: ["8025:8025"]
 
 volumes:
   db-data:

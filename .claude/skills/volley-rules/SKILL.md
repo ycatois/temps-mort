@@ -55,5 +55,10 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 - `origin` (`PointOrigin`) : points marqués, fautes adverses, sans détail ; `teamErrors` compte aussi les fautes saisies sans joueuse.
 - Efficacité en attaque = (points − fautes et contrées) / tentatives, tentatives = points + fautes + attaques en jeu. Réception moyenne sur 0 à 3. Elles n'ont de sens que si la période contient des `Touch` (`MatchStats.fullInput`) : en saisie simple, les attaques en jeu manquent, ne pas les estimer.
 
+## Tableau tactique (`tactics.dart`, E08)
+- Coordonnées sur le terrain entier : x de 0 à 1 (gauche → droite vu depuis notre camp), y de 0 (fond adverse) à 1 (notre fond), filet en y = 0,5 ; marges hors terrain autorisées (`BoardPoint.marginX`, `marginY`) pour le serveur et la couverture.
+- `courtPositions(format)` : place de chaque poste dans notre camp, dans l'ordre de la composition (index 0 = poste 1 = zone 1, arrière droit). La composition en cours du match étant déjà tournée, `TacticBoard.forLineup(format, state.lineup)` place les pions sur la rotation en cours.
+- Pas de schéma de réception pré-construit (V1-TAC-08) tant que les placements par rotation en 4-2 et 5-1 n'ont pas été validés avec Yann.
+
 ## En cas de doute
 Proposer un paramètre plutôt qu'une règle codée en dur, et le signaler à Yann (coach) qui tranche.

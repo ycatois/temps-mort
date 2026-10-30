@@ -1,5 +1,6 @@
 import '../domain/domain.dart';
 import 'match_record.dart';
+import 'tactic_play.dart';
 
 /// Conversion JSON des équipes, matchs et événements pour le stockage local (et plus tard la synchro).
 /// Les énumérations sont écrites par leur nom : ne jamais renommer une valeur déjà publiée.
@@ -156,4 +157,65 @@ LineupTemplate templateFromJson(Json j) => LineupTemplate(
       liberoId: j['liberoId'] as String?,
       captainId: j['captainId'] as String?,
       system: j['system'] == null ? null : GameSystem.values.byName(j['system']! as String),
+    );
+
+Json boardToJson(TacticBoard b) => {
+      'format': b.format.name,
+      'tokens': [
+        for (final t in b.tokens)
+          {
+            'id': t.id,
+            'kind': t.kind.name,
+            'x': t.position.x,
+            'y': t.position.y,
+            if (t.playerId != null) 'playerId': t.playerId,
+          },
+      ],
+      'strokes': [
+        for (final s in b.strokes)
+          {
+            'tool': s.tool.name,
+            'color': s.color.name,
+            // x1, y1, x2, y2… : plus compact qu'une liste d'objets.
+            'points': [for (final p in s.points) ...[p.x, p.y]],
+          },
+      ],
+    };
+
+TacticBoard boardFromJson(Json j) => TacticBoard(
+      format: GameFormat.values.byName(j['format']! as String),
+      tokens: [for (final t in j['tokens']! as List<Object?>) _tokenFromJson(t! as Json)],
+      strokes: [for (final s in j['strokes']! as List<Object?>) _strokeFromJson(s! as Json)],
+    );
+
+BoardToken _tokenFromJson(Json t) => BoardToken(
+      id: t['id']! as String,
+      kind: TokenKind.values.byName(t['kind']! as String),
+      position: BoardPoint((t['x']! as num).toDouble(), (t['y']! as num).toDouble()),
+      playerId: t['playerId'] as String?,
+    );
+
+Stroke _strokeFromJson(Json s) {
+  final flat = [for (final v in s['points']! as List<Object?>) (v! as num).toDouble()];
+  return Stroke(
+    tool: StrokeTool.values.byName(s['tool']! as String),
+    color: StrokeColor.values.byName(s['color']! as String),
+    points: [for (var i = 0; i + 1 < flat.length; i += 2) BoardPoint(flat[i], flat[i + 1])],
+  );
+}
+
+Json playToJson(TacticPlay p) => {
+      'id': p.id,
+      'teamId': p.teamId,
+      'name': p.name,
+      'savedAt': p.savedAt.toIso8601String(),
+      'board': boardToJson(p.board),
+    };
+
+TacticPlay playFromJson(Json j) => TacticPlay(
+      id: j['id']! as String,
+      teamId: j['teamId']! as String,
+      name: j['name']! as String,
+      savedAt: DateTime.parse(j['savedAt']! as String),
+      board: boardFromJson(j['board']! as Json),
     );

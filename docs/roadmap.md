@@ -102,15 +102,15 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 
 | ID | Fonctionnalité | Priorité | État |
 |---|---|---|---|
-| V1-TAC-01 | Terrain vu du dessus avec 6 pions aux prénoms des joueuses | Indispensable | ⬜ |
-| V1-TAC-02 | Pions pré-placés sur la rotation en cours du match | Indispensable | ⬜ |
-| V1-TAC-03 | Déplacer les pions au doigt | Indispensable | ⬜ |
-| V1-TAC-04 | Dessiner à main levée (flèches, zones, trajectoires) en 3 couleurs | Indispensable | ⬜ |
-| V1-TAC-05 | Effacer tout ou annuler le dernier trait | Indispensable | ⬜ |
-| V1-TAC-06 | Ajouter des pions adverses et un ballon | Important | ⬜ |
-| V1-TAC-07 | Enregistrer un schéma et le rappeler (bibliothèque) | Important | ⬜ |
+| V1-TAC-01 | Terrain vu du dessus avec 6 pions aux prénoms des joueuses | Indispensable | ✅ 6, 4 ou 2 pions selon le format |
+| V1-TAC-02 | Pions pré-placés sur la rotation en cours du match | Indispensable | ✅ |
+| V1-TAC-03 | Déplacer les pions au doigt | Indispensable | ✅ |
+| V1-TAC-04 | Dessiner à main levée (flèches, zones, trajectoires) en 3 couleurs | Indispensable | ✅ |
+| V1-TAC-05 | Effacer tout ou annuler le dernier trait | Indispensable | ✅ |
+| V1-TAC-06 | Ajouter des pions adverses et un ballon | Important | ✅ |
+| V1-TAC-07 | Enregistrer un schéma et le rappeler (bibliothèque) | Important | ✅ par équipe et par format |
 | V1-TAC-08 | Schémas de réception pré-construits pour les 6 rotations en 4-2 et 5-1 | Important | ⬜ |
-| V1-TAC-09 | Basculer entre demi-terrain et terrain entier | Confort | ⬜ |
+| V1-TAC-09 | Basculer entre demi-terrain et terrain entier | Confort | ✅ |
 
 ### Temps mort et fin de match (TMO, FIN)
 

@@ -10,6 +10,9 @@ class StoreScope extends InheritedWidget {
 
   static AppStore of(BuildContext context) => context.getInheritedWidgetOfExactType<StoreScope>()!.store;
 
+  /// Null quand l'écran est ouvert sans stockage (certains tests).
+  static AppStore? maybeOf(BuildContext context) => context.getInheritedWidgetOfExactType<StoreScope>()?.store;
+
   @override
   bool updateShouldNotify(StoreScope oldWidget) => store != oldWidget.store;
 }

@@ -6,6 +6,7 @@ import 'package:sqflite/sqflite.dart';
 import '../domain/domain.dart';
 import 'codec.dart';
 import 'match_record.dart';
+import 'tactic_play.dart';
 import 'store.dart';
 
 /// Stockage SQLite sur l'appareil. Chaque équipe et chaque match est une ligne JSON ;
@@ -22,7 +23,7 @@ class SqliteStore implements AppStore {
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 3,
         onCreate: (db, version) async {
           await db.execute('CREATE TABLE teams (id TEXT PRIMARY KEY, data TEXT NOT NULL)');
           await db.execute(
@@ -31,10 +32,12 @@ class SqliteStore implements AppStore {
           await db.execute('CREATE TABLE match_events (match_id TEXT NOT NULL, seq INTEGER NOT NULL, '
               'data TEXT NOT NULL, PRIMARY KEY (match_id, seq))');
           await _createTemplates(db);
+          await _createPlays(db);
         },
-        // Version 2 : compositions types (E04).
+        // Version 2 : compositions types (E04). Version 3 : schémas tactiques (E08).
         onUpgrade: (db, from, to) async {
           if (from < 2) await _createTemplates(db);
+          if (from < 3) await _createPlays(db);
         },
       ),
     );
@@ -95,6 +98,25 @@ class SqliteStore implements AppStore {
         {'team_id': template.teamId, 'format': template.format.name, 'data': jsonEncode(templateToJson(template))},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
+
+  @override
+  Future<List<TacticPlay>> plays(String teamId) async {
+    final rows = await _db.query('tactic_plays', where: 'team_id = ?', whereArgs: [teamId], orderBy: 'saved_at DESC');
+    return [for (final r in rows) playFromJson(_decode(r['data']))];
+  }
+
+  @override
+  Future<void> savePlay(TacticPlay play) => _db.insert(
+        'tactic_plays',
+        {'id': play.id, 'team_id': play.teamId, 'saved_at': play.savedAt.toIso8601String(), 'data': jsonEncode(playToJson(play))},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+  @override
+  Future<void> deletePlay(String id) => _db.delete('tactic_plays', where: 'id = ?', whereArgs: [id]);
+
+  static Future<void> _createPlays(Database db) => db.execute('CREATE TABLE tactic_plays '
+      '(id TEXT PRIMARY KEY, team_id TEXT NOT NULL, saved_at TEXT NOT NULL, data TEXT NOT NULL)');
 
   static Future<void> _createTemplates(Database db) => db.execute('CREATE TABLE lineup_templates '
       '(team_id TEXT NOT NULL, format TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (team_id, format))');

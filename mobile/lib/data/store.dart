@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../domain/domain.dart';
 import 'match_record.dart';
+import 'tactic_play.dart';
 
 /// Stockage local, sur l'appareil (hors ligne d'abord). Implémentations : [SqliteStore] dans l'app,
 /// [MemoryStore] dans les tests.
@@ -21,6 +22,11 @@ abstract interface class AppStore {
   /// Composition type de l'équipe dans ce format, ou null.
   Future<LineupTemplate?> lineupTemplate(String teamId, GameFormat format);
   Future<void> saveLineupTemplate(LineupTemplate template);
+
+  /// Schémas tactiques de l'équipe (V1-TAC-07), du plus récent au plus ancien.
+  Future<List<TacticPlay>> plays(String teamId);
+  Future<void> savePlay(TacticPlay play);
+  Future<void> deletePlay(String id);
 }
 
 class MemoryStore implements AppStore {
@@ -28,6 +34,7 @@ class MemoryStore implements AppStore {
   final _matches = <String, MatchRecord>{};
   final _events = <String, List<MatchEvent>>{};
   final _templates = <String, LineupTemplate>{};
+  final _plays = <String, TacticPlay>{};
 
   @override
   Future<List<Team>> teams() async => _teams.values.toList();
@@ -54,6 +61,16 @@ class MemoryStore implements AppStore {
   @override
   Future<void> saveLineupTemplate(LineupTemplate template) async =>
       _templates['${template.teamId}/${template.format.name}'] = template;
+
+  @override
+  Future<List<TacticPlay>> plays(String teamId) async =>
+      _plays.values.where((p) => p.teamId == teamId).toList()..sort((a, b) => b.savedAt.compareTo(a.savedAt));
+
+  @override
+  Future<void> savePlay(TacticPlay play) async => _plays[play.id] = play;
+
+  @override
+  Future<void> deletePlay(String id) async => _plays.remove(id);
 }
 
 final _random = Random.secure();

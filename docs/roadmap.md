@@ -60,8 +60,8 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-MAT-01 | Afficher le score du set, les sets gagnés et l'équipe au service | Indispensable | ✅ |
 | V1-MAT-02 | Faire tourner automatiquement l'équipe à chaque side-out gagné | Indispensable | ✅ |
 | V1-MAT-03 | Afficher en permanence la rotation en cours (qui est où, qui sert) | Indispensable | ✅ |
-| V1-MAT-04 | Remplacement : choisir la sortante et l'entrante, compteur des 6 remplacements, retour à la place d'origine contrôlé | Indispensable | 🟡 compteur fait, retour à la place d'origine à faire |
-| V1-MAT-05 | Entrées et sorties du libero en zone arrière, sans décompter les remplacements | Indispensable | ✅ |
+| V1-MAT-04 | Remplacement : choisir la sortante et l'entrante, compteur des 6 remplacements, retour à la place d'origine contrôlé | Indispensable | ✅ panneau E06, compteur, retour à la place d'origine (paramètre, actif par défaut en 6x6) |
+| V1-MAT-05 | Entrées et sorties du libero en zone arrière, sans décompter les remplacements | Indispensable | ✅ entrée et sortie du libero depuis E06, sortie automatique avant le poste 4 |
 | V1-MAT-06 | Temps morts : compteur par équipe et par set | Indispensable | ✅ |
 | V1-MAT-07 | Fin de set automatique au score réglementaire, début du set suivant avec nouvelle composition | Indispensable | ✅ |
 | V1-MAT-08 | Annuler la dernière action, sans limite de profondeur | Indispensable | ✅ |

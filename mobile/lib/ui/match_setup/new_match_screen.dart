@@ -180,6 +180,17 @@ class _NewMatchScreenState extends State<NewMatchScreen> {
           ),
           const SizedBox(height: 8),
           Text('Deux points d\'écart pour gagner un set.', style: Theme.of(context).textTheme.bodyMedium),
+          if (_rules.substitutionsPerSet != 0) ...[
+            const SizedBox(height: 8),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _rules.pairedSubstitutions,
+              onChanged: (v) => setState(() => _rules = _rules.copyWith(pairedSubstitutions: v)),
+              title: const Text('Retour à la place d\'origine'),
+              subtitle: const Text(
+                  'Une titulaire ne sort qu\'une fois par set et ne revient qu\'à la place de sa remplaçante.'),
+            ),
+          ],
         ],
       ),
     );

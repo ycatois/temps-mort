@@ -11,12 +11,13 @@ class MatchRules {
     required this.substitutionsPerSet,
     required this.timeoutsPerSet,
     required this.liberoAllowed,
+    this.pairedSubstitutions = false,
   });
 
   factory MatchRules.defaultFor(GameFormat format) => switch (format) {
         GameFormat.six => const MatchRules(
             setsToWin: 3, pointsPerSet: 25, pointsDecidingSet: 15,
-            substitutionsPerSet: 6, timeoutsPerSet: 2, liberoAllowed: true),
+            substitutionsPerSet: 6, timeoutsPerSet: 2, liberoAllowed: true, pairedSubstitutions: true),
         GameFormat.four => const MatchRules(
             setsToWin: 2, pointsPerSet: 25, pointsDecidingSet: 15,
             substitutionsPerSet: null, timeoutsPerSet: 2, liberoAllowed: false),
@@ -35,6 +36,11 @@ class MatchRules {
   final int timeoutsPerSet;
   final bool liberoAllowed;
 
+  /// Règle du « couple » (FIVB 15.6) : une titulaire ne sort qu'une fois par set et ne revient qu'à sa
+  /// place d'origine, à la place de sa remplaçante ; une remplaçante n'entre qu'une fois par set, et seule
+  /// sa titulaire peut la remplacer. Activée par défaut en 6x6, désactivable (loisir, jeunes, tournois).
+  final bool pairedSubstitutions;
+
   int get maxSets => setsToWin * 2 - 1;
 
   int targetFor(int setIndex) => setIndex == maxSets - 1 ? pointsDecidingSet : pointsPerSet;
@@ -50,6 +56,7 @@ class MatchRules {
     Object? substitutionsPerSet = _keep,
     int? timeoutsPerSet,
     bool? liberoAllowed,
+    bool? pairedSubstitutions,
   }) =>
       MatchRules(
         setsToWin: setsToWin ?? this.setsToWin,
@@ -61,5 +68,6 @@ class MatchRules {
             : substitutionsPerSet as int?,
         timeoutsPerSet: timeoutsPerSet ?? this.timeoutsPerSet,
         liberoAllowed: liberoAllowed ?? this.liberoAllowed,
+        pairedSubstitutions: pairedSubstitutions ?? this.pairedSubstitutions,
       );
 }

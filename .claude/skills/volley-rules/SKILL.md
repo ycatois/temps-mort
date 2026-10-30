@@ -25,7 +25,9 @@ Code : `mobile/lib/domain/` (Dart pur). Tests : `mobile/test/domain/match_engine
 
 ## Remplacements et temps morts
 - 6x6 : 6 remplacements par set ; 4x4 : illimités par défaut ; 2x2 : aucun. 2 temps morts par set (1 en 2x2).
-- Non modélisé pour l'instant (à paramétrer si besoin) : règle du « couple » (un remplaçant ne peut rentrer qu'à la place du joueur qu'il a remplacé), remplacement exceptionnel sur blessure.
+- Règle du « couple » (FIVB 15.6), paramètre `MatchRules.pairedSubstitutions` (actif par défaut en 6x6, modifiable dans E03) : une titulaire ne sort qu'une fois par set et ne revient qu'à sa place d'origine, à la place de sa remplaçante ; une remplaçante n'entre qu'une fois par set et seule sa titulaire peut la remplacer. Titulaires = composition du `StartSet` du set ; `MatchState.partnerOf` donne le binôme. Refus : `StarterAlreadyLeft`, `SubstituteAlreadyPlayed`, `OnlyPartnerReturns`, `ReturnToOwnPlace`.
+- Matchs enregistrés avant ce paramètre : il vaut `false` à la relecture, pour que leurs remplacements se rejouent.
+- Non modélisé pour l'instant : remplacement exceptionnel sur blessure (hors compteur, hors règle du couple).
 
 ## Libero (6x6 uniquement)
 - Déclaré au `StartSet`, jamais dans la composition de départ.

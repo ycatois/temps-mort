@@ -54,6 +54,22 @@ class MatchController extends ChangeNotifier {
     if (next != null) _record(next);
   }
 
+  /// Raison pour laquelle [event] serait refusé maintenant, ou null (pour griser les choix impossibles).
+  Rejection? check(MatchEvent event) => _session.check(event);
+
+  /// Joueuses sur le banc qui peuvent entrer : ni sur le terrain, ni libero, ni remplacée par le libero.
+  List<Player> get bench => [
+        for (final p in team.activePlayers)
+          if (!state.lineup.contains(p.id) && p.id != state.liberoId && p.id != state.liberoReplacing) p,
+      ]..sort((a, b) => a.number.compareTo(b.number));
+
+  /// E06 : remplacement (V1-MAT-04). Renvoie le refus éventuel, sans rien changer dans ce cas.
+  Rejection? substitute(String outId, String inId) => _record(Substitution(outId, inId));
+
+  /// E06 : entrée du libero à la place d'une joueuse arrière, et sortie (V1-MAT-05).
+  Rejection? liberoIn(String replacedId) => _record(LiberoIn(replacedId));
+  Rejection? liberoOut() => _record(const LiberoOut());
+
   /// Proposition pour le set suivant (composition du set précédent), ou null si aucun set n'est à démarrer.
   StartSet? get suggestedNextSet => _session.nextSetStart();
 
@@ -73,9 +89,10 @@ class MatchController extends ChangeNotifier {
     return p == null ? (number: 0, name: '?') : (number: p.number, name: p.firstName);
   }
 
-  void _record(MatchEvent event) {
+  Rejection? _record(MatchEvent event) {
     _lastRejection = _session.record(event);
     if (_lastRejection == null) onEventsChanged?.call(_session.events);
     notifyListeners();
+    return _lastRejection;
   }
 }

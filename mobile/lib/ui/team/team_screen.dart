@@ -5,8 +5,7 @@ import '../../domain/domain.dart';
 import '../common/labels.dart';
 import '../common/store_scope.dart';
 import '../common/widgets.dart';
-import '../composition/composition_screen.dart';
-import '../match/match_screen.dart';
+import '../match/match_access.dart';
 import '../match_setup/new_match_screen.dart';
 import '../tactics/tactics_screen.dart';
 import '../theme/tokens.dart';
@@ -24,12 +23,9 @@ class TeamScreen extends StatefulWidget {
   State<TeamScreen> createState() => _TeamScreenState();
 }
 
-/// Un match de la liste, avec son état recalculé depuis ses événements (null = pas encore commencé).
-typedef _MatchRow = ({MatchRecord record, MatchState? state});
-
 class _TeamScreenState extends State<TeamScreen> {
   late Team _team = widget.team;
-  List<_MatchRow> _matches = const [];
+  List<MatchRow> _matches = const [];
 
   /// Tablette : joueuse ouverte dans la fiche, ou [_adding] pour une nouvelle.
   Player? _selected;
@@ -42,12 +38,7 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   Future<void> _loadMatches() async {
-    final store = StoreScope.of(context);
-    final rows = <_MatchRow>[];
-    for (final m in await store.matches(_team.id)) {
-      final events = await store.events(m.id);
-      rows.add((record: m, state: events.isEmpty ? null : MatchSession(m.teamFor(_team), rules: m.rules, events: events).state));
-    }
+    final rows = await loadMatchRows(StoreScope.of(context), _team);
     if (mounted) setState(() => _matches = rows);
   }
 
@@ -123,42 +114,40 @@ class _TeamScreenState extends State<TeamScreen> {
     ));
   }
 
-  /// Pas encore commencé : composition d'abord. Sinon on reprend le match là où il en était (V1-MAT-12).
   Future<void> _openMatch(MatchRecord match) async {
-    final store = StoreScope.of(context);
-    final navigator = Navigator.of(context);
-    final team = match.teamFor(_team);
-    if ((await store.events(match.id)).isEmpty) {
-      final start = await navigator.push<StartSet>(
-          MaterialPageRoute(builder: (_) => CompositionScreen(team: team, rules: match.rules, match: match)));
-      if (start == null) return;
-      await store.saveEvents(match.id, [start]);
-    }
-    final events = await store.events(match.id);
-    await navigator.push(MaterialPageRoute<void>(
-      builder: (_) => MatchScreen(
-        team: team,
-        rules: match.rules,
-        events: events,
-        onEventsChanged: (e) => store.saveEvents(match.id, e),
-        fullInput: match.fullInput,
-        onFullInputChanged: (v) => store.saveMatch(match.withFullInput(v)),
-        opponent: match.opponent,
-        date: match.date,
-        composeNextSet: (context, suggested, {required setNumber, required serverLocked}) =>
-            Navigator.of(context).push<StartSet>(MaterialPageRoute(
-          builder: (_) => CompositionScreen(
-            team: team,
-            rules: match.rules,
-            match: match,
-            setNumber: setNumber,
-            initial: suggested,
-            initialServer: serverLocked ? suggested.firstServer : null,
-            serverLocked: serverLocked,
-          ),
-        )),
-      ),
+    await openMatch(context, _team, match);
+    await _loadMatches();
+  }
+
+  /// E11 : informations du match (adversaire, date, lieu…) ; règles verrouillées s'il a commencé.
+  Future<void> _editMatch(MatchRow row) async {
+    await Navigator.of(context).push<NewMatchResult>(MaterialPageRoute(
+      builder: (_) => NewMatchScreen(team: _team, match: row.record, started: row.state != null),
     ));
+    await _loadMatches();
+  }
+
+  Future<void> _deleteMatch(MatchRow row) async {
+    final store = StoreScope.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Supprimer le match contre ${row.record.opponent} ?'),
+        content: Text(row.state == null
+            ? 'Le match sera retiré de la liste.'
+            : 'Le match et toutes ses statistiques seront effacés de cet appareil. Cette action est définitive.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Annuler')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: TmColor.error),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Supprimer'),
+          ),
+        ],
+      ),
+    );
+    if (ok != true) return;
+    await store.deleteMatch(row.record.id);
     await _loadMatches();
   }
 
@@ -236,7 +225,14 @@ class _TeamScreenState extends State<TeamScreen> {
                 ],
               );
             }),
-            _MatchList(matches: _matches, onOpen: _openMatch, onNew: _newMatch),
+            _MatchList(
+              matches: _matches,
+              onOpen: _openMatch,
+              onNew: _newMatch,
+              onEdit: _editMatch,
+              onDelete: _deleteMatch,
+              onSummary: (row) => openSummary(context, _team, row.record),
+            ),
           ],
         ),
       ),
@@ -325,12 +321,24 @@ class _PlayerTile extends StatelessWidget {
   }
 }
 
+/// E11 — Historique des matchs de l'équipe (V1-FIN-05) : en cours, à venir, terminés.
+/// Chaque match s'ouvre au toucher ; son menu permet de le modifier, d'en voir le résumé ou de le supprimer.
 class _MatchList extends StatelessWidget {
-  const _MatchList({required this.matches, required this.onOpen, required this.onNew});
+  const _MatchList({
+    required this.matches,
+    required this.onOpen,
+    required this.onNew,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onSummary,
+  });
 
-  final List<_MatchRow> matches;
+  final List<MatchRow> matches;
   final ValueChanged<MatchRecord> onOpen;
   final VoidCallback onNew;
+  final ValueChanged<MatchRow> onEdit;
+  final ValueChanged<MatchRow> onDelete;
+  final ValueChanged<MatchRow> onSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -349,31 +357,42 @@ class _MatchList extends StatelessWidget {
         ),
       );
     }
+    // À venir : le plus proche d'abord ; en cours et terminés : le plus récent d'abord.
+    final upcoming = matches.where((m) => m.notStarted).toList()..sort((a, b) => a.record.date.compareTo(b.record.date));
+    final sections = [
+      ('En cours', matches.where((m) => m.inProgress).toList()),
+      ('À venir', upcoming),
+      ('Terminés', matches.where((m) => m.finished).toList()),
+    ];
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 900),
-            child: TmCard(
-              child: Column(
-                children: [
-                  for (final m in matches)
-                    ListTile(
-                      minTileHeight: TmTouch.primaryTarget,
-                      contentPadding: EdgeInsets.zero,
-                      title: Text(m.record.opponent, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
-                      subtitle: Text([
-                        '${formatDate(m.record.date)} · ${formatTime(m.record.date)}',
-                        m.record.home ? 'Domicile' : 'Extérieur',
-                        if (m.record.competition.isNotEmpty) m.record.competition,
-                        m.record.format.label,
-                      ].join(' · ')),
-                      trailing: _StatusChip(state: m.state),
-                      onTap: () => onOpen(m.record),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final (title, rows) in sections)
+                  if (rows.isNotEmpty) ...[
+                    TmCard(
+                      title: '$title (${rows.length})',
+                      child: Column(
+                        children: [
+                          for (final m in rows)
+                            MatchTile(
+                              row: m,
+                              onTap: () => onOpen(m.record),
+                              onEdit: () => onEdit(m),
+                              onDelete: () => onDelete(m),
+                              onSummary: m.notStarted ? null : () => onSummary(m),
+                            ),
+                        ],
+                      ),
                     ),
-                ],
-              ),
+                    const SizedBox(height: 12),
+                  ],
+              ],
             ),
           ),
         ),
@@ -382,18 +401,76 @@ class _MatchList extends StatelessWidget {
   }
 }
 
-class _StatusChip extends StatelessWidget {
-  const _StatusChip({required this.state});
-  final MatchState? state;
+/// Une ligne de match : adversaire, date, lieu, état, et le menu des actions (s'il y en a).
+class MatchTile extends StatelessWidget {
+  const MatchTile({super.key, required this.row, required this.onTap, this.onEdit, this.onDelete, this.onSummary, this.teamName});
+
+  final MatchRow row;
+  final VoidCallback onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+  final VoidCallback? onSummary;
+
+  /// Sur l'accueil, l'équipe concernée.
+  final String? teamName;
 
   @override
   Widget build(BuildContext context) {
-    final s = state;
-    final (text, color) = switch (s) {
-      null => ('À jouer · composer', TmColor.accent),
-      MatchState(phase: Phase.finished) => ('${s.winner == Side.us ? 'Gagné' : 'Perdu'} ${s.setsWon}', TmColor.navy),
-      _ => ('En cours · sets ${s.setsWon} · reprendre', TmColor.accent),
-    };
-    return Text(text, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 15));
+    final r = row.record;
+    final actions = onEdit != null || onDelete != null || onSummary != null;
+    return ListTile(
+      minTileHeight: TmTouch.primaryTarget,
+      contentPadding: EdgeInsets.zero,
+      title: Text(teamName == null ? r.opponent : '$teamName contre ${r.opponent}',
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text([
+            '${formatDate(r.date)} · ${formatTime(r.date)}',
+            r.home ? 'Domicile' : 'Extérieur',
+            if (r.venue.isNotEmpty) r.venue,
+            if (r.competition.isNotEmpty) r.competition,
+            r.format.label,
+          ].join(' · ')),
+          const SizedBox(height: 2),
+          Text(matchStatus(row.state), style: const TextStyle(color: TmColor.accent, fontWeight: FontWeight.w700, fontSize: 15)),
+        ],
+      ),
+      trailing: actions
+          ? PopupMenuButton<String>(
+              tooltip: 'Actions du match contre ${r.opponent}',
+              onSelected: (v) => switch (v) {
+                'edit' => onEdit?.call(),
+                'summary' => onSummary?.call(),
+                _ => onDelete?.call(),
+              },
+              itemBuilder: (_) => [
+                if (onSummary != null)
+                  const PopupMenuItem(value: 'summary', child: ListTile(leading: Icon(Icons.summarize_outlined), title: Text('Voir le résumé'))),
+                if (onEdit != null)
+                  const PopupMenuItem(value: 'edit', child: ListTile(leading: Icon(Icons.edit_outlined), title: Text('Modifier les informations'))),
+                if (onDelete != null)
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete_outline, color: TmColor.error),
+                      title: Text('Supprimer le match', style: TextStyle(color: TmColor.error)),
+                    ),
+                  ),
+              ],
+            )
+          : const Icon(Icons.chevron_right),
+      onTap: onTap,
+    );
   }
 }
+
+/// État du match en toutes lettres : à composer, en cours (sets, score), gagné ou perdu avec les sets.
+String matchStatus(MatchState? s) => switch (s) {
+      null => 'À jouer · toucher pour composer',
+      MatchState(phase: Phase.finished) =>
+        '${s.winner == Side.us ? 'Gagné' : 'Perdu'} ${s.setsWon} · ${s.setsDone.map((x) => '$x').join(', ')}',
+      _ => 'En cours · sets ${s.setsWon}${s.phase == Phase.inPlay ? ' · set ${s.setIndex + 1} à ${s.score}' : ''}'
+          ' · toucher pour reprendre',
+    };

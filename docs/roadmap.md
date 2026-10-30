@@ -68,7 +68,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-MAT-09 | Corriger à la main le score, le service ou la rotation (cas d'erreur d'arbitrage ou de saisie) | Indispensable | ⬜ |
 | V1-MAT-10 | Chronologie du set : liste des points avec qui et comment | Important | ⬜ |
 | V1-MAT-11 | Carton ou sanction à l'équipe adverse ou à la sienne | Confort | ⬜ |
-| V1-MAT-12 | Mettre un match en pause et le reprendre plus tard | Important | ✅ un match quitté se reprend depuis la liste des matchs |
+| V1-MAT-12 | Mettre un match en pause et le reprendre plus tard | Important | ✅ un match quitté se reprend depuis l'accueil ou la liste des matchs |
 
 ### Saisie des statistiques (STA)
 
@@ -122,7 +122,7 @@ Légende : ✅ fait dans le moteur `mobile/lib/domain` (testé) · 🟡 partiel 
 | V1-FIN-02 | Export du résumé en image et en PDF | Indispensable | ✅ |
 | V1-FIN-03 | Partage du résumé (feuille de partage du téléphone : WhatsApp, email) | Indispensable | ✅ |
 | V1-FIN-04 | Export des données brutes en CSV | Important | ✅ un événement par ligne |
-| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | 🟡 liste des matchs par équipe, modification à faire |
+| V1-FIN-05 | Historique des matchs de la saison, consultable et modifiable | Indispensable | 🟡 en cours / à venir / terminés, modifier les informations, résumé, supprimer ; pas encore de notion de saison |
 
 ### Technique et expérience (TEC)
 

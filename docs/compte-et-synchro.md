@@ -1,6 +1,6 @@
 # Compte coach et synchronisation (V1-EQU-01, V1-TEC-03)
 
-> **Statut : architecture validée par Yann le 2026-10-30** (voir « Décisions »). Rien n'est encore codé ; on teste d'abord en local.
+> **Statut : architecture validée par Yann le 2026-10-30** (voir « Décisions »). Étape 1 faite : l'API tourne en local (`web/app/src/Api`, tests dans `web/tests/api.php`). L'app ne l'utilise pas encore.
 
 ## Ce qu'on veut
 
@@ -67,6 +67,19 @@ Exception, les événements d'un match : deux appareils qui saisissent le même 
 
 Supprimer une joueuse ou une équipe dans l'app envoie une **pierre tombale** : l'identifiant et « supprimé ». Le serveur **efface vraiment le contenu** et ne garde que cette marque, pour que les autres appareils suppriment aussi. La suppression du compte efface tout côté serveur.
 
+Une suppression gagne toujours un conflit, **dans les deux sens** : une modification faite hors ligne sur un autre appareil ne fait pas revenir des données supprimées à la demande d'une famille. En cas de conflit perdu, le serveur renvoie toujours sa version, pour que l'appareil se remette à jour.
+
+### Synchros simultanées
+
+Les synchros d'un même coach passent l'une après l'autre (verrou sur sa ligne, transaction en `READ COMMITTED`). Sans cela, MariaDB laissait des appareils manquer définitivement des documents écrits au même moment par un autre appareil : c'est vérifié par `scripts/test-api-concurrence.py` (4 appareils, 160 synchros simultanées), qui échoue si on retire ce verrou.
+
+### Limites et quotas
+
+- Connexion : 10 essais par quart d'heure par adresse et réseau, 30 par réseau, 50 par adresse (un tiers ne bloque pas un coach depuis un seul endroit).
+- Mot de passe oublié : 3 codes par heure par adresse et réseau, 10 par adresse ; 5 essais par code, comptés avant la comparaison.
+- Création de compte : 5 par heure par réseau.
+- Sauvegarde : 20 000 documents et 50 Mo par coach (des années de matchs) ; au-delà, refus 507.
+
 ## Base de données (MariaDB)
 
 ```
@@ -86,7 +99,7 @@ POST /api/v1/auth/register    { email, password, deviceName } → { token }
 POST /api/v1/auth/login       { email, password, deviceName } → { token }
 POST /api/v1/auth/reset-code  { email }                         → envoie le code
 POST /api/v1/auth/reset       { email, code, newPassword }      → mot de passe changé
-POST /api/v1/sync             { lastRev, changes: [...] } → { rev, changes: [...] }
+POST /api/v1/sync             { lastRev, changes: [...] } → { rev, changes: [...], pushed: {id: rev}, conflicts: [id] }
 DELETE /api/v1/account                                    → efface tout
 POST /api/v1/auth/logout                                   → révoque ce jeton
 ```
@@ -100,11 +113,17 @@ Un seul appel `sync` pousse et tire à la fois : moins d'allers-retours sur un r
 3. Les e-mails (mot de passe oublié) se lisent dans Mailpit (http://localhost:8025).
 4. Le HTTP en clair n'est autorisé que dans la version de développement ; la version publiée n'accepte que HTTPS.
 
-Tests automatiques : côté PHP, `web/tests/run.php` (sans dépendance, comme aujourd'hui) ; côté app, un faux serveur en mémoire pour tester la synchro sans réseau.
+Tests automatiques : côté PHP, `web/tests/run.php` (sans dépendance, SQLite en mémoire, lancé par la CI) ; côté app, un faux serveur en mémoire pour tester la synchro sans réseau.
+
+Sur la vraie pile (Apache, MariaDB, Mailpit), avec `docker compose` démarré :
+- `python scripts/test-api-local.py` : inscription, synchro entre deux appareils, conflit, mot de passe oublié par Mailpit, déconnexion, suppression du compte ;
+- `python scripts/test-api-concurrence.py` : synchros simultanées, aucun document perdu.
+
+À relancer après toute modification de `web/app/src/Api` : SQLite ne reproduit ni les requêtes préparées natives ni les transactions de MariaDB.
 
 ## Découpage proposé (une PR chacun)
 
-1. **API locale** : migration, inscription, connexion, mot de passe oublié, `/sync`, Mailpit dans docker, tests PHP.
+1. ✅ **API locale** : migration, inscription, connexion, mot de passe oublié, `/sync`, Mailpit dans docker, tests PHP.
 2. **App, compte** : écran « Mon compte » (créer, se connecter, se déconnecter), jeton dans le stockage sécurisé, verrouillage par empreinte ou visage.
 3. **App, synchro** : révisions locales, pousser et tirer, déclencheurs, indicateur « synchronisé il y a 2 min ».
 4. **Suppressions et compte** : pierres tombales, suppression du compte.

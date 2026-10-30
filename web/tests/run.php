@@ -76,5 +76,7 @@ check('prix entier', price(9.0) === '9');
 check('prix décimal', price(7.2) === '7,20');
 check('échappement', e('<a href="x">') === '&lt;a href=&quot;x&quot;&gt;');
 
+require __DIR__ . '/api.php';
+
 echo "\n$passed réussi(s), $failed échec(s)\n";
 exit($failed ? 1 : 0);

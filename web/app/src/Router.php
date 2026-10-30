@@ -6,7 +6,7 @@ namespace TempsMort;
 final class Router
 {
     /** @var array<string,array<string,callable>> */
-    private array $routes = ['GET' => [], 'POST' => []];
+    private array $routes = ['GET' => [], 'POST' => [], 'DELETE' => []];
     /** @var callable|null */
     private $notFound = null;
 
@@ -14,6 +14,7 @@ final class Router
 
     public function get(string $path, callable $handler): void  { $this->routes['GET'][$path] = $handler; }
     public function post(string $path, callable $handler): void { $this->routes['POST'][$path] = $handler; }
+    public function delete(string $path, callable $handler): void { $this->routes['DELETE'][$path] = $handler; }
     public function notFound(callable $handler): void { $this->notFound = $handler; }
 
     /** @param array<string,mixed> $post */

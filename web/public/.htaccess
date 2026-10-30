@@ -2,6 +2,11 @@
 Options -Indexes
 DirectoryIndex index.php
 
+# API de l'app : Apache en CGI/FastCGI (o2switch) peut retirer l'en-tête Authorization ; on le transmet à PHP.
+<IfModule mod_setenvif.c>
+  SetEnvIf Authorization "(.+)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
 

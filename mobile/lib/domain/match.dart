@@ -148,6 +148,8 @@ class MatchState {
     this.liberoId,
     this.liberoReplacing,
     this.substitutionsUsed = 0,
+    this.starters = const [],
+    this.substitutions = const [],
     this.timeoutsUsed = const Score(),
     this.history = const [],
   });
@@ -166,6 +168,12 @@ class MatchState {
   /// Joueur remplacé par le libero (sur le banc tant que le libero est en jeu).
   final String? liberoReplacing;
   final int substitutionsUsed;
+
+  /// Composition de départ du set en cours : les titulaires, pour la règle du retour à la place d'origine.
+  final List<String> starters;
+
+  /// Remplacements du set en cours, dans l'ordre.
+  final List<Substitution> substitutions;
   final Score timeoutsUsed;
   final List<RallyRecord> history;
 
@@ -186,6 +194,17 @@ class MatchState {
 
   int timeoutsLeft(Side side) => rules.timeoutsPerSet - timeoutsUsed[side];
 
+  /// La joueuse liée à [id] par un remplacement de ce set : la remplaçante d'une titulaire,
+  /// ou la titulaire d'une remplaçante. Null si [id] n'a pas été remplacée et n'a remplacé personne.
+  String? partnerOf(String id) {
+    for (final s in substitutions) {
+      if (!starters.contains(s.outId)) continue;
+      if (s.outId == id) return s.inId;
+      if (s.inId == id) return s.outId;
+    }
+    return null;
+  }
+
   static const Object _keep = Object();
 
   MatchState copyWith({
@@ -198,6 +217,8 @@ class MatchState {
     Object? liberoId = _keep,
     Object? liberoReplacing = _keep,
     int? substitutionsUsed,
+    List<String>? starters,
+    List<Substitution>? substitutions,
     Score? timeoutsUsed,
     List<RallyRecord>? history,
   }) =>
@@ -212,6 +233,8 @@ class MatchState {
         liberoId: identical(liberoId, _keep) ? this.liberoId : liberoId as String?,
         liberoReplacing: identical(liberoReplacing, _keep) ? this.liberoReplacing : liberoReplacing as String?,
         substitutionsUsed: substitutionsUsed ?? this.substitutionsUsed,
+        starters: starters ?? this.starters,
+        substitutions: substitutions ?? this.substitutions,
         timeoutsUsed: timeoutsUsed ?? this.timeoutsUsed,
         history: history ?? this.history,
       );
@@ -316,6 +339,40 @@ final class LiberoCannotBeSubstituted extends Rejection {
   String get message => 'Le libero et la joueuse qu\'il remplace ne passent pas par un remplacement.';
 }
 
+final class StarterAlreadyLeft extends Rejection {
+  const StarterAlreadyLeft(this.playerId);
+  final String playerId;
+  @override
+  String get message => "Une titulaire ne sort qu'une fois par set.";
+}
+
+final class SubstituteAlreadyPlayed extends Rejection {
+  const SubstituteAlreadyPlayed(this.playerId);
+  final String playerId;
+  @override
+  String get message => "Une remplaçante n'entre qu'une fois par set.";
+}
+
+final class OnlyPartnerReturns extends Rejection {
+  const OnlyPartnerReturns(this.substituteId, this.starterId);
+  final String substituteId;
+
+  /// La titulaire qu'elle a remplacée : la seule qui peut reprendre sa place.
+  final String starterId;
+  @override
+  String get message => "Seule la titulaire qu'elle a remplacée peut reprendre sa place.";
+}
+
+final class ReturnToOwnPlace extends Rejection {
+  const ReturnToOwnPlace(this.starterId, this.substituteId);
+  final String starterId;
+
+  /// Sa remplaçante, à la place de laquelle elle peut revenir (null si inconnue).
+  final String? substituteId;
+  @override
+  String get message => "Une titulaire ne revient qu'à sa place d'origine, à la place de sa remplaçante.";
+}
+
 final class NotEnoughWomen extends Rejection {
   const NotEnoughWomen(this.required, this.actual);
   final int required;
@@ -394,6 +451,8 @@ class MatchEngine {
           liberoId: s.liberoId,
           liberoReplacing: null,
           substitutionsUsed: 0,
+          starters: s.lineup,
+          substitutions: const [],
           timeoutsUsed: const Score(),
         ),
       final Rally r => _applyRally(state, r),
@@ -401,6 +460,7 @@ class MatchEngine {
       final Substitution s => state.copyWith(
           lineup: List.unmodifiable(state.lineup.map((id) => id == s.outId ? s.inId : id)),
           substitutionsUsed: state.substitutionsUsed + 1,
+          substitutions: List.unmodifiable([...state.substitutions, s]),
         ),
       final LiberoIn l => state.copyWith(
           lineup: List.unmodifiable(state.lineup.map((id) => id == l.replacedId ? state.liberoId! : id)),
@@ -461,7 +521,30 @@ class MatchEngine {
     if (e.outId == state.liberoId || e.inId == state.liberoId || e.inId == state.liberoReplacing) {
       return const LiberoCannotBeSubstituted();
     }
+    if (rules.pairedSubstitutions) {
+      final paired = _checkPaired(state, e);
+      if (paired != null) return paired;
+    }
     return _womenCheck(state.lineup.map((id) => id == e.outId ? e.inId : id));
+  }
+
+  /// Règle du « couple » : voir [MatchRules.pairedSubstitutions].
+  Rejection? _checkPaired(MatchState state, Substitution e) {
+    final starters = state.starters;
+    bool hasLeft(String id) => state.substitutions.any((s) => s.outId == id);
+    bool hasEntered(String id) => state.substitutions.any((s) => s.inId == id);
+
+    if (starters.contains(e.outId)) {
+      if (hasLeft(e.outId)) return StarterAlreadyLeft(e.outId);
+      // Une titulaire sortie ne revient qu'à la place de sa remplaçante.
+      if (starters.contains(e.inId)) return ReturnToOwnPlace(e.inId, state.partnerOf(e.inId));
+      if (hasEntered(e.inId)) return SubstituteAlreadyPlayed(e.inId);
+      return null;
+    }
+    // Une remplaçante sur le terrain : seule sa titulaire peut reprendre sa place.
+    final partner = state.partnerOf(e.outId);
+    if (partner != null && e.inId != partner) return OnlyPartnerReturns(e.outId, partner);
+    return null;
   }
 
   Rejection? _checkLiberoIn(MatchState state, LiberoIn e) {

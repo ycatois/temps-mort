@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../domain/domain.dart';
 import '../theme/tokens.dart';
 import 'match_controller.dart';
+import 'substitution_panel.dart';
 
 /// Ouvre l'écran E04 pour composer le set [setNumber] à partir de [suggested] ; null si le coach renonce.
 typedef ComposeSet = Future<StartSet?> Function(
@@ -294,6 +295,15 @@ class _ActionPanel extends StatelessWidget {
   final MatchController c;
   final ComposeSet? compose;
 
+  /// Libellé du bouton E06, ou null quand il n'y a ni remplacement ni libero (2x2).
+  String? get _substitutionLabel {
+    final s = c.state;
+    final limit = s.rules.substitutionsPerSet;
+    final libero = s.liberoId != null ? ' · libero' : '';
+    if (limit == 0) return libero.isEmpty ? null : 'Libero';
+    return limit == null ? 'Remplacement$libero' : 'Remplacement ${s.substitutionsUsed}/$limit$libero';
+  }
+
   /// Ouvre E04 sur la composition du set précédent, puis démarre le set choisi.
   Future<void> _changeLineup(BuildContext context) async {
     final suggested = c.suggestedNextSet;
@@ -434,6 +444,15 @@ class _ActionPanel extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
+        if (_substitutionLabel != null) ...[
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
+            onPressed: playing ? () => showSubstitutionPanel(context, c) : null,
+            icon: const Icon(Icons.swap_horiz),
+            label: Text(_substitutionLabel!),
+          ),
+          const SizedBox(height: 8),
+        ],
         OutlinedButton(onPressed: c.canUndo ? c.undo : null, child: const Text('Annuler la dernière saisie')),
         if (c.lastRejection != null)
           Padding(

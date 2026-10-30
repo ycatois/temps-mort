@@ -22,6 +22,9 @@ class MatchSession {
   /// On n'annule pas le début du premier set : il vient de l'écran Composition, pas d'une saisie de match.
   bool get canUndo => _log.length > 1;
 
+  /// Raison pour laquelle [event] serait refusé maintenant, ou null : sert à griser les choix impossibles.
+  Rejection? check(MatchEvent event) => _engine.check(_state, event);
+
   /// Enregistre l'événement et renvoie null, ou renvoie la raison du refus sans rien changer.
   Rejection? record(MatchEvent event) {
     final rejection = _engine.check(_state, event);

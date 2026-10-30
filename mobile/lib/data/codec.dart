@@ -52,6 +52,7 @@ Json rulesToJson(MatchRules r) => {
       'substitutionsPerSet': r.substitutionsPerSet,
       'timeoutsPerSet': r.timeoutsPerSet,
       'liberoAllowed': r.liberoAllowed,
+      'pairedSubstitutions': r.pairedSubstitutions,
     };
 
 MatchRules rulesFromJson(Json j) => MatchRules(
@@ -62,6 +63,8 @@ MatchRules rulesFromJson(Json j) => MatchRules(
       substitutionsPerSet: j['substitutionsPerSet'] as int?,
       timeoutsPerSet: j['timeoutsPerSet']! as int,
       liberoAllowed: j['liberoAllowed']! as bool,
+      // Absente des matchs enregistrés avant E06 : désactivée, pour que leurs remplacements se rejouent.
+      pairedSubstitutions: j['pairedSubstitutions'] as bool? ?? false,
     );
 
 Json matchToJson(MatchRecord m) => {

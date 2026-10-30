@@ -343,4 +343,81 @@ void main() {
       expect(start.withFirstServer(Side.them).system, GameSystem.s51);
     });
   });
+
+  group('Retour à la place d\'origine (règle du couple)', () {
+    // Titulaires : manon, chloe, emma, ines, lucie, lea. Banc : zoe ; jade est libero.
+    MatchSession started() => session()..record(StartSet(Side.us, start, liberoId: 'jade'));
+
+    test('activée par défaut en 6x6 seulement', () {
+      expect(MatchRules.defaultFor(GameFormat.six).pairedSubstitutions, isTrue);
+      expect(MatchRules.defaultFor(GameFormat.four).pairedSubstitutions, isFalse);
+    });
+
+    test('la titulaire revient à sa place, à la place de sa remplaçante', () {
+      final s = started();
+      expect(s.record(const Substitution('emma', 'zoe')), isNull);
+      expect(s.state.lineup[2], 'zoe');
+      expect(s.state.partnerOf('zoe'), 'emma');
+      expect(s.record(const Substitution('zoe', 'emma')), isNull);
+      expect(s.state.lineup[2], 'emma', reason: 'même poste qu\'au départ');
+    });
+
+    test('une remplaçante ne peut être remplacée que par sa titulaire', () {
+      final s = started()..record(const Substitution('emma', 'zoe'));
+      expect(s.record(const Substitution('zoe', 'manon')), isA<AlreadyOnCourt>());
+      // Emma ne revient pas à la place de Lucie : sa place est celle de Zoé.
+      expect(s.record(const Substitution('lucie', 'emma')), const TypeMatcher<ReturnToOwnPlace>().having((r) => r.substituteId, 'remplaçante', 'zoe'));
+    });
+
+    test('une remplaçante ne laisse sa place à personne d\'autre que sa titulaire', () {
+      final team = six.copyWith(players: [
+        ...six.players,
+        const Player(id: 'nina', firstName: 'Nina', number: 4, gender: PlayerGender.f),
+      ]);
+      final s = MatchSession(team)
+        ..record(StartSet(Side.us, start, liberoId: 'jade'))
+        ..record(const Substitution('emma', 'zoe'));
+      expect(
+        s.record(const Substitution('zoe', 'nina')),
+        const TypeMatcher<OnlyPartnerReturns>().having((r) => r.starterId, 'titulaire', 'emma'),
+      );
+      expect(s.record(const Substitution('ines', 'nina')), isNull, reason: 'une autre titulaire peut sortir');
+    });
+
+    test('une titulaire ne sort qu\'une fois, une remplaçante n\'entre qu\'une fois', () {
+      final s = started()
+        ..record(const Substitution('emma', 'zoe'))
+        ..record(const Substitution('zoe', 'emma'));
+      expect(s.record(const Substitution('emma', 'zoe')), isA<StarterAlreadyLeft>());
+      expect(s.record(const Substitution('ines', 'zoe')), isA<SubstituteAlreadyPlayed>());
+    });
+
+    test('tout redevient possible au set suivant', () {
+      final s = started()
+        ..record(const Substitution('emma', 'zoe'))
+        ..record(const Substitution('zoe', 'emma'))
+        ..win(25);
+      s.record(s.nextSetStart()!);
+      expect(s.state.substitutions, isEmpty);
+      expect(s.record(const Substitution('emma', 'zoe')), isNull);
+    });
+
+    test('désactivée : remplacements libres dans la limite du compteur', () {
+      final s = session(MatchRules.defaultFor(GameFormat.six).copyWith(pairedSubstitutions: false))
+        ..record(StartSet(Side.us, start, liberoId: 'jade'))
+        ..record(const Substitution('emma', 'zoe'))
+        ..record(const Substitution('zoe', 'emma'));
+      expect(s.record(const Substitution('emma', 'zoe')), isNull);
+    });
+
+    test('un match enregistré sans le paramètre se rejoue sans la règle', () {
+      final s = MatchSession(six, rules: MatchRules.defaultFor(GameFormat.six).copyWith(pairedSubstitutions: false), events: [
+        StartSet(Side.us, start, liberoId: 'jade'),
+        const Substitution('emma', 'zoe'),
+        const Substitution('zoe', 'emma'),
+        const Substitution('emma', 'zoe'),
+      ]);
+      expect(s.state.lineup[2], 'zoe');
+    });
+  });
 }

@@ -108,6 +108,26 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 }
 
+/// Durée d'un temps mort (V1-TMO-02).
+const timeoutDuration = 30;
+
+/// E08 sur la rotation en cours ; avec [timeout], E09 : chrono et chiffres clés du set.
+void _openTactics(BuildContext context, MatchController c, {bool timeout = false}) {
+  final s = c.state;
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    builder: (_) => TacticsScreen(
+      team: c.team,
+      lineup: s.lineup,
+      liberoId: s.liberoId,
+      rotation: s.lineup.isEmpty ? null : s.rotation,
+      serving: s.lineup.isEmpty ? null : s.serving == Side.us,
+      score: '${s.score.us} – ${s.score.them}',
+      setStats: timeout ? computeStats(s.history, touches: s.touches, setIndex: s.setIndex) : null,
+      timeoutSeconds: timeout ? timeoutDuration : null,
+    ),
+  ));
+}
+
 class _ScoreBar extends StatelessWidget {
   const _ScoreBar({required this.c});
   final MatchController c;
@@ -135,8 +155,14 @@ class _ScoreBar extends StatelessWidget {
         style: const TextStyle(fontFamily: TmFont.display, fontWeight: FontWeight.w700, fontSize: 56, color: Colors.white, height: 1),
       ),
     );
+    // E09 : le temps mort est enregistré, puis le tableau tactique s'ouvre avec le chrono.
     final timeout = FilledButton(
-      onPressed: s.phase == Phase.inPlay && s.timeoutsLeft(Side.us) > 0 ? c.timeout : null,
+      onPressed: s.phase == Phase.inPlay && s.timeoutsLeft(Side.us) > 0
+          ? () {
+              c.timeout();
+              if (c.lastRejection == null) _openTactics(context, c, timeout: true);
+            }
+          : null,
       style: FilledButton.styleFrom(
         backgroundColor: TmColor.yellow,
         foregroundColor: TmColor.navy,
@@ -505,19 +531,7 @@ class _ActionPanel extends StatelessWidget {
         const SizedBox(height: 8),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(minimumSize: const Size(0, TmTouch.primaryTarget)),
-          onPressed: () {
-            final s = c.state;
-            Navigator.of(context).push(MaterialPageRoute<void>(
-              builder: (_) => TacticsScreen(
-                team: c.team,
-                lineup: s.lineup,
-                liberoId: s.liberoId,
-                rotation: s.lineup.isEmpty ? null : s.rotation,
-                serving: s.lineup.isEmpty ? null : s.serving == Side.us,
-                score: '${s.score.us} – ${s.score.them}',
-              ),
-            ));
-          },
+          onPressed: () => _openTactics(context, c),
           icon: const Icon(Icons.draw_outlined),
           label: const Text('Tableau tactique'),
         ),
